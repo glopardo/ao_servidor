@@ -1,0 +1,1141 @@
+Attribute VB_Name = "modNuevoTimer"
+'Argentum Online 0.11.20
+'Copyright (C) 2002 Márquez Pablo Ignacio
+'
+'This program is free software; you can redistribute it and/or modify
+'it under the terms of the GNU General Public License as published by
+'the Free Software Foundation; either version 2 of the License, or
+'any later version.
+'
+'This program is distributed in the hope that it will be useful,
+'but WITHOUT ANY WARRANTY; without even the implied warranty of
+'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'GNU General Public License for more details.
+'
+'You should have received a copy of the GNU General Public License
+'along with this program; if not, write to the Free Software
+'Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+'
+'Argentum Online is based on Baronsoft's VB6 Online RPG
+'You can contact the original creator of ORE at aaron@baronsoft.com
+'for more information about ORE please visit http://www.baronsoft.com/
+'
+'
+'You can contact me at:
+'morgolock@speedy.com.ar
+'www.geocities.com/gmorgolock
+'Calle 3 número 983 piso 7 dto A
+'La Plata - Pcia, Buenos Aires - Republica Argentina
+'Código Postal 1900
+'Pablo Ignacio Márquez
+
+
+
+Option Explicit
+
+Declare Function SetTimer Lib "user32" (ByVal hWnd As Long, ByVal nIDEvent As Long, ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
+Declare Function KillTimer Lib "user32" (ByVal hWnd As Long, ByVal nIDEvent As Long) As Long
+Private Declare Function MoveFile Lib "kernel32" Alias "MoveFileA" (ByVal lpExistingFileName As String, ByVal lpNewFileName As String) As Long
+
+Dim hGameTimer As Long
+Dim hNpcAtacaTimer As Long
+Dim hNpcAITimer As Long
+Dim hOcultoTimer As Long
+Dim hAuditoriaTimer As Long
+Dim hInvisibleTimer As Long
+Dim hParalizadoTimer As Long
+Dim hVenenoTimer As Long
+Dim hFrioTimer As Long
+Dim hMeditarTimer As Long
+Dim hCegueEstuTimer As Long
+Dim hTransformadoTimer As Long
+Dim hHySTimer As Long
+Dim hInvocacionTimer As Long
+Dim hSanarTimer As Long
+Dim hEnergiaTimer As Long
+Dim hPocionesTimer As Long
+Dim hAutoTimer As Long
+Dim hNpcAccionAtacaTimer As Long
+
+Sub AuditoriaTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+On Error GoTo errhand
+
+Dim k As Integer
+For k = 1 To LastUser
+    If UserList(k).ConnID <> -1 Then
+        DayStats.Segundos = DayStats.Segundos + 1
+    End If
+Next k
+
+Call PasarSegundo
+
+Static Andando As Boolean
+Static Contador As Long
+Dim Tmp As Boolean
+
+Contador = Contador + 1
+
+If Contador >= 10 Then
+    Contador = 0
+    Tmp = EstadisticasWeb.EstadisticasAndando()
+    
+    If Andando = False And Tmp = True Then
+        Call InicializaEstadisticas
+    End If
+    
+    Andando = Tmp
+End If
+
+Exit Sub
+
+errhand:
+Call LogError("Error en Timer Auditoria (sistema de desconexion de 10 segundos). Err: " & Err.Description & " - " & Err.Number)
+End Sub
+Public Sub AuditoriaTimer(Enabled As Boolean)
+    If Enabled Then
+        If hAuditoriaTimer <> 0 Then KillTimer 0, hAuditoriaTimer
+        hAuditoriaTimer = SetTimer(0, 0, 1000, AddressOf AuditoriaTimerProc)
+    Else
+        If hAuditoriaTimer = 0 Then Exit Sub
+        KillTimer 0, hAuditoriaTimer
+        hAuditoriaTimer = 0
+    End If
+End Sub
+
+Public Sub OcultoTimer(Enabled As Boolean)
+    If Enabled Then
+        If hOcultoTimer <> 0 Then KillTimer 0, hOcultoTimer
+        hOcultoTimer = SetTimer(0, 0, 3000, AddressOf OcultoTimerProc)
+    Else
+        If hOcultoTimer = 0 Then Exit Sub
+        KillTimer 0, hOcultoTimer
+        hOcultoTimer = 0
+    End If
+End Sub
+Sub OcultoTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+
+For i = 1 To LastUser
+        If UserList(i).flags.Oculto = 1 Then Call DoPermanecerOculto(i)
+Next i
+
+End Sub
+Public Sub MeditarTimer(Enabled As Boolean)
+    If Enabled Then
+        If hMeditarTimer <> 0 Then KillTimer 0, hMeditarTimer
+        hMeditarTimer = SetTimer(0, 0, 800, AddressOf MeditarTimerProc)
+    Else
+        If hMeditarTimer = 0 Then Exit Sub
+        KillTimer 0, hMeditarTimer
+        hMeditarTimer = 0
+    End If
+End Sub
+Sub MeditarTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+
+For i = 1 To LastUser
+        If UserList(i).flags.Meditando = True Then
+        UserList(i).Counters.IdleCount = 0
+        
+Dim Cant As Integer
+
+If UserList(i).Stats.MinMAN >= UserList(i).Stats.MaxMAN Then
+    Call SendData(ToIndex, i, 0, "D9")
+    Call SendData(ToIndex, i, 0, "MEDOK")
+    UserList(i).flags.Meditando = False
+    UserList(i).Char.FX = 0
+    UserList(i).Char.loops = 0
+    Call SendData(ToPCArea, i, UserList(i).Pos.Map, "CFX" & UserList(i).Char.CharIndex & "," & 0 & "," & 0)
+
+Else
+    Cant = (Porcentaje(UserList(i).Stats.MaxMAN, 3) + (UserList(i).Stats.UserSkills(Meditar) / 5))
+    Call AddtoVar(UserList(i).Stats.MinMAN, Cant, UserList(i).Stats.MaxMAN)
+    Call SendData(ToIndex, i, 0, "MN" & Cant)
+    Call SendUserMANA(i)
+    Call SubirSkill(i, Meditar)
+End If
+
+End If
+Next i
+
+End Sub
+Public Sub NpcAccionAtacaTimer(Enabled As Boolean)
+    If Enabled Then
+        If hNpcAccionAtacaTimer <> 0 Then KillTimer 0, hNpcAccionAtacaTimer
+        hNpcAccionAtacaTimer = SetTimer(0, 0, 700, AddressOf NpcAccionAtacaTimerProc)
+    Else
+        If hNpcAccionAtacaTimer = 0 Then Exit Sub
+        KillTimer 0, hNpcAccionAtacaTimer
+        hNpcAccionAtacaTimer = 0
+    End If
+End Sub
+
+Sub NpcAccionAtacaTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim Npc As Integer
+
+If Not haciendoBK Then
+    'Update NPCs
+    For Npc = 1 To LastNPC
+        '<<<<<<<<<<< Ataques >>>>>>>>>>>>>>>>
+        If Npclist(Npc).MaestroUser = 0 And Npclist(Npc).flags.Paralizado = 0 Then
+            'Busca a alguien para atacar
+            '¿Es un guardia?
+            If Npclist(Npc).NPCtype = NPCTYPE_GUARDIAS Then
+                    Call GuardiasAI(Npc)
+            ElseIf Npclist(Npc).Hostile And Npclist(Npc).Stats.Alineacion <> 0 Then
+                    Call HostilMalvadoAI(Npc)
+            ElseIf Npclist(Npc).Hostile And Npclist(Npc).Stats.Alineacion = 0 Then
+                    Call HostilBuenoAI(Npc)
+            End If
+        Else
+            'Evitamos que ataque a su amo, a menos
+            'que el amo lo ataque.
+            'Call HostilBuenoAI(NpcIndex)
+        End If
+        Next Npc
+End If
+
+End Sub
+
+
+Public Sub NpcAITimer(Enabled As Boolean)
+    If Enabled Then
+        If hNpcAITimer <> 0 Then KillTimer 0, hNpcAITimer
+        hNpcAITimer = SetTimer(0, 0, 420, AddressOf NpcAITimerProc)
+    Else
+        If hNpcAITimer = 0 Then Exit Sub
+        KillTimer 0, hNpcAITimer
+        hNpcAITimer = 0
+    End If
+End Sub
+Sub NpcAITimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+On Error GoTo ErrorHandler
+
+Dim NpcIndex As Integer
+Dim X As Integer
+Dim Y As Integer
+Dim UseAI As Integer
+Dim mapa As Integer
+
+If Not haciendoBK Then
+    'Update NPCs
+    For NpcIndex = 1 To LastNPC
+        
+        If Npclist(NpcIndex).flags.NPCActive Then 'Nos aseguramos que sea INTELIGENTE!
+           If Not Npclist(NpcIndex).flags.Paralizado = 1 Then
+            'Usamos AI si hay algun user en el mapa
+                mapa = Npclist(NpcIndex).Pos.Map
+                If mapa > 0 Then
+                     If MapInfo(mapa).NumUsers > 0 Then
+                             If Npclist(NpcIndex).Movement <> ESTATICO Then
+                                   Call NPCAI(NpcIndex)
+                             End If
+                     End If
+                End If
+                
+           End If
+                   
+        End If
+    
+    Next NpcIndex
+
+End If
+
+
+Exit Sub
+
+ErrorHandler:
+ Call LogError("Error en TIMER_AI_Timer " & Npclist(NpcIndex).Name & " mapa:" & Npclist(NpcIndex).Pos.Map)
+ Call MuereNpc(NpcIndex, 0)
+
+End Sub
+
+Public Sub NpcAtacaTimer(Enabled As Boolean)
+    If Enabled Then
+        If hNpcAtacaTimer <> 0 Then KillTimer 0, hNpcAtacaTimer
+        hNpcAtacaTimer = SetTimer(0, 0, 2000, AddressOf NpcAtacaTimerProc)
+    Else
+        If hNpcAtacaTimer = 0 Then Exit Sub
+        KillTimer 0, hNpcAtacaTimer
+        hNpcAtacaTimer = 0
+    End If
+End Sub
+Public Sub InvisibleTimer(Enabled As Boolean)
+    If Enabled Then
+        If hInvisibleTimer <> 0 Then KillTimer 0, hInvisibleTimer
+        hInvisibleTimer = SetTimer(0, 0, 2500, AddressOf InvisibleTimerProc)
+    Else
+        If hInvisibleTimer = 0 Then Exit Sub
+        KillTimer 0, hInvisibleTimer
+        hInvisibleTimer = 0
+    End If
+End Sub
+Sub InvisibleTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+If UserList(i).flags.Invisible = 1 And UserList(i).flags.AdminInvisible <> 1 And UserList(i).flags.Oculto = 0 Then
+If TActual - UserList(i).Counters.Invisibilidad >= 40 * IntervaloInvisible Then
+UserList(i).flags.Invisible = 0
+UserList(i).Counters.Invisibilidad = 0
+  UserList(i).flags.Invisible = 0
+  UserList(i).flags.Oculto = 0
+  Call SendData(ToMap, 0, UserList(i).Pos.Map, Codificar("V4" & UserList(i).Char.CharIndex & ",0"))
+  Call SendData(ToIndex, i, 0, "V6")
+End If
+
+End If
+Next i
+
+    
+End Sub
+
+Public Sub VenenoTimer(Enabled As Boolean)
+    If Enabled Then
+        If hVenenoTimer <> 0 Then KillTimer 0, hVenenoTimer
+        hVenenoTimer = SetTimer(0, 0, 20000, AddressOf VenenoTimerProc)
+    Else
+        If hVenenoTimer = 0 Then Exit Sub
+        KillTimer 0, hVenenoTimer
+        hVenenoTimer = 0
+    End If
+End Sub
+Sub VenenoTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim N As Integer
+Dim i As Integer
+
+For i = 1 To LastUser
+If UserList(i).flags.Envenenado = 1 And UserList(i).flags.Privilegios = 0 Then
+  Call SendData(ToIndex, i, 0, "1M")
+  UserList(i).Counters.Veneno = 0
+  N = RandomNumber(1, 5)
+  UserList(i).Stats.MinHP = UserList(i).Stats.MinHP - N
+  If UserList(i).Stats.MinHP < 1 Then Call UserDie(i)
+  Call SendUserHPSTA(i)
+End If
+Next i
+    
+End Sub
+Public Sub FrioTimer(Enabled As Boolean)
+    If Enabled Then
+        If hFrioTimer <> 0 Then KillTimer 0, hFrioTimer
+        hFrioTimer = SetTimer(0, 0, 3000, AddressOf FrioTimerProc)
+    Else
+        If hFrioTimer = 0 Then Exit Sub
+        KillTimer 0, hFrioTimer
+        hFrioTimer = 0
+    End If
+End Sub
+Sub FrioTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+Dim modifi As Integer
+
+If UserList(i).flags.Muerto = 0 Then
+If UserList(i).flags.Desnudo Then
+
+  If MapInfo(UserList(i).Pos.Map).Terreno = Nieve Then
+    Call SendData(ToIndex, i, 0, "1K")
+    modifi = Porcentaje(UserList(i).Stats.MaxHP, 10)
+    UserList(i).Stats.MinHP = UserList(i).Stats.MinHP - modifi
+    If UserList(i).Stats.MinHP < 1 Then
+            Call SendData(ToIndex, i, 0, "1L")
+            UserList(i).Stats.MinHP = 0
+            Call UserDie(i)
+    End If
+  Else
+    modifi = Porcentaje(UserList(i).Stats.MaxSta, 10)
+    Call QuitarSta(i, modifi)
+    Call SendData(ToIndex, i, 0, "FR")
+  End If
+  
+  UserList(i).Counters.Frio = 0
+  Call SendUserHPSTA(i)
+End If
+End If
+Next i
+    
+End Sub
+
+
+
+Public Sub ParalizadoTimer(Enabled As Boolean)
+    If Enabled Then
+        If hParalizadoTimer <> 0 Then KillTimer 0, hParalizadoTimer
+        hParalizadoTimer = SetTimer(0, 0, 2500, AddressOf ParalizadoTimerProc)
+    Else
+        If hParalizadoTimer = 0 Then Exit Sub
+        KillTimer 0, hParalizadoTimer
+        hParalizadoTimer = 0
+    End If
+End Sub
+Public Sub TransformadoTimer(Enabled As Boolean)
+    If Enabled Then
+        If hTransformadoTimer <> 0 Then KillTimer 0, hTransformadoTimer
+        hTransformadoTimer = SetTimer(0, 0, 4000, AddressOf TransformadoTimerProc)
+    Else
+        If hTransformadoTimer = 0 Then Exit Sub
+        KillTimer 0, hTransformadoTimer
+        hTransformadoTimer = 0
+    End If
+End Sub
+Sub ParalizadoTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+If UserList(i).flags.Paralizado = 1 Then
+If TActual - UserList(i).Counters.Paralisis >= 40 * IntervaloParalizadoUsuario Then
+Call SendData(ToIndex, i, 0, "P8")
+UserList(i).flags.Paralizado = 0
+End If
+
+End If
+Next i
+    
+End Sub
+Sub TransformadoTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+If UserList(i).flags.Transformado = 1 Then
+If TActual - UserList(i).Counters.Transformado >= 40 * IntervaloInvisible Then
+    Call SendData(ToIndex, i, 0, "!5")
+    Call DoTransformar(i)
+End If
+
+End If
+Next i
+    
+End Sub
+
+Public Sub CegueEstuTimer(Enabled As Boolean)
+    If Enabled Then
+        If hCegueEstuTimer <> 0 Then KillTimer 0, hCegueEstuTimer
+        hCegueEstuTimer = SetTimer(0, 0, 3000, AddressOf CegueEstuTimerProc)
+    Else
+        If hCegueEstuTimer = 0 Then Exit Sub
+        KillTimer 0, hCegueEstuTimer
+        hCegueEstuTimer = 0
+    End If
+End Sub
+Sub CegueEstuTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+
+If UserList(i).flags.Ceguera = 1 Or UserList(i).flags.Estupidez = 1 Then
+
+If TActual - UserList(i).Counters.Ceguera >= 40 * IntervaloParalizadoUsuario Then
+    If UserList(i).flags.Ceguera = 1 Then
+        UserList(i).flags.Ceguera = 0
+        Call SendData(ToIndex, i, 0, "NSEGUE")
+    Else
+        UserList(i).flags.Estupidez = 0
+        Call SendData(ToIndex, i, 0, "NESTUP")
+    End If
+    
+End If
+
+End If
+Next i
+    
+End Sub
+
+Sub NpcAtacaTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim Npc As Integer
+
+For Npc = 1 To LastNPC
+    Npclist(Npc).CanAttack = 1
+    If Npclist(Npc).flags.Paralizado = 1 Then
+    Call EfectoParalisisNpc(Npc)
+    End If
+Next Npc
+
+
+End Sub
+
+Public Sub GameTimer(Enabled As Boolean)
+    If Enabled Then
+        If hGameTimer <> 0 Then KillTimer 0, hGameTimer
+        hGameTimer = SetTimer(0, 0, 1000, AddressOf GameTimerProc)
+    Else
+        If hGameTimer = 0 Then Exit Sub
+        KillTimer 0, hGameTimer
+        hGameTimer = 0
+    End If
+End Sub
+Sub GameTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim iUserIndex As Integer
+Dim iNpcIndex As Integer
+
+ '<<<<<< Procesa eventos de los usuarios >>>>>>
+ For iUserIndex = 1 To MaxUsers
+   'Conexion activa?
+   If UserList(iUserIndex).ConnID <> -1 Then
+      '¿User valido?
+      If UserList(iUserIndex).flags.UserLogged Then
+         
+         '[Alejo-18-5]
+
+         
+         UserList(iUserIndex).NumeroPaquetesPorMiliSec = 0
+
+         'Call DoTileEvents(iUserIndex, UserList(iUserIndex).Pos.Map, UserList(iUserIndex).Pos.X, UserList(iUserIndex).Pos.Y)
+         
+                
+         'If UserList(iUserIndex).flags.Paralizado = 1 Then Call EfectoParalisisUser(iUserIndex)
+         'If UserList(iUserIndex).flags.Transformado = 1 Then Call EfectoTransformado(iUserIndex)
+        ' If UserList(iUserIndex).flags.Ceguera = 1 Or _
+            UserList(iUserIndex).flags.Estupidez Then Call EfectoCegueEstu(iUserIndex)
+          
+
+               
+               '[Consejeros]
+               'If UserList(iUserIndex).flags.Desnudo And UserList(iUserIndex).flags.Privilegios = 0 Then Call EfectoFrio(iUserIndex)
+               'If UserList(iUserIndex).flags.Meditando Then Call DoMeditar(iUserIndex)
+               'if UserList(iUserIndex).flags.Envenenado = 1 And UserList(iUserIndex).flags.Privilegios = 0 Then Call EfectoVeneno(iUserIndex, bEnviarStats)
+               'If UserList(iUserIndex).flags.AdminInvisible <> 1 And UserList(iUserIndex).flags.Invisible = 1 Then Call EfectoInvisibilidad(iUserIndex)
+               
+               'Call DuracionPociones(iUserIndex)
+               'Call HambreYSed(iUserIndex, bEnviarAyS)
+
+
+               'If UserList(iUserIndex).NroMacotas > 0 Then Call TiempoInvocacion(iUserIndex)
+
+     Else 'no esta logeado?
+     'UserList(iUserIndex).Counters.IdleCount = 0
+     '[Gonzalo]: deshabilitado para el nuevo sistema de tiraje
+     'de dados :)
+        UserList(iUserIndex).Counters.IdleCount = UserList(iUserIndex).Counters.IdleCount + 1
+        If UserList(iUserIndex).Counters.IdleCount > IntervaloParaConexion Then
+              UserList(iUserIndex).Counters.IdleCount = 0
+              Call CloseSocket(iUserIndex)
+        End If
+     End If 'UserLogged
+        
+   End If
+
+   Next iUserIndex
+
+End Sub
+
+
+' Las siguientes funciones devuelven TRUE o FALSE si el intervalo
+' permite hacerlo. Si devuelve TRUE, setean automaticamente el
+' timer para que no se pueda hacer la accion hasta el nuevo ciclo.
+'
+
+' CASTING DE HECHIZOS
+Public Function IntervaloPermiteLanzarSpell(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerLanzarSpell >= 40 * IntervaloUserPuedeCastear Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerLanzarSpell = TActual
+    IntervaloPermiteLanzarSpell = True
+Else
+    IntervaloPermiteLanzarSpell = False
+End If
+
+End Function
+
+Public Function IntervaloPermiteGolpeHechi(ByVal UserIndex As Integer) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerPuedeGolpeHechi >= 40 * IntervaloUserPuedeGolpeHechi Then
+    IntervaloPermiteGolpeHechi = True
+Else
+    IntervaloPermiteGolpeHechi = False
+End If
+End Function
+Public Function IntervaloPermiteHechiGolpe(ByVal UserIndex As Integer) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerPuedeHechiGolpe >= 40 * IntervaloUserPuedeHechiGolpe Then
+    IntervaloPermiteHechiGolpe = True
+Else
+    IntervaloPermiteHechiGolpe = False
+End If
+End Function
+Public Function IntervaloPermiteAtacar(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerPuedeAtacar >= 40 * IntervaloUserPuedeAtacar Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerPuedeAtacar = TActual
+    IntervaloPermiteAtacar = True
+Else
+    IntervaloPermiteAtacar = False
+End If
+End Function
+
+
+
+' ATAQUE CUERPO A CUERPO
+'Public Function IntervaloPermiteAtacar(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+'Dim TActual As Long
+'
+'TActual = GetTickCount() And &H7FFFFFFF''
+'
+'If TActual - UserList(UserIndex).Counters.TimerPuedeAtacar >= 40 * IntervaloUserPuedeAtacar Then
+'    If Actualizar Then UserList(UserIndex).Counters.TimerPuedeAtacar = TActual
+'    IntervaloPermiteAtacar = True
+'Else
+'    IntervaloPermiteAtacar = False
+'End If
+'End Function
+
+' TRABAJO
+Public Function IntervaloPermiteTrabajar(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerPuedeTrabajar >= 40 * IntervaloUserPuedeTrabajar Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerPuedeTrabajar = TActual
+    IntervaloPermiteTrabajar = True
+Else
+    IntervaloPermiteTrabajar = False
+End If
+End Function
+
+' USAR OBJETOS
+Public Function IntervaloPermiteUsar(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerUsar >= IntervaloUserPuedeUsar Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerUsar = TActual
+    IntervaloPermiteUsar = True
+Else
+    IntervaloPermiteUsar = False
+End If
+
+End Function
+Public Function IntervaloPermiteUsarClick(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerUsar >= IntervaloUserPuedeUsar Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerUsarClick = TActual
+    IntervaloPermiteUsarClick = True
+Else
+    IntervaloPermiteUsarClick = False
+End If
+
+End Function
+
+Public Function IntervaloPermiteUsarArcos(ByVal UserIndex As Integer, Optional ByVal Actualizar As Boolean = True) As Boolean
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+
+If TActual - UserList(UserIndex).Counters.TimerUsar >= IntervaloFlechasCazadores Then
+    If Actualizar Then UserList(UserIndex).Counters.TimerUsar = TActual
+    IntervaloPermiteUsarArcos = True
+Else
+    IntervaloPermiteUsarArcos = False
+End If
+
+End Function
+
+
+
+
+Public Sub PocionesTimer(Enabled As Boolean)
+    If Enabled Then
+        If hPocionesTimer <> 0 Then KillTimer 0, hPocionesTimer
+        hPocionesTimer = SetTimer(0, 0, 3500, AddressOf PocionesTimerProc)
+    Else
+        If hPocionesTimer = 0 Then Exit Sub
+        KillTimer 0, hPocionesTimer
+        hPocionesTimer = 0
+    End If
+End Sub
+Sub PocionesTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim TActual As Long
+
+TActual = GetTickCount() And &H7FFFFFFF
+Dim i As Integer
+
+For i = 1 To LastUser
+
+'Controla la duracion de las pociones
+If UserList(i).flags.DuracionEfecto > 0 Then
+   If TActual - UserList(i).flags.DuracionEfecto >= 48000 Then
+        UserList(i).flags.DuracionEfecto = 0
+        UserList(i).flags.TomoPocion = False
+        UserList(i).flags.TipoPocion = 0
+        'volvemos los atributos al estado normal
+        UserList(i).Stats.UserAtributos(Agilidad) = UserList(i).Stats.UserAtributosBackUP(Agilidad)
+        UserList(i).Stats.UserAtributos(fuerza) = UserList(i).Stats.UserAtributosBackUP(fuerza)
+   End If
+End If
+Next i
+
+
+    
+End Sub
+
+Public Sub HySTimer(Enabled As Boolean)
+    If Enabled Then
+        If hHySTimer <> 0 Then KillTimer 0, hHySTimer
+        hHySTimer = SetTimer(0, 0, 200000, AddressOf HySTimerProc)
+    Else
+        If hHySTimer = 0 Then Exit Sub
+        KillTimer 0, hHySTimer
+        hHySTimer = 0
+    End If
+End Sub
+Sub HySTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+
+For i = 1 To LastUser
+
+If UserList(i).flags.Muerto = 0 Then
+If UserList(i).Stats.MinAGU > 0 Then
+          UserList(i).Stats.MinAGU = UserList(i).Stats.MinAGU - 10
+                            
+          If UserList(i).Stats.MinAGU <= 0 Then
+               UserList(i).Stats.MinAGU = 0
+               UserList(i).flags.Sed = 1
+          End If
+                            
+          EnviarHyS (i)
+                            
+    End If
+
+
+'hambre
+
+If UserList(i).Stats.MinHam > 0 Then
+        UserList(i).Stats.MinHam = UserList(i).Stats.MinHam - 10
+        If UserList(i).Stats.MinHam < 0 Then
+               UserList(i).Stats.MinHam = 0
+               UserList(i).flags.Hambre = 1
+        End If
+        EnviarHyS (i)
+    End If
+End If
+Next i
+
+
+    
+End Sub
+
+Public Sub InvocacionTimer(Enabled As Boolean)
+    If Enabled Then
+        If hInvocacionTimer <> 0 Then KillTimer 0, hInvocacionTimer
+        hInvocacionTimer = SetTimer(0, 0, 3000, AddressOf InvocacionTimerProc)
+    Else
+        If hInvocacionTimer = 0 Then Exit Sub
+        KillTimer 0, hInvocacionTimer
+        hInvocacionTimer = 0
+    End If
+End Sub
+Sub InvocacionTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+Dim UserIndex As Integer
+
+For UserIndex = 1 To LastUser
+
+For i = 1 To MAXMASCOTAS
+    If UserList(UserIndex).MascotasIndex(i) > 0 Then
+        Npclist(UserList(UserIndex).MascotasIndex(i)).Contadores.TiempoExistencia = Npclist(UserList(UserIndex).MascotasIndex(i)).Contadores.TiempoExistencia - 3
+        If Npclist(UserList(UserIndex).MascotasIndex(i)).Contadores.TiempoExistencia <= 0 Then
+        Call MuereNpc(UserList(UserIndex).MascotasIndex(i), 0)
+        End If
+    End If
+Next i
+
+Next UserIndex
+    
+End Sub
+
+Public Sub EnergiaTimer(Enabled As Boolean)
+    If Enabled Then
+        If hEnergiaTimer <> 0 Then KillTimer 0, hEnergiaTimer
+        hEnergiaTimer = SetTimer(0, 0, 2200, AddressOf EnergiaTimerProc)
+    Else
+        If hEnergiaTimer = 0 Then Exit Sub
+        KillTimer 0, hEnergiaTimer
+        hEnergiaTimer = 0
+    End If
+End Sub
+Public Sub AutoTimer(Enabled As Boolean)
+    If Enabled Then
+        If hAutoTimer <> 0 Then KillTimer 0, hAutoTimer
+        hAutoTimer = SetTimer(0, 0, 60000, AddressOf AutoTimerProc)
+    Else
+        If hAutoTimer = 0 Then Exit Sub
+        KillTimer 0, hAutoTimer
+        hAutoTimer = 0
+    End If
+End Sub
+Sub EnergiaTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+Dim massta As Integer
+
+For i = 1 To LastUser
+
+            If UserList(i).flags.Muerto = 0 Then
+  
+               If Lloviendo Then
+                    If Not Intemperie(i) Then
+                                 If Not UserList(i).flags.Descansar And (UserList(i).flags.Hambre = 0 And UserList(i).flags.Sed = 0) Then
+                                 'No esta descansando
+                                    If UserList(i).Stats.MinSta < UserList(i).Stats.MaxSta Then
+                                    massta = CInt(RandomNumber(4, Porcentaje(UserList(i).Stats.MaxSta, 20)))
+                                    UserList(i).Stats.MinSta = UserList(i).Stats.MinSta + massta
+                                        If UserList(i).Stats.MinSta > UserList(i).Stats.MaxSta Then UserList(i).Stats.MinSta = UserList(i).Stats.MaxSta
+                                        Call SendData(ToIndex, i, 0, "MV")
+                                        Call SendUserSTA(i)
+                                        
+                                    End If
+
+
+
+
+                                 ElseIf UserList(i).flags.Descansar Then
+                                 'esta descansando
+
+                                    If UserList(i).Stats.MinSta < UserList(i).Stats.MaxSta Then
+                                    massta = CInt(RandomNumber(8, Porcentaje(UserList(i).Stats.MaxSta, 40)))
+                                    UserList(i).Stats.MinSta = UserList(i).Stats.MinSta + massta
+                                        If UserList(i).Stats.MinSta > UserList(i).Stats.MaxSta Then UserList(i).Stats.MinSta = UserList(i).Stats.MaxSta
+                                        Call SendData(ToIndex, i, 0, "MV")
+                                        Call SendUserSTA(i)
+                                        
+                                    End If
+                                          'termina de descansar automaticamente
+                                          If UserList(i).Stats.MaxHP = UserList(i).Stats.MinHP And _
+                                             UserList(i).Stats.MaxSta = UserList(i).Stats.MinSta Then
+                                                    Call SendData(ToIndex, i, 0, "DOK")
+                                                    Call SendData(ToIndex, i, 0, "DN")
+                                                    UserList(i).flags.Descansar = False
+                                          End If
+                                 End If 'Not UserList(i).Flags.Descansar And (UserList(i).Flags.Hambre = 0 And UserList(i).Flags.Sed = 0)
+                    End If
+               Else
+                    If Not UserList(i).flags.Descansar And Not UserList(i).flags.Desnudo = 1 And (UserList(i).flags.Hambre = 0 And UserList(i).flags.Sed = 0) Then
+                    'No esta descansando
+
+If UserList(i).Stats.MinSta < UserList(i).Stats.MaxSta Then
+       massta = CInt(RandomNumber(4, Porcentaje(UserList(i).Stats.MaxSta, 20)))
+       UserList(i).Stats.MinSta = UserList(i).Stats.MinSta + massta
+       If UserList(i).Stats.MinSta > UserList(i).Stats.MaxSta Then UserList(i).Stats.MinSta = UserList(i).Stats.MaxSta
+           Call SendData(ToIndex, i, 0, "MV")
+           Call SendUserSTA(i)
+       
+End If
+ElseIf UserList(i).flags.Descansar Then
+                    'esta descansando
+  
+If UserList(i).Stats.MinSta < UserList(i).Stats.MaxSta Then
+       massta = CInt(RandomNumber(8, Porcentaje(UserList(i).Stats.MaxSta, 40)))
+       UserList(i).Stats.MinSta = UserList(i).Stats.MinSta + massta
+       If UserList(i).Stats.MinSta > UserList(i).Stats.MaxSta Then UserList(i).Stats.MinSta = UserList(i).Stats.MaxSta
+           Call SendData(ToIndex, i, 0, "MV")
+           Call SendUserSTA(i)
+      
+End If
+'termina de descansar automaticamente
+                             If UserList(i).Stats.MaxHP = UserList(i).Stats.MinHP And _
+                                UserList(i).Stats.MaxSta = UserList(i).Stats.MinSta Then
+                                     Call SendData(ToIndex, i, 0, "DOK")
+                                     Call SendData(ToIndex, i, 0, "DN")
+                                     UserList(i).flags.Descansar = False
+                             End If
+                    End If 'Not UserList(i).Flags.Descansar And (UserList(i).Flags.Hambre = 0 And UserList(i).Flags.Sed = 0)
+               End If
+
+            End If
+
+Next i
+    
+End Sub
+
+Public Sub SanarTimer(Enabled As Boolean)
+    If Enabled Then
+        If hSanarTimer <> 0 Then KillTimer 0, hSanarTimer
+        hSanarTimer = SetTimer(0, 0, 32000, AddressOf SanarTimerProc)
+    Else
+        If hSanarTimer = 0 Then Exit Sub
+        KillTimer 0, hSanarTimer
+        hSanarTimer = 0
+    End If
+End Sub
+Sub SanarTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Dim i As Integer
+Dim mashit As Integer
+
+For i = 1 To LastUser
+
+            If UserList(i).flags.Muerto = 0 Then
+
+               If Lloviendo Then
+                    If Not Intemperie(i) Then
+                                 If Not UserList(i).flags.Descansar And (UserList(i).flags.Hambre = 0 And UserList(i).flags.Sed = 0) Then
+                                 'No esta descansando
+
+'con el paso del tiempo va sanando....pero muy lentamente ;-)
+If UserList(i).Stats.MinHP < UserList(i).Stats.MaxHP Then
+      mashit = CInt(RandomNumber(1, Porcentaje(UserList(i).Stats.MaxHP, 3)))
+
+      UserList(i).Stats.MinHP = UserList(i).Stats.MinHP + mashit
+      If UserList(i).Stats.MinHP > UserList(i).Stats.MaxHP Then UserList(i).Stats.MinHP = UserList(i).Stats.MaxHP
+         Call SendData(ToIndex, i, 0, "1N")
+         Call SendUserHP(i)
+      
+End If
+ElseIf UserList(i).flags.Descansar Then
+                                 'esta descansando
+
+'con el paso del tiempo va sanando....pero muy lentamente ;-)
+If UserList(i).Stats.MinHP < UserList(i).Stats.MaxHP Then
+      mashit = CInt(RandomNumber(10, Porcentaje(UserList(i).Stats.MaxHP, 20)))
+
+      UserList(i).Stats.MinHP = UserList(i).Stats.MinHP + mashit
+      If UserList(i).Stats.MinHP > UserList(i).Stats.MaxHP Then UserList(i).Stats.MinHP = UserList(i).Stats.MaxHP
+         Call SendData(ToIndex, i, 0, "1N")
+         Call SendUserHP(i)
+      
+End If
+'termina de descansar automaticamente
+                            If UserList(i).Stats.MaxHP = UserList(i).Stats.MinHP And _
+                                UserList(i).Stats.MaxSta = UserList(i).Stats.MinSta Then
+                                Call SendData(ToIndex, i, 0, "DOK")
+                                Call SendData(ToIndex, i, 0, "DN")
+                                UserList(i).flags.Descansar = False
+                            End If
+                                 End If 'Not UserList(i).Flags.Descansar And (UserList(i).Flags.Hambre = 0 And UserList(i).Flags.Sed = 0)
+                    End If
+               Else
+                    If Not UserList(i).flags.Descansar And Not UserList(i).flags.Desnudo = 1 And (UserList(i).flags.Hambre = 0 And UserList(i).flags.Sed = 0) Then
+                    'No esta descansando
+                        If UserList(i).Stats.MinHP < UserList(i).Stats.MaxHP Then
+                        mashit = CInt(RandomNumber(1, Porcentaje(UserList(i).Stats.MaxHP, 3)))
+                        UserList(i).Stats.MinHP = UserList(i).Stats.MinHP + mashit
+                            If UserList(i).Stats.MinHP > UserList(i).Stats.MaxHP Then UserList(i).Stats.MinHP = UserList(i).Stats.MaxHP
+                            Call SendData(ToIndex, i, 0, "1N")
+                            Call SendUserHP(i)
+                            End If
+                        ElseIf UserList(i).flags.Descansar Then
+                        'esta descansando
+                            If UserList(i).Stats.MinHP < UserList(i).Stats.MaxHP Then
+                            mashit = CInt(RandomNumber(10, Porcentaje(UserList(i).Stats.MaxHP, 20)))
+                            UserList(i).Stats.MinHP = UserList(i).Stats.MinHP + mashit
+                                If UserList(i).Stats.MinHP > UserList(i).Stats.MaxHP Then UserList(i).Stats.MinHP = UserList(i).Stats.MaxHP
+                                Call SendData(ToIndex, i, 0, "1N")
+                                Call SendUserHP(i)
+                                End If
+                             If UserList(i).Stats.MaxHP = UserList(i).Stats.MinHP And _
+                                UserList(i).Stats.MaxSta = UserList(i).Stats.MinSta Then
+                                Call SendData(ToIndex, i, 0, "DOK")
+                                Call SendData(ToIndex, i, 0, "DN")
+                                UserList(i).flags.Descansar = False
+                             End If
+                    End If 'Not UserList(i).Flags.Descansar And (UserList(i).Flags.Hambre = 0 And UserList(i).Flags.Sed = 0)
+               End If
+
+            End If
+
+Next i
+    
+End Sub
+
+Public Sub EfectoParalisisNpc(ByVal NpcIndex As Integer)
+
+If Npclist(NpcIndex).Contadores.Paralisis > 0 Then
+    Npclist(NpcIndex).Contadores.Paralisis = Npclist(NpcIndex).Contadores.Paralisis - 5
+Else
+    Npclist(NpcIndex).flags.Paralizado = 0
+    Npclist(NpcIndex).flags.QuienParalizo = 0
+End If
+
+End Sub
+
+Sub AutoTimerProc(ByVal hWnd As Long, ByVal hEvent As Long, ByVal TimerID As Long, ByVal lpTimerFunc As Long)
+
+Static Minutos As Long
+Static MinutosLatsClean As Long
+
+Static MinsSocketReset As Long
+
+Static MinsPjesSave As Long
+
+If FileExist(App.Path & "\LOGS\connect.log", vbNormal) Then Kill App.Path & "\LOGS\connect.log"
+If FileExist(App.Path & "\LOGS\haciendo.log", vbNormal) Then Kill App.Path & "\LOGS\haciendo.log"
+If FileExist(App.Path & "\LOGS\stats.log", vbNormal) Then Kill App.Path & "\LOGS\stats.log"
+If FileExist(App.Path & "\LOGS\wsapi.log", vbNormal) Then Kill App.Path & "\LOGS\wsapi.log"
+
+
+
+If Time >= #10:00:00 AM# And Time <= #10:01:01 AM# And Worldsaves = 0 Then
+    Worldsaves = Worldsaves + 1
+    Call DoBackUp
+    Call aClon.VaciarColeccion
+End If
+
+If Time >= #4:30:00 PM# And Time <= #4:31:01 PM# And Worldsaves <= 1 Then
+    Worldsaves = Worldsaves + 1
+    Call DoBackUp
+    Call aClon.VaciarColeccion
+End If
+
+If Time >= #9:45:00 PM# And Time <= #9:46:01 PM# And Worldsaves <= 2 Then
+    Worldsaves = Worldsaves + 1
+    Call DoBackUp
+    Call aClon.VaciarColeccion
+End If
+
+If Time >= #3:30:00 AM# And Time <= #3:31:01 AM# And Worldsaves <= 3 Then
+    Worldsaves = Worldsaves + 1
+    Call DoBackUp
+    Call aClon.VaciarColeccion
+End If
+
+If Time >= #6:28:00 AM# And Time <= #6:29:01 AM# And Worldsaves <> 0 Then
+
+If FileExist(App.Path & "\LOGS\HackAttemps.log", vbNormal) Then Kill App.Path & "\LOGS\HackAttemps.log"
+If FileExist(App.Path & "\LOGS\Asesinatos.log", vbNormal) Then Kill App.Path & "\LOGS\Asesinatos.log"
+
+Call SendData(ToAll, 0, 0, "||Un nuevo día ha comenzado..." & FONTTYPE_FENIX)
+
+    Worldsaves = 0
+    Call SaveDayStats
+        DayStats.MaxUsuarios = 0
+        DayStats.Segundos = 0
+        DayStats.Promedio = 0
+        Call DayElapsed
+    Call DoBackUp
+    Call aClon.VaciarColeccion
+   ' Dim mifile As Integer
+   ' mifile = FreeFile
+   ' Open App.Path & "\LOGS\Main.log" For Append Shared As #mifile
+   ' Print #mifile, Date & " " & Time & " server reiniciado especial por mantenimiento."
+   ' Close #mifile
+   ' ShellExecute frmMain.hwnd, "open", App.Path & "/fenixao.exe", "", "", 1
+   ' Call ApagarSistema
+End If
+   
+If MinutosLatsClean >= 20 Then
+        MinutosLatsClean = 0
+        Call ReSpawnOrigPosNpcs 'respawn de los guardias en las pos originales
+        Call LimpiarMundo
+        Call ComprobarCerrar
+ '       If FileExist(App.Path & "\LOGS\Asesinatos.log", vbNormal) Then Kill App.Path & "\LOGS\Asesinatos.log"
+Else
+        MinutosLatsClean = MinutosLatsClean + 1
+End If
+
+Call PurgarPenas
+Call CheckIdleUser
+
+'<<<<<-------- Log the number of users online ------>>>
+Dim N As Integer
+N = FreeFile(1)
+Open App.Path & "\LOGS\numusers.log" For Output Shared As N
+Print #N, NumUsers
+Close #N
+'<<<<<-------- Log the number of users online ------>>>
+
+
+
+Exit Sub
+errhandler:
+    Call LogError("Error en TimerAutoSave")
+
+End Sub
+Sub CheckIdleUser()
+Dim iUserIndex As Integer
+
+For iUserIndex = 1 To MaxUsers
+   If UserList(iUserIndex).flags.Privilegios = 0 Then
+   'Conexion activa? y es un usuario loggeado?
+   If UserList(iUserIndex).ConnID <> -1 And UserList(iUserIndex).flags.UserLogged Then
+        'Actualiza el contador de inactividad
+        UserList(iUserIndex).Counters.IdleCount = UserList(iUserIndex).Counters.IdleCount + 1
+        If UserList(iUserIndex).Counters.IdleCount >= IdleLimit Then
+            Call SendData(ToIndex, iUserIndex, 0, "!!Demasiado tiempo inactivo. Has sido desconectado..")
+            Call Cerrar_Usuario(iUserIndex)
+        End If
+  End If
+  End If
+  
+Next iUserIndex
+
+End Sub
+
+Public Sub ComprobarCerrar()
+
+Dim Cerrar As Byte
+Dim Worlds As Byte
+Dim mifile As Integer
+Dim Seguridad As Byte
+
+Cerrar = GetVar(App.Path & "\Executor.ini", "EXECUTOR", "Cerrar")
+Worlds = GetVar(App.Path & "\Executor.ini", "EXECUTOR", "Worldsave")
+
+If Worlds = 1 Then
+Call DoBackUp
+WriteVar App.Path & "\Executor.ini", "EXECUTOR", "Worldsave", "0"
+Seguridad = 1
+End If
+
+
+If Cerrar = 1 And Seguridad = 1 Then
+    mifile = FreeFile
+    Open App.Path & "\LOGS\Main.log" For Append Shared As #mifile
+    Print #mifile, Date & " " & Time & " server apagado por el Executor."
+    Close #mifile
+    WriteVar App.Path & "\Executor.ini", "EXECUTOR", "Cerrar", 0
+    Seguridad = 0
+    End
+End If
+
+End Sub
+
+
