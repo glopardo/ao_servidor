@@ -621,8 +621,7 @@ Select Case sndRoute
         Exit Sub
 
     Case ToPCArea
-        
-        
+    
         For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
             If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
         Next

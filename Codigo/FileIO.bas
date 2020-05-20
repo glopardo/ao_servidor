@@ -38,6 +38,7 @@ Public BalanceCasa As Double
 Public Baneos As New Collection
 
 Option Explicit
+
 Public Sub LoadCasino()
 
 BalanceCasa = val(GetVar(App.Path & "\Logs\Casino.log", "INIT", "Balance"))

@@ -375,6 +375,7 @@ If NpcImpacto(NpcIndex, UserIndex) Then
     If Npclist(NpcIndex).Veneno = 1 Then Call NpcEnvenenarUser(UserIndex)
 Else
     Call SendData(ToIndex, UserIndex, 0, "N1")
+    Call SendData(ToIndex, UserIndex, UserList(UserIndex).POS.Map, "||" & vbRed & "°" & "Fallo" & "°" & Npclist(NpcIndex).Char.CharIndex)
 End If
 
 Call SubirSkill(UserIndex, Tacticas)
@@ -541,6 +542,7 @@ End If
 Call NpcAtacado(NpcIndex, UserIndex)
 
 If UserImpactoNpc(UserIndex, NpcIndex) Then
+    'Golpeó al NPC
     If Npclist(NpcIndex).flags.Snd2 Then
         Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "\" & UserList(UserIndex).Char.CharIndex & "," & Npclist(NpcIndex).flags.Snd2)
     Else
@@ -548,8 +550,10 @@ If UserImpactoNpc(UserIndex, NpcIndex) Then
     End If
     Call UserDañoNpc(UserIndex, NpcIndex)
 Else
+    'Falló el golpe
      Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "-" & UserList(UserIndex).Char.CharIndex)
      Call SendData(ToIndex, UserIndex, 0, "U1")
+     Call SendData(ToIndex, UserIndex, UserList(UserIndex).POS.Map, "||" & vbRed & "°" & "Fallaste" & "°" & UserList(UserIndex).Char.CharIndex)
 End If
 
 End Sub
