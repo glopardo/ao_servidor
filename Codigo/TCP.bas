@@ -2176,7 +2176,7 @@ If UCase$(Left$(rdata, 6)) = "/RMSG " Then
     rdata = Right$(rdata, Len(rdata) - 6)
     Call LogGM(UserList(UserIndex).Name, "Mensaje Broadcast:" & rdata, False)
     If Len(rdata) > 0 Then
-        Call SendData(ToAll, 0, 0, "||" & rdata & FONTTYPE_TALK & ENDC)
+        Call SendData(ToAll, 0, 0, "|$" & UserList(UserIndex).Name & "> " & rdata & ENDC)
     End If
     Exit Sub
 End If
