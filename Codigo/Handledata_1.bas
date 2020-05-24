@@ -92,19 +92,19 @@ Select Case UCase$(Left$(rdata, 1))
         If Right$(rdata, Len(rdata) - 1) = " " Or Right$(rdata, Len(rdata) - 1) = "-" Then rdata = "1 "
         If Len(rdata) = 1 Then Exit Sub
         
-        If val(Right$(rdata, Len(rdata) - 1)) > 0 Then
-                UserList(UserIndex).flags.IntentosCodigo = UserList(UserIndex).flags.IntentosCodigo + 1
-                If UserList(UserIndex).flags.IntentosCodigo >= 10 Then
-                    UserList(UserIndex).flags.CodigoTrabajo = 0
-                    UserList(UserIndex).flags.IntentosCodigo = 0
-                    Call SacarModoTrabajo(UserIndex)
-                    Call SendData(ToIndex, UserIndex, 0, "||Fuiste encarcelado por mandar demasiados códigos de trabajo incorrectos." & FONTTYPE_FIGHT)
-                    Call SendData(ToAdmins, 0, 0, "||" & UserList(UserIndex).Name & " fue encarcelado por mandar demasiados códigos incorrectos." & fonttype_Server)
-                    Call Encarcelar(UserIndex, 15)
-                    Exit Sub
-                Else: Call SendData(ToIndex, UserIndex, 0, "||Código incorrecto. Te quedan " & 10 - UserList(UserIndex).flags.IntentosCodigo & " intentos o serás encarcelado." & FONTTYPE_INFO)
-                End If
-            End If
+        'If val(Right$(rdata, Len(rdata) - 1)) > 0 Then
+        '        UserList(UserIndex).flags.IntentosCodigo = UserList(UserIndex).flags.IntentosCodigo + 1
+        '        If UserList(UserIndex).flags.IntentosCodigo >= 10 Then
+        '            UserList(UserIndex).flags.CodigoTrabajo = 0
+        '            UserList(UserIndex).flags.IntentosCodigo = 0
+        '            Call SacarModoTrabajo(UserIndex)
+        '            Call SendData(ToIndex, UserIndex, 0, "||Fuiste encarcelado por mandar demasiados códigos de trabajo incorrectos." & FONTTYPE_FIGHT)
+        '            Call SendData(ToAdmins, 0, 0, "||" & UserList(UserIndex).Name & " fue encarcelado por mandar demasiados códigos incorrectos." & fonttype_Server)
+        '            Call Encarcelar(UserIndex, 15)
+        '            Exit Sub
+        '        Else: Call SendData(ToIndex, UserIndex, 0, "||Código incorrecto. Te quedan " & 10 - UserList(UserIndex).flags.IntentosCodigo & " intentos o serás encarcelado." & FONTTYPE_INFO)
+        '        End If
+        '    End If
        
         
         Modo = Left$(rdata, 1)
