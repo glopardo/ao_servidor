@@ -342,6 +342,7 @@ Public Const Constitucion = 5
 
 Public CuentaRegresiva As Integer
 Public GMCuenta As Integer
+Public MinutosTLimpiar As Byte
 
 Public Const AdicionalHPGuerrero = 2
 Public Const AdicionalSTLadron = 3

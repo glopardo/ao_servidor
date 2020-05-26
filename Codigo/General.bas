@@ -176,6 +176,31 @@ For i = 1 To TrashCollector.Count
 Next
 
 End Sub
+
+Public Sub LimpiarItemsMundo()
+    Dim MapaActual, Xnn, Ynn, UserIndex As Integer
+    MapaActual = 1
+    Call SendData(ToAll, 0, 0, "||Realizando Limpieza del Mundo" & FONTTYPE_FENIX)
+    
+    For MapaActual = 1 To NumMaps
+        For Ynn = YMinMapSize To YMaxMapSize
+            For Xnn = XMinMapSize To XMaxMapSize
+                If MapData(MapaActual, Xnn, Ynn).OBJInfo.OBJIndex > 0 And MapData(MapaActual, Xnn, Ynn).Blocked = 0 Then
+                    If Not ItemEsDeMapa(val(MapaActual), val(Xnn), val(Ynn)) Then
+                        Call EraseObj(ToMap, UserIndex, MapaActual, 10000, val(MapaActual), val(Xnn), val(Ynn))
+                End If
+            End If
+        Next Xnn
+        Next Ynn
+    Next MapaActual
+    
+    Call SendData(ToAll, 0, 0, "||Limpieza del Mundo finalizada!" & FONTTYPE_FENIX)
+    
+    If frmMain.Tlimpiar.Enabled = True Then
+        frmMain.Tlimpiar.Enabled = False
+    End If
+End Sub
+
 Sub ConfigListeningSocket(ByRef Obj As Object, ByVal Port As Integer)
 #If UsarQueSocket = 0 Then
 

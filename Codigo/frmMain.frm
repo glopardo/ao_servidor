@@ -84,6 +84,12 @@ Begin VB.Form frmMain
       TabIndex        =   4
       Top             =   120
       Width           =   4935
+      Begin VB.Timer Tlimpiar 
+         Enabled         =   0   'False
+         Interval        =   15000
+         Left            =   3240
+         Top             =   600
+      End
       Begin VB.Timer TimerTrabaja 
          Interval        =   10000
          Left            =   4200
@@ -675,6 +681,25 @@ Error:
     Call LogError("Error en TimerTrabaja: " & Err.Description)
     
 End Sub
+
+Public Sub Tlimpiar_Timer()
+    MinutosTLimpiar = MinutosTLimpiar + 1
+    
+    If MinutosTLimpiar = 2 Then
+        Call SendData(ToAll, 0, 0, "||Se realizará una limpieza del Mundo en 30 segundos. Por favor recojan sus items." & FONTTYPE_VENENO)
+    End If
+    
+    If MinutosTLimpiar = 3 Then
+        Call SendData(ToAll, 0, 0, "||Se realizará una limpieza del Mundo en 15 segundos. Por favor recojan sus items." & FONTTYPE_VENENO)
+    End If
+    
+    If MinutosTLimpiar = 4 Then
+        Call LimpiarItemsMundo
+        MinutosTLimpiar = 1
+    End If
+    
+End Sub
+
 Private Sub UserTimer_Timer()
 On Error GoTo Error
 Static Andaban As Boolean, Contador As Single

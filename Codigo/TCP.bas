@@ -3029,6 +3029,15 @@ If UCase$(rdata) = "/LLUVIA" Then
     Exit Sub
 End If
 
+If UCase$(rdata) = "/LIMPIARMUNDO" Then
+    If UserList(UserIndex).flags.Privilegios = 3 Then
+        Call SendData(ToAll, 0, 0, "||Se realizará una limpieza del Mundo en 1 minuto. Por favor recojan sus pertenencias." & FONTTYPE_VENENO)
+        frmMain.Tlimpiar.Enabled = True
+        Call LogGM(UserList(UserIndex).Name, " ejecutó una limpieza del Mundo.", True)
+    End If
+    Exit Sub
+End If
+
 If UCase$(rdata) = "/PASSDAY" Then
     Call DayElapsed
     Exit Sub
