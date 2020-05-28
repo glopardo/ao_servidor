@@ -35,39 +35,39 @@ Attribute VB_Name = "Extra"
 'www.fenixao.com.ar
 
 Option Explicit
-Public Function EsNewbie(UserIndex As Integer) As Boolean
+Public Function EsNewbie(Userindex As Integer) As Boolean
 
-EsNewbie = (UserList(UserIndex).Stats.ELV <= LimiteNewbie)
+EsNewbie = (UserList(Userindex).Stats.ELV <= LimiteNewbie)
 
 End Function
-Public Sub DoTileEvents(UserIndex As Integer)
+Public Sub DoTileEvents(Userindex As Integer)
 On Error GoTo errhandler
 Dim Map As Integer, X As Integer, Y As Integer
 Dim nPos As WorldPos, mPos As WorldPos
 
-Map = UserList(UserIndex).POS.Map
-X = UserList(UserIndex).POS.X
-Y = UserList(UserIndex).POS.Y
+Map = UserList(Userindex).POS.Map
+X = UserList(Userindex).POS.X
+Y = UserList(Userindex).POS.Y
 
 mPos = MapData(Map, X, Y).TileExit
 If Not MapaValido(mPos.Map) Or Not InMapBounds(mPos.X, mPos.Y) Then Exit Sub
 
-If MapInfo(mPos.Map).Restringir And Not EsNewbie(UserIndex) Then
-    Call SendData(ToIndex, UserIndex, 0, "1J")
-ElseIf UserList(UserIndex).Stats.ELV < MapInfo(mPos.Map).Nivel And Not (UserList(UserIndex).Clase = PIRATA And UserList(UserIndex).Recompensas(1) = 2) Then
-    Call SendData(ToIndex, UserIndex, 0, "%/" & MapInfo(mPos.Map).Nivel)
+If MapInfo(mPos.Map).Restringir And Not EsNewbie(Userindex) Then
+    Call SendData(ToIndex, Userindex, 0, "1J")
+ElseIf UserList(Userindex).Stats.ELV < MapInfo(mPos.Map).Nivel And Not (UserList(Userindex).Clase = PIRATA And UserList(Userindex).Recompensas(1) = 2) Then
+    Call SendData(ToIndex, Userindex, 0, "%/" & MapInfo(mPos.Map).Nivel)
 Else
-    If LegalPos(mPos.Map, mPos.X, mPos.Y, PuedeAtravesarAgua(UserIndex)) Then
-        If mPos.X <> 0 And mPos.Y <> 0 Then Call WarpUserChar(UserIndex, mPos.Map, mPos.X, mPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
+    If LegalPos(mPos.Map, mPos.X, mPos.Y, PuedeAtravesarAgua(Userindex)) Then
+        If mPos.X <> 0 And mPos.Y <> 0 Then Call WarpUserChar(Userindex, mPos.Map, mPos.X, mPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
     Else
         Call ClosestStablePos(mPos, nPos)
-        If nPos.X <> 0 And nPos.Y Then Call WarpUserChar(UserIndex, nPos.Map, nPos.X, nPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
+        If nPos.X <> 0 And nPos.Y Then Call WarpUserChar(Userindex, nPos.Map, nPos.X, nPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
     End If
     Exit Sub
 End If
 
-Call ClosestStablePos(UserList(UserIndex).POS, nPos)
-If nPos.X <> 0 And nPos.Y Then Call WarpUserChar(UserIndex, nPos.Map, nPos.X, nPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
+Call ClosestStablePos(UserList(Userindex).POS, nPos)
+If nPos.X <> 0 And nPos.Y Then Call WarpUserChar(Userindex, nPos.Map, nPos.X, nPos.Y, ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT)
 
 Exit Sub
 
@@ -171,7 +171,7 @@ Next
 
 End Function
 Function NameIndex(ByVal Name As String) As Integer
-Dim UserIndex As Integer, i As Integer
+Dim Userindex As Integer, i As Integer
 
 Name = Replace$(Name, "+", " ")
 
@@ -180,7 +180,7 @@ If Len(Name) = 0 Then
     Exit Function
 End If
   
-UserIndex = 1
+Userindex = 1
 
 If Right$(Name, 1) = "*" Then
     Name = Left$(Name, Len(Name) - 1)
@@ -200,12 +200,12 @@ Else
 End If
 
 End Function
-Function CheckForSameIP(UserIndex As Integer, ByVal UserIP As String) As Boolean
+Function CheckForSameIP(Userindex As Integer, ByVal UserIP As String) As Boolean
 Dim LoopC As Integer
 
 For LoopC = 1 To MaxUsers
     If UserList(LoopC).flags.UserLogged Then
-        If UserList(LoopC).ip = UserIP And UserIndex <> LoopC Then
+        If UserList(LoopC).ip = UserIP And Userindex <> LoopC Then
             CheckForSameIP = True
             Exit Function
         End If
@@ -213,7 +213,7 @@ For LoopC = 1 To MaxUsers
 Next
 
 End Function
-Function CheckForSameName(UserIndex As Integer, ByVal Name As String) As Boolean
+Function CheckForSameName(Userindex As Integer, ByVal Name As String) As Boolean
 Dim LoopC As Integer
 
 For LoopC = 1 To LastUser
@@ -264,7 +264,7 @@ Function LegalPos(Map As Integer, X As Integer, Y As Integer, Optional PuedeAgua
 If Not MapaValido(Map) Or Not InMapBounds(X, Y) Then Exit Function
 
 LegalPos = (MapData(Map, X, Y).Blocked = 0) And _
-           (MapData(Map, X, Y).UserIndex = 0) And _
+           (MapData(Map, X, Y).Userindex = 0) And _
            (MapData(Map, X, Y).NpcIndex = 0) And _
            (MapData(Map, X, Y).Agua = Buleano(PuedeAgua))
 
@@ -274,17 +274,17 @@ Function LegalPosNPC(Map As Integer, X As Integer, Y As Integer, AguaValida As B
 If Not InMapBounds(X, Y) Then Exit Function
 
 LegalPosNPC = (MapData(Map, X, Y).Blocked <> 1) And _
-     (MapData(Map, X, Y).UserIndex = 0) And _
+     (MapData(Map, X, Y).Userindex = 0) And _
      (MapData(Map, X, Y).NpcIndex = 0) And _
      (MapData(Map, X, Y).trigger <> POSINVALIDA) _
      And Buleano(AguaValida) = MapData(Map, X, Y).Agua
      
 End Function
-Public Sub SendNPC(UserIndex As Integer, NpcIndex As Integer)
+Public Sub SendNPC(Userindex As Integer, NpcIndex As Integer)
 Dim Info As String
 Dim CRI As Byte
 
-Select Case UserList(UserIndex).Stats.UserSkills(Supervivencia)
+Select Case UserList(Userindex).Stats.UserSkills(Supervivencia)
     Case Is <= 20
         If Npclist(NpcIndex).Stats.MinHP = Npclist(NpcIndex).Stats.MaxHP Then
             CRI = 5
@@ -315,24 +315,24 @@ Select Case UserList(UserIndex).Stats.UserSkills(Supervivencia)
     Case Else
         Info = "||" & Npclist(NpcIndex).Name & " [" & Npclist(NpcIndex).Stats.MinHP & "/" & Npclist(NpcIndex).Stats.MaxHP & "]"
         If Npclist(NpcIndex).flags.Paralizado Then Info = Info & " - PARALIZADO"
-        Call SendData(ToIndex, UserIndex, 0, Info & FONTTYPE_INFO)
+        Call SendData(ToIndex, Userindex, 0, Info & FONTTYPE_INFO)
         Exit Sub
 End Select
 
 Info = "9Q" & Npclist(NpcIndex).Name & "," & CRI
-Call SendData(ToIndex, UserIndex, 0, Info)
+Call SendData(ToIndex, Userindex, 0, Info)
                 
 End Sub
-Public Sub Expresar(NpcIndex As Integer, UserIndex As Integer)
+Public Sub Expresar(NpcIndex As Integer, Userindex As Integer)
 
 If Npclist(NpcIndex).NroExpresiones Then
     Dim randomi
     randomi = RandomNumber(1, Npclist(NpcIndex).NroExpresiones)
-    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "3Q" & vbWhite & "°" & Npclist(NpcIndex).Expresiones(randomi) & "°" & Npclist(NpcIndex).Char.CharIndex)
+    Call SendData(ToPCArea, Userindex, UserList(Userindex).POS.Map, "3Q" & vbWhite & "°" & Npclist(NpcIndex).Expresiones(randomi) & "°" & Npclist(NpcIndex).Char.CharIndex)
 End If
                     
 End Sub
-Sub LookatTile(UserIndex As Integer, Map As Integer, X As Integer, Y As Integer)
+Sub LookatTile(Userindex As Integer, Map As Integer, X As Integer, Y As Integer)
 
 Dim FoundChar As Byte
 Dim FoundSomething As Byte
@@ -343,57 +343,57 @@ Dim Info As String
 
 
 If InMapBounds(X, Y) Then
-    UserList(UserIndex).flags.TargetMap = Map
-    UserList(UserIndex).flags.TargetX = X
-    UserList(UserIndex).flags.TargetY = Y
+    UserList(Userindex).flags.TargetMap = Map
+    UserList(Userindex).flags.TargetX = X
+    UserList(Userindex).flags.TargetY = Y
     
     If MapData(Map, X, Y).OBJInfo.OBJIndex Then
         
         If MapData(Map, X, Y).OBJInfo.Amount = 1 Then
-            Call SendData(ToIndex, UserIndex, 0, "4Q" & ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Name)
+            Call SendData(ToIndex, Userindex, 0, "4Q" & ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Name)
         Else
-            Call SendData(ToIndex, UserIndex, 0, "5Q" & ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Name & "," & MapData(Map, X, Y).OBJInfo.Amount)
+            Call SendData(ToIndex, Userindex, 0, "5Q" & ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Name & "," & MapData(Map, X, Y).OBJInfo.Amount)
         End If
-        UserList(UserIndex).flags.TargetObj = MapData(Map, X, Y).OBJInfo.OBJIndex
-        UserList(UserIndex).flags.TargetObjMap = Map
-        UserList(UserIndex).flags.TargetObjX = X
-        UserList(UserIndex).flags.TargetObjY = Y
+        UserList(Userindex).flags.TargetObj = MapData(Map, X, Y).OBJInfo.OBJIndex
+        UserList(Userindex).flags.TargetObjMap = Map
+        UserList(Userindex).flags.TargetObjX = X
+        UserList(Userindex).flags.TargetObjY = Y
         FoundSomething = 1
     ElseIf MapData(Map, X + 1, Y).OBJInfo.OBJIndex Then
         
         If ObjData(MapData(Map, X + 1, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_PUERTAS Then
-            Call SendData(ToIndex, UserIndex, 0, "6Q" & ObjData(MapData(Map, X + 1, Y).OBJInfo.OBJIndex).Name)
-            UserList(UserIndex).flags.TargetObj = MapData(Map, X + 1, Y).OBJInfo.OBJIndex
-            UserList(UserIndex).flags.TargetObjMap = Map
-            UserList(UserIndex).flags.TargetObjX = X + 1
-            UserList(UserIndex).flags.TargetObjY = Y
+            Call SendData(ToIndex, Userindex, 0, "6Q" & ObjData(MapData(Map, X + 1, Y).OBJInfo.OBJIndex).Name)
+            UserList(Userindex).flags.TargetObj = MapData(Map, X + 1, Y).OBJInfo.OBJIndex
+            UserList(Userindex).flags.TargetObjMap = Map
+            UserList(Userindex).flags.TargetObjX = X + 1
+            UserList(Userindex).flags.TargetObjY = Y
             FoundSomething = 1
         End If
     ElseIf MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex Then
         If ObjData(MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex).ObjType = OBJTYPE_PUERTAS Then
             
-            Call SendData(ToIndex, UserIndex, 0, "6Q" & ObjData(MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex).Name)
-            UserList(UserIndex).flags.TargetObj = MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex
-            UserList(UserIndex).flags.TargetObjMap = Map
-            UserList(UserIndex).flags.TargetObjX = X + 1
-            UserList(UserIndex).flags.TargetObjY = Y + 1
+            Call SendData(ToIndex, Userindex, 0, "6Q" & ObjData(MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex).Name)
+            UserList(Userindex).flags.TargetObj = MapData(Map, X + 1, Y + 1).OBJInfo.OBJIndex
+            UserList(Userindex).flags.TargetObjMap = Map
+            UserList(Userindex).flags.TargetObjX = X + 1
+            UserList(Userindex).flags.TargetObjY = Y + 1
             FoundSomething = 1
         End If
     ElseIf MapData(Map, X, Y + 1).OBJInfo.OBJIndex Then
         If ObjData(MapData(Map, X, Y + 1).OBJInfo.OBJIndex).ObjType = OBJTYPE_PUERTAS Then
             
-            Call SendData(ToIndex, UserIndex, 0, "6Q" & ObjData(MapData(Map, X, Y + 1).OBJInfo.OBJIndex).Name)
-            UserList(UserIndex).flags.TargetObj = MapData(Map, X, Y).OBJInfo.OBJIndex
-            UserList(UserIndex).flags.TargetObjMap = Map
-            UserList(UserIndex).flags.TargetObjX = X
-            UserList(UserIndex).flags.TargetObjY = Y + 1
+            Call SendData(ToIndex, Userindex, 0, "6Q" & ObjData(MapData(Map, X, Y + 1).OBJInfo.OBJIndex).Name)
+            UserList(Userindex).flags.TargetObj = MapData(Map, X, Y).OBJInfo.OBJIndex
+            UserList(Userindex).flags.TargetObjMap = Map
+            UserList(Userindex).flags.TargetObjX = X
+            UserList(Userindex).flags.TargetObjY = Y + 1
             FoundSomething = 1
         End If
     End If
     
     If Y + 1 <= YMaxMapSize Then
-        If MapData(Map, X, Y + 1).UserIndex Then
-            TempCharIndex = MapData(Map, X, Y + 1).UserIndex
+        If MapData(Map, X, Y + 1).Userindex Then
+            TempCharIndex = MapData(Map, X, Y + 1).Userindex
             FoundChar = 1
         End If
         If MapData(Map, X, Y + 1).NpcIndex Then
@@ -403,8 +403,8 @@ If InMapBounds(X, Y) Then
     End If
     
     If FoundChar = 0 Then
-        If MapData(Map, X, Y).UserIndex Then
-            TempCharIndex = MapData(Map, X, Y).UserIndex
+        If MapData(Map, X, Y).Userindex Then
+            TempCharIndex = MapData(Map, X, Y).Userindex
             FoundChar = 1
         End If
         If MapData(Map, X, Y).NpcIndex Then
@@ -423,9 +423,9 @@ If InMapBounds(X, Y) Then
             If UserList(TempCharIndex).Faccion.BandoOriginal <> UserList(TempCharIndex).Faccion.Bando Then
                 Stat = Stat & " <" & ListaBandos(UserList(TempCharIndex).Faccion.Bando) & "> <Mercenario>"
             ElseIf UserList(TempCharIndex).Faccion.Jerarquia Then
-                Stat = Stat & " <" & ListaBandos(UserList(TempCharIndex).Faccion.Bando) & "> <" & Titulo(TempCharIndex) & ">"
+                Stat = Stat & " <" & ListaBandos(UserList(TempCharIndex).Faccion.Bando) & "> <" & Titulo(TempCharIndex) & ">" & Cargo(TempCharIndex)
             Else
-                Stat = Stat & " <" & Titulo(TempCharIndex) & ">"
+                Stat = Stat & " <" & Titulo(TempCharIndex) & ">" & Cargo(TempCharIndex)
             End If
         End If
         
@@ -444,24 +444,28 @@ If InMapBounds(X, Y) Then
         Else
             If UserList(TempCharIndex).flags.Muerto Then
                 Stat = "2K" & UserList(TempCharIndex).Name
-            ElseIf UserList(TempCharIndex).Faccion.Bando = Real Then
+            ElseIf UserList(TempCharIndex).Faccion.Bando = Real And UserList(TempCharIndex).flags.EsConseReal = 0 Then
                 Stat = "3K" & Stat
-            ElseIf UserList(TempCharIndex).Faccion.Bando = Caos Then
+            ElseIf UserList(TempCharIndex).Faccion.Bando = Caos And UserList(TempCharIndex).flags.EsConseCaos = 0 Then
                 Stat = "4K" & Stat
             ElseIf EsNewbie(TempCharIndex) Then
                 Stat = "H0" & Stat
+            ElseIf UserList(TempCharIndex).Faccion.Bando = Caos And UserList(TempCharIndex).flags.EsConseCaos = 1 Then
+                Stat = "H2" & Stat
+            ElseIf UserList(TempCharIndex).Faccion.Bando = Real And UserList(TempCharIndex).flags.EsConseReal = 1 Then
+                Stat = "H1" & Stat
             Else
                 Stat = "1&" & Stat
             End If
         End If
         
-        Call SendData(ToIndex, UserIndex, 0, Stat)
+        Call SendData(ToIndex, Userindex, 0, Stat)
             
         
         FoundSomething = 1
-        UserList(UserIndex).flags.TargetUser = TempCharIndex
-        UserList(UserIndex).flags.TargetNpc = 0
-        UserList(UserIndex).flags.TargetNpcTipo = 0
+        UserList(Userindex).flags.TargetUser = TempCharIndex
+        UserList(Userindex).flags.TargetNpc = 0
+        UserList(Userindex).flags.TargetNpcTipo = 0
        
        
     ElseIf FoundChar = 2 Then
@@ -476,56 +480,56 @@ If InMapBounds(X, Y) Then
             End If
                 
             If Npclist(TempCharIndex).flags.TiendaUser Then
-                If UserIndex = Npclist(TempCharIndex).flags.TiendaUser Then
-                    If UserList(UserIndex).Tienda.Gold Then
-                        Call SendData(ToIndex, UserIndex, 0, "/O" & UserList(UserIndex).Tienda.Gold & "," & Npclist(TempCharIndex).Char.CharIndex)
+                If Userindex = Npclist(TempCharIndex).flags.TiendaUser Then
+                    If UserList(Userindex).Tienda.Gold Then
+                        Call SendData(ToIndex, Userindex, 0, "/O" & UserList(Userindex).Tienda.Gold & "," & Npclist(TempCharIndex).Char.CharIndex)
                     Else
-                        Call SendData(ToIndex, UserIndex, 0, "/P" & Npclist(TempCharIndex).Char.CharIndex)
+                        Call SendData(ToIndex, Userindex, 0, "/P" & Npclist(TempCharIndex).Char.CharIndex)
                     End If
                 Else
-                    Call SendData(ToIndex, UserIndex, 0, "/Q" & UserList(Npclist(TempCharIndex).flags.TiendaUser).Name & "," & Npclist(TempCharIndex).Char.CharIndex)
+                    Call SendData(ToIndex, Userindex, 0, "/Q" & UserList(Npclist(TempCharIndex).flags.TiendaUser).Name & "," & Npclist(TempCharIndex).Char.CharIndex)
                 End If
             ElseIf Len(Npclist(TempCharIndex).Desc) > 1 Then
-                Call SendData(ToIndex, UserIndex, 0, "3Q" & vbWhite & "°" & Npclist(TempCharIndex).Desc & "°" & Npclist(TempCharIndex).Char.CharIndex)
+                Call SendData(ToIndex, Userindex, 0, "3Q" & vbWhite & "°" & Npclist(TempCharIndex).Desc & "°" & Npclist(TempCharIndex).Char.CharIndex)
             ElseIf Npclist(TempCharIndex).MaestroUser Then
-                Call SendData(ToIndex, UserIndex, 0, "7Q" & Npclist(TempCharIndex).Name & "," & UserList(Npclist(TempCharIndex).MaestroUser).Name)
+                Call SendData(ToIndex, Userindex, 0, "7Q" & Npclist(TempCharIndex).Name & "," & UserList(Npclist(TempCharIndex).MaestroUser).Name)
             ElseIf Npclist(TempCharIndex).AutoCurar = 1 Then
-                Call SendData(ToIndex, UserIndex, 0, "8Q" & Npclist(TempCharIndex).Name)
+                Call SendData(ToIndex, Userindex, 0, "8Q" & Npclist(TempCharIndex).Name)
             Else
-                Call SendNPC(UserIndex, TempCharIndex)
+                Call SendNPC(Userindex, TempCharIndex)
             End If
             FoundSomething = 1
-            UserList(UserIndex).flags.TargetNpcTipo = Npclist(TempCharIndex).NPCtype
-            UserList(UserIndex).flags.TargetNpc = TempCharIndex
-            UserList(UserIndex).flags.TargetUser = 0
-            UserList(UserIndex).flags.TargetObj = 0
+            UserList(Userindex).flags.TargetNpcTipo = Npclist(TempCharIndex).NPCtype
+            UserList(Userindex).flags.TargetNpc = TempCharIndex
+            UserList(Userindex).flags.TargetUser = 0
+            UserList(Userindex).flags.TargetObj = 0
     End If
     
     If FoundChar = 0 Then
-        UserList(UserIndex).flags.TargetNpc = 0
-        UserList(UserIndex).flags.TargetNpcTipo = 0
-        UserList(UserIndex).flags.TargetUser = 0
+        UserList(Userindex).flags.TargetNpc = 0
+        UserList(Userindex).flags.TargetNpcTipo = 0
+        UserList(Userindex).flags.TargetUser = 0
     End If
     
     If FoundSomething = 0 Then
-        UserList(UserIndex).flags.TargetNpc = 0
-        UserList(UserIndex).flags.TargetNpcTipo = 0
-        UserList(UserIndex).flags.TargetUser = 0
-        UserList(UserIndex).flags.TargetObj = 0
-        UserList(UserIndex).flags.TargetObjMap = 0
-        UserList(UserIndex).flags.TargetObjX = 0
-        UserList(UserIndex).flags.TargetObjY = 0
+        UserList(Userindex).flags.TargetNpc = 0
+        UserList(Userindex).flags.TargetNpcTipo = 0
+        UserList(Userindex).flags.TargetUser = 0
+        UserList(Userindex).flags.TargetObj = 0
+        UserList(Userindex).flags.TargetObjMap = 0
+        UserList(Userindex).flags.TargetObjX = 0
+        UserList(Userindex).flags.TargetObjY = 0
     End If
 
 Else
     If FoundSomething = 0 Then
-        UserList(UserIndex).flags.TargetNpc = 0
-        UserList(UserIndex).flags.TargetNpcTipo = 0
-        UserList(UserIndex).flags.TargetUser = 0
-        UserList(UserIndex).flags.TargetObj = 0
-        UserList(UserIndex).flags.TargetObjMap = 0
-        UserList(UserIndex).flags.TargetObjX = 0
-        UserList(UserIndex).flags.TargetObjY = 0
+        UserList(Userindex).flags.TargetNpc = 0
+        UserList(Userindex).flags.TargetNpcTipo = 0
+        UserList(Userindex).flags.TargetUser = 0
+        UserList(Userindex).flags.TargetObj = 0
+        UserList(Userindex).flags.TargetObjMap = 0
+        UserList(Userindex).flags.TargetObjX = 0
+        UserList(Userindex).flags.TargetObjY = 0
     End If
 End If
 

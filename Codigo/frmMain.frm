@@ -210,6 +210,7 @@ Begin VB.Form frmMain
          Width           =   4695
       End
       Begin VB.CommandButton Command1 
+         BackColor       =   &H008080FF&
          Caption         =   "Enviar Mensaje BroadCast"
          Height          =   375
          Left            =   120
@@ -628,32 +629,32 @@ For i = 1 To LastUser
 Next
 
 End Sub
-Sub TimerMedita(UserIndex As Integer)
+Sub TimerMedita(Userindex As Integer)
 Dim Cant As Single
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.tInicioMeditar) >= TIEMPO_INICIOMEDITAR Then
-    Cant = UserList(UserIndex).Counters.ManaAcumulado + UserList(UserIndex).Stats.MaxMAN * (1 + UserList(UserIndex).Stats.UserSkills(Meditar) * 0.05) / 100
+If TiempoTranscurrido(UserList(Userindex).Counters.tInicioMeditar) >= TIEMPO_INICIOMEDITAR Then
+    Cant = UserList(Userindex).Counters.ManaAcumulado + UserList(Userindex).Stats.MaxMAN * (1 + UserList(Userindex).Stats.UserSkills(Meditar) * 0.05) / 100
     If Cant <= 0.75 Then
-        UserList(UserIndex).Counters.ManaAcumulado = Cant
+        UserList(Userindex).Counters.ManaAcumulado = Cant
         Exit Sub
     Else
         Cant = Round(Cant)
-        UserList(UserIndex).Counters.ManaAcumulado = 0
+        UserList(Userindex).Counters.ManaAcumulado = 0
     End If
-    Call AddtoVar(UserList(UserIndex).Stats.MinMAN, Cant, UserList(UserIndex).Stats.MaxMAN)
-    Call SendData(ToIndex, UserIndex, 0, "MN" & Cant)
-    Call SubirSkill(UserIndex, Meditar)
-    If UserList(UserIndex).Stats.MinMAN >= UserList(UserIndex).Stats.MaxMAN Then
-        Call SendData(ToIndex, UserIndex, 0, "D9")
-        Call SendData(ToIndex, UserIndex, 0, "MEDOK")
-        UserList(UserIndex).flags.Meditando = False
-        UserList(UserIndex).Char.FX = 0
-        UserList(UserIndex).Char.loops = 0
-        Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & 0 & "," & 0)
+    Call AddtoVar(UserList(Userindex).Stats.MinMAN, Cant, UserList(Userindex).Stats.MaxMAN)
+    Call SendData(ToIndex, Userindex, 0, "MN" & Cant)
+    Call SubirSkill(Userindex, Meditar)
+    If UserList(Userindex).Stats.MinMAN >= UserList(Userindex).Stats.MaxMAN Then
+        Call SendData(ToIndex, Userindex, 0, "D9")
+        Call SendData(ToIndex, Userindex, 0, "MEDOK")
+        UserList(Userindex).flags.Meditando = False
+        UserList(Userindex).Char.FX = 0
+        UserList(Userindex).Char.loops = 0
+        Call SendData(ToPCArea, Userindex, UserList(Userindex).POS.Map, "CFX" & UserList(Userindex).Char.CharIndex & "," & 0 & "," & 0)
     End If
 End If
 
-Call SendUserMANA(UserIndex)
+Call SendUserMANA(Userindex)
 
 End Sub
 Private Sub TimerTrabaja_Timer()
@@ -766,137 +767,137 @@ Error:
     Call LogError("Error en UserTimer:" & Err.Description & " " & UI)
     
 End Sub
-Public Sub TimerOculto(UserIndex As Integer)
+Public Sub TimerOculto(Userindex As Integer)
 Dim ClaseBuena As Boolean
 
-ClaseBuena = UserList(UserIndex).Clase = GUERRERO Or UserList(UserIndex).Clase = ARQUERO Or UserList(UserIndex).Clase = CAZADOR
+ClaseBuena = UserList(Userindex).Clase = GUERRERO Or UserList(Userindex).Clase = ARQUERO Or UserList(Userindex).Clase = CAZADOR
 
-If RandomNumber(1, 10 + UserList(UserIndex).Stats.UserSkills(Ocultarse) / 4 + 15 * Buleano(ClaseBuena) + 25 * Buleano(ClaseBuena And Not UserList(UserIndex).Clase = GUERRERO And UserList(UserIndex).Invent.ArmourEqpObjIndex = 360)) <= 5 Then
-    UserList(UserIndex).flags.Oculto = 0
-    UserList(UserIndex).flags.Invisible = 0
-    Call SendData(ToMap, 0, UserList(UserIndex).POS.Map, ("V3" & UserList(UserIndex).Char.CharIndex & ",0"))
-    Call SendData(ToIndex, UserIndex, 0, "V5")
+If RandomNumber(1, 10 + UserList(Userindex).Stats.UserSkills(Ocultarse) / 4 + 15 * Buleano(ClaseBuena) + 25 * Buleano(ClaseBuena And Not UserList(Userindex).Clase = GUERRERO And UserList(Userindex).Invent.ArmourEqpObjIndex = 360)) <= 5 Then
+    UserList(Userindex).flags.Oculto = 0
+    UserList(Userindex).flags.Invisible = 0
+    Call SendData(ToMap, 0, UserList(Userindex).POS.Map, ("V3" & UserList(Userindex).Char.CharIndex & ",0"))
+    Call SendData(ToIndex, Userindex, 0, "V5")
 End If
 
 End Sub
-Public Sub TimerStamina(UserIndex As Integer)
+Public Sub TimerStamina(Userindex As Integer)
 
-If UserList(UserIndex).Stats.MinSta < UserList(UserIndex).Stats.MaxSta And UserList(UserIndex).flags.Hambre = 0 And UserList(UserIndex).flags.Sed = 0 And UserList(UserIndex).flags.Desnudo = 0 Then
-   If (Not UserList(UserIndex).flags.Descansar And TiempoTranscurrido(UserList(UserIndex).Counters.STACounter) >= StaminaIntervaloSinDescansar) Or _
-   (UserList(UserIndex).flags.Descansar And TiempoTranscurrido(UserList(UserIndex).Counters.STACounter) >= StaminaIntervaloDescansar) Then
-        UserList(UserIndex).Counters.STACounter = Timer
-        UserList(UserIndex).Stats.MinSta = Minimo(UserList(UserIndex).Stats.MinSta + CInt(RandomNumber(5, Porcentaje(UserList(UserIndex).Stats.MaxSta, 15))), UserList(UserIndex).Stats.MaxSta)
-        If TiempoTranscurrido(UserList(UserIndex).Counters.CartelStamina) >= 10 Then
-            UserList(UserIndex).Counters.CartelStamina = Timer
-            Call SendData(ToIndex, UserIndex, 0, "MV")
+If UserList(Userindex).Stats.MinSta < UserList(Userindex).Stats.MaxSta And UserList(Userindex).flags.Hambre = 0 And UserList(Userindex).flags.Sed = 0 And UserList(Userindex).flags.Desnudo = 0 Then
+   If (Not UserList(Userindex).flags.Descansar And TiempoTranscurrido(UserList(Userindex).Counters.STACounter) >= StaminaIntervaloSinDescansar) Or _
+   (UserList(Userindex).flags.Descansar And TiempoTranscurrido(UserList(Userindex).Counters.STACounter) >= StaminaIntervaloDescansar) Then
+        UserList(Userindex).Counters.STACounter = Timer
+        UserList(Userindex).Stats.MinSta = Minimo(UserList(Userindex).Stats.MinSta + CInt(RandomNumber(5, Porcentaje(UserList(Userindex).Stats.MaxSta, 15))), UserList(Userindex).Stats.MaxSta)
+        If TiempoTranscurrido(UserList(Userindex).Counters.CartelStamina) >= 10 Then
+            UserList(Userindex).Counters.CartelStamina = Timer
+            Call SendData(ToIndex, Userindex, 0, "MV")
         End If
         EnviarEstats = True
     End If
 End If
 
 End Sub
-Sub TimerTransformado(UserIndex As Integer)
+Sub TimerTransformado(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Transformado) >= IntervaloInvisible Then
-    Call DoTransformar(UserIndex)
+If TiempoTranscurrido(UserList(Userindex).Counters.Transformado) >= IntervaloInvisible Then
+    Call DoTransformar(Userindex)
 End If
 
 End Sub
-Sub TimerInvisibilidad(UserIndex As Integer)
+Sub TimerInvisibilidad(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Invisibilidad) >= IntervaloInvisible Then
-    Call SendData(ToIndex, UserIndex, 0, "V6")
-    Call QuitarInvisible(UserIndex)
+If TiempoTranscurrido(UserList(Userindex).Counters.Invisibilidad) >= IntervaloInvisible Then
+    Call SendData(ToIndex, Userindex, 0, "V6")
+    Call QuitarInvisible(Userindex)
 End If
 
 End Sub
-Sub TimerFlecha(UserIndex As Integer)
+Sub TimerFlecha(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.BonusFlecha) >= 45 Then
-    UserList(UserIndex).Counters.BonusFlecha = 0
-    UserList(UserIndex).flags.BonusFlecha = False
-    Call SendData(ToIndex, UserIndex, 0, "||Se acabó el efecto del Arco Encantado." & FONTTYPE_INFO)
+If TiempoTranscurrido(UserList(Userindex).Counters.BonusFlecha) >= 45 Then
+    UserList(Userindex).Counters.BonusFlecha = 0
+    UserList(Userindex).flags.BonusFlecha = False
+    Call SendData(ToIndex, Userindex, 0, "||Se acabó el efecto del Arco Encantado." & FONTTYPE_INFO)
 End If
 
 End Sub
-Sub TimerPiquete(UserIndex As Integer)
+Sub TimerPiquete(Userindex As Integer)
 
-If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).trigger = 5 Then
-    UserList(UserIndex).Counters.PiqueteC = UserList(UserIndex).Counters.PiqueteC + 1
-    If UserList(UserIndex).Counters.PiqueteC Mod 5 = 0 Then Call SendData(ToIndex, UserIndex, 0, "9N")
-    If UserList(UserIndex).Counters.PiqueteC >= 25 Then
-        UserList(UserIndex).Counters.PiqueteC = 0
-        Call Encarcelar(UserIndex, 3)
+If MapData(UserList(Userindex).POS.Map, UserList(Userindex).POS.X, UserList(Userindex).POS.Y).trigger = 5 Then
+    UserList(Userindex).Counters.PiqueteC = UserList(Userindex).Counters.PiqueteC + 1
+    If UserList(Userindex).Counters.PiqueteC Mod 5 = 0 Then Call SendData(ToIndex, Userindex, 0, "9N")
+    If UserList(Userindex).Counters.PiqueteC >= 25 Then
+        UserList(Userindex).Counters.PiqueteC = 0
+        Call Encarcelar(Userindex, 3)
     End If
-Else: UserList(UserIndex).Counters.PiqueteC = 0
+Else: UserList(Userindex).Counters.PiqueteC = 0
 End If
 
 End Sub
-Public Sub TimerProtEntro(UserIndex As Integer)
+Public Sub TimerProtEntro(Userindex As Integer)
 On Error GoTo Error
 
-UserList(UserIndex).Counters.Protegido = UserList(UserIndex).Counters.Protegido - 1
-If UserList(UserIndex).Counters.Protegido <= 0 Then UserList(UserIndex).flags.Protegido = 0
+UserList(Userindex).Counters.Protegido = UserList(Userindex).Counters.Protegido - 1
+If UserList(Userindex).Counters.Protegido <= 0 Then UserList(Userindex).flags.Protegido = 0
 
 Exit Sub
 
 Error:
     Call LogError("Error en TimerProtEntro" & " " & Err.Description)
 End Sub
-Sub TimerParalisis(UserIndex As Integer)
+Sub TimerParalisis(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Paralisis) >= IntervaloParalizadoUsuario Then
-    UserList(UserIndex).Counters.Paralisis = 0
-    UserList(UserIndex).flags.Paralizado = 0
-    Call SendData(ToIndex, UserIndex, 0, "P8")
+If TiempoTranscurrido(UserList(Userindex).Counters.Paralisis) >= IntervaloParalizadoUsuario Then
+    UserList(Userindex).Counters.Paralisis = 0
+    UserList(Userindex).flags.Paralizado = 0
+    Call SendData(ToIndex, Userindex, 0, "P8")
 End If
 
 End Sub
-Sub TimerCeguera(UserIndex As Integer)
+Sub TimerCeguera(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Ceguera) >= IntervaloParalizadoUsuario / 2 Then
-    UserList(UserIndex).Counters.Ceguera = 0
-    UserList(UserIndex).flags.Ceguera = 0
-    Call SendData(ToIndex, UserIndex, 0, "NSEGUE")
+If TiempoTranscurrido(UserList(Userindex).Counters.Ceguera) >= IntervaloParalizadoUsuario / 2 Then
+    UserList(Userindex).Counters.Ceguera = 0
+    UserList(Userindex).flags.Ceguera = 0
+    Call SendData(ToIndex, Userindex, 0, "NSEGUE")
 End If
 
 End Sub
-Sub TimerEstupidez(UserIndex As Integer)
+Sub TimerEstupidez(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Estupidez) >= IntervaloParalizadoUsuario Then
-    UserList(UserIndex).Counters.Estupidez = 0
-    UserList(UserIndex).flags.Estupidez = 0
-    Call SendData(ToIndex, UserIndex, 0, "NESTUP")
+If TiempoTranscurrido(UserList(Userindex).Counters.Estupidez) >= IntervaloParalizadoUsuario Then
+    UserList(Userindex).Counters.Estupidez = 0
+    UserList(Userindex).flags.Estupidez = 0
+    Call SendData(ToIndex, Userindex, 0, "NESTUP")
 End If
 
 End Sub
-Sub TimerCarcel(UserIndex As Integer)
+Sub TimerCarcel(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Pena) >= UserList(UserIndex).Counters.TiempoPena Then
-    UserList(UserIndex).Counters.TiempoPena = 0
-    UserList(UserIndex).flags.Encarcelado = 0
-    UserList(UserIndex).Counters.Pena = 0
-    If UserList(UserIndex).POS.Map = Prision.Map Then
-        Call WarpUserChar(UserIndex, Libertad.Map, Libertad.X, Libertad.Y, True)
-        Call SendData(ToIndex, UserIndex, 0, "4P")
+If TiempoTranscurrido(UserList(Userindex).Counters.Pena) >= UserList(Userindex).Counters.TiempoPena Then
+    UserList(Userindex).Counters.TiempoPena = 0
+    UserList(Userindex).flags.Encarcelado = 0
+    UserList(Userindex).Counters.Pena = 0
+    If UserList(Userindex).POS.Map = Prision.Map Then
+        Call WarpUserChar(Userindex, Libertad.Map, Libertad.X, Libertad.Y, True)
+        Call SendData(ToIndex, Userindex, 0, "4P")
     End If
 End If
 
 End Sub
-Sub TimerVenenoDoble(UserIndex As Integer)
+Sub TimerVenenoDoble(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Veneno) >= 2 Then
-    If TiempoTranscurrido(UserList(UserIndex).flags.EstasEnvenenado) >= 8 Then
-        UserList(UserIndex).flags.Envenenado = 0
-        UserList(UserIndex).flags.EstasEnvenenado = 0
-        UserList(UserIndex).Counters.Veneno = 0
+If TiempoTranscurrido(UserList(Userindex).Counters.Veneno) >= 2 Then
+    If TiempoTranscurrido(UserList(Userindex).flags.EstasEnvenenado) >= 8 Then
+        UserList(Userindex).flags.Envenenado = 0
+        UserList(Userindex).flags.EstasEnvenenado = 0
+        UserList(Userindex).Counters.Veneno = 0
     Else
-        Call SendData(ToIndex, UserIndex, 0, "1M")
-        UserList(UserIndex).Counters.Veneno = Timer
-        If Not UserList(UserIndex).flags.Quest Then
-            UserList(UserIndex).Stats.MinHP = Maximo(0, UserList(UserIndex).Stats.MinHP - 25)
-            If UserList(UserIndex).Stats.MinHP = 0 Then
-                Call UserDie(UserIndex)
+        Call SendData(ToIndex, Userindex, 0, "1M")
+        UserList(Userindex).Counters.Veneno = Timer
+        If Not UserList(Userindex).flags.Quest Then
+            UserList(Userindex).Stats.MinHP = Maximo(0, UserList(Userindex).Stats.MinHP - 25)
+            If UserList(Userindex).Stats.MinHP = 0 Then
+                Call UserDie(Userindex)
             Else: EnviarEstats = True
             End If
         End If
@@ -904,47 +905,47 @@ If TiempoTranscurrido(UserList(UserIndex).Counters.Veneno) >= 2 Then
 End If
 
 End Sub
-Sub UserSacrificado(UserIndex As Integer)
+Sub UserSacrificado(Userindex As Integer)
 Dim MiObj As Obj
 
 MiObj.OBJIndex = Gema
-MiObj.Amount = UserList(UserIndex).Stats.ELV ^ 2
+MiObj.Amount = UserList(Userindex).Stats.ELV ^ 2
 
-Call MakeObj(ToMap, UserIndex, UserList(UserIndex).POS.Map, MiObj, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y)
-Call UserDie(UserIndex)
+Call MakeObj(ToMap, Userindex, UserList(Userindex).POS.Map, MiObj, UserList(Userindex).POS.Map, UserList(Userindex).POS.X, UserList(Userindex).POS.Y)
+Call UserDie(Userindex)
 
-UserList(UserList(UserIndex).flags.Sacrificador).flags.Sacrificado = 0
-Call SendData(ToIndex, UserList(UserIndex).flags.Sacrificador, 0, "||Sacrificaste a " & UserList(UserIndex).Name & " por " & MiObj.Amount & " partes de la piedra filosofal." & FONTTYPE_INFO)
-UserList(UserIndex).flags.Ban = 1
-Call CloseSocket(UserIndex)
+UserList(UserList(Userindex).flags.Sacrificador).flags.Sacrificado = 0
+Call SendData(ToIndex, UserList(Userindex).flags.Sacrificador, 0, "||Sacrificaste a " & UserList(Userindex).Name & " por " & MiObj.Amount & " partes de la piedra filosofal." & FONTTYPE_INFO)
+UserList(Userindex).flags.Ban = 1
+Call CloseSocket(Userindex)
 
 End Sub
-Sub TimerSacrificando(UserIndex As Integer)
+Sub TimerSacrificando(Userindex As Integer)
 
-UserList(UserIndex).Stats.MinHP = UserList(UserIndex).Stats.MinHP - 10
-UserList(UserList(UserIndex).flags.Sacrificador).Stats.MinMAN = Minimo(0, UserList(UserList(UserIndex).flags.Sacrificador).Stats.MinMAN - 50)
-Call SendUserMANA(UserList(UserIndex).flags.Sacrificador)
+UserList(Userindex).Stats.MinHP = UserList(Userindex).Stats.MinHP - 10
+UserList(UserList(Userindex).flags.Sacrificador).Stats.MinMAN = Minimo(0, UserList(UserList(Userindex).flags.Sacrificador).Stats.MinMAN - 50)
+Call SendUserMANA(UserList(Userindex).flags.Sacrificador)
 
-If UserList(UserList(UserIndex).flags.Sacrificador).Stats.MinMAN = 0 Then Call CancelarSacrificio(UserIndex)
-If UserList(UserIndex).Stats.MinHP <= 0 Then Call UserSacrificado(UserIndex)
+If UserList(UserList(Userindex).flags.Sacrificador).Stats.MinMAN = 0 Then Call CancelarSacrificio(Userindex)
+If UserList(Userindex).Stats.MinHP <= 0 Then Call UserSacrificado(Userindex)
 
 EnviarEstats = True
 
 End Sub
-Sub TimerVeneno(UserIndex As Integer)
+Sub TimerVeneno(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Veneno) >= IntervaloVeneno Then
-    If TiempoTranscurrido(UserList(UserIndex).flags.EstasEnvenenado) >= IntervaloVeneno * 10 Then
-        UserList(UserIndex).flags.Envenenado = 0
-        UserList(UserIndex).flags.EstasEnvenenado = 0
-        UserList(UserIndex).Counters.Veneno = 0
+If TiempoTranscurrido(UserList(Userindex).Counters.Veneno) >= IntervaloVeneno Then
+    If TiempoTranscurrido(UserList(Userindex).flags.EstasEnvenenado) >= IntervaloVeneno * 10 Then
+        UserList(Userindex).flags.Envenenado = 0
+        UserList(Userindex).flags.EstasEnvenenado = 0
+        UserList(Userindex).Counters.Veneno = 0
     Else
-        Call SendData(ToIndex, UserIndex, 0, "1M")
-        UserList(UserIndex).Counters.Veneno = Timer
-        If Not UserList(UserIndex).flags.Quest Then
-            UserList(UserIndex).Stats.MinHP = Maximo(0, UserList(UserIndex).Stats.MinHP - RandomNumber(1, 5))
-            If UserList(UserIndex).Stats.MinHP = 0 Then
-                Call UserDie(UserIndex)
+        Call SendData(ToIndex, Userindex, 0, "1M")
+        UserList(Userindex).Counters.Veneno = Timer
+        If Not UserList(Userindex).flags.Quest Then
+            UserList(Userindex).Stats.MinHP = Maximo(0, UserList(Userindex).Stats.MinHP - RandomNumber(1, 5))
+            If UserList(Userindex).Stats.MinHP = 0 Then
+                Call UserDie(Userindex)
             Else: EnviarEstats = True
             End If
         End If
@@ -952,129 +953,129 @@ If TiempoTranscurrido(UserList(UserIndex).Counters.Veneno) >= IntervaloVeneno Th
 End If
 
 End Sub
-Public Sub TimerFrio(UserIndex As Integer)
+Public Sub TimerFrio(Userindex As Integer)
 
-If UserList(UserIndex).flags.Privilegios > 1 Then Exit Sub
+If UserList(Userindex).flags.Privilegios > 1 Then Exit Sub
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Frio) >= IntervaloFrio Then
-    UserList(UserIndex).Counters.Frio = Timer
-    If MapInfo(UserList(UserIndex).POS.Map).Terreno = Nieve Then
-        If TiempoTranscurrido(UserList(UserIndex).Counters.CartelFrio) >= 5 Then
-            UserList(UserIndex).Counters.CartelFrio = Timer
-            Call SendData(ToIndex, UserIndex, 0, "1K")
+If TiempoTranscurrido(UserList(Userindex).Counters.Frio) >= IntervaloFrio Then
+    UserList(Userindex).Counters.Frio = Timer
+    If MapInfo(UserList(Userindex).POS.Map).Terreno = Nieve Then
+        If TiempoTranscurrido(UserList(Userindex).Counters.CartelFrio) >= 5 Then
+            UserList(Userindex).Counters.CartelFrio = Timer
+            Call SendData(ToIndex, Userindex, 0, "1K")
         End If
-        If Not UserList(UserIndex).flags.Quest Then
-            UserList(UserIndex).Stats.MinHP = Maximo(0, UserList(UserIndex).Stats.MinHP - Porcentaje(UserList(UserIndex).Stats.MaxHP, 5))
+        If Not UserList(Userindex).flags.Quest Then
+            UserList(Userindex).Stats.MinHP = Maximo(0, UserList(Userindex).Stats.MinHP - Porcentaje(UserList(Userindex).Stats.MaxHP, 5))
             EnviarEstats = True
-            If UserList(UserIndex).Stats.MinHP = 0 Then
-                Call SendData(ToIndex, UserIndex, 0, "1L")
-                Call UserDie(UserIndex)
+            If UserList(Userindex).Stats.MinHP = 0 Then
+                Call SendData(ToIndex, Userindex, 0, "1L")
+                Call UserDie(Userindex)
             End If
         End If
     End If
-    Call QuitarSta(UserIndex, Porcentaje(UserList(UserIndex).Stats.MaxSta, 5))
-    If TiempoTranscurrido(UserList(UserIndex).Counters.CartelFrio) >= 10 Then
-        UserList(UserIndex).Counters.CartelFrio = Timer
-        Call SendData(ToIndex, UserIndex, 0, "FR")
+    Call QuitarSta(Userindex, Porcentaje(UserList(Userindex).Stats.MaxSta, 5))
+    If TiempoTranscurrido(UserList(Userindex).Counters.CartelFrio) >= 10 Then
+        UserList(Userindex).Counters.CartelFrio = Timer
+        Call SendData(ToIndex, Userindex, 0, "FR")
     End If
     EnviarEstats = True
 End If
 
 End Sub
-Sub TimerPocion(UserIndex As Integer)
+Sub TimerPocion(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).flags.DuracionEfecto) >= 45 Then
-    UserList(UserIndex).flags.DuracionEfecto = 0
-    UserList(UserIndex).flags.TomoPocion = False
-    UserList(UserIndex).Stats.UserAtributos(Agilidad) = UserList(UserIndex).Stats.UserAtributosBackUP(Agilidad)
-    UserList(UserIndex).Stats.UserAtributos(fuerza) = UserList(UserIndex).Stats.UserAtributosBackUP(fuerza)
-    Call UpdateFuerzaYAg(UserIndex)
+If TiempoTranscurrido(UserList(Userindex).flags.DuracionEfecto) >= 45 Then
+    UserList(Userindex).flags.DuracionEfecto = 0
+    UserList(Userindex).flags.TomoPocion = False
+    UserList(Userindex).Stats.UserAtributos(Agilidad) = UserList(Userindex).Stats.UserAtributosBackUP(Agilidad)
+    UserList(Userindex).Stats.UserAtributos(fuerza) = UserList(Userindex).Stats.UserAtributosBackUP(fuerza)
+    Call UpdateFuerzaYAg(Userindex)
 End If
 
 End Sub
-Public Sub TimerHyS(UserIndex As Integer)
+Public Sub TimerHyS(Userindex As Integer)
 Dim EnviaInfo As Boolean
 
-If UserList(UserIndex).flags.Privilegios > 1 Or (UserList(UserIndex).Clase = TALADOR And UserList(UserIndex).Recompensas(1) = 2) Or UserList(UserIndex).flags.Quest Then Exit Sub
+If UserList(Userindex).flags.Privilegios > 1 Or (UserList(Userindex).Clase = TALADOR And UserList(Userindex).Recompensas(1) = 2) Or UserList(Userindex).flags.Quest Then Exit Sub
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.AGUACounter) >= IntervaloSed Then
-    If UserList(UserIndex).flags.Sed = 0 Then
-        UserList(UserIndex).Stats.MinAGU = UserList(UserIndex).Stats.MinAGU - 10
-        If UserList(UserIndex).Stats.MinAGU <= 0 Then
-            UserList(UserIndex).Stats.MinAGU = 0
-            UserList(UserIndex).flags.Sed = 1
+If TiempoTranscurrido(UserList(Userindex).Counters.AGUACounter) >= IntervaloSed Then
+    If UserList(Userindex).flags.Sed = 0 Then
+        UserList(Userindex).Stats.MinAGU = UserList(Userindex).Stats.MinAGU - 10
+        If UserList(Userindex).Stats.MinAGU <= 0 Then
+            UserList(Userindex).Stats.MinAGU = 0
+            UserList(Userindex).flags.Sed = 1
         End If
         EnviaInfo = True
     End If
-    UserList(UserIndex).Counters.AGUACounter = Timer
+    UserList(Userindex).Counters.AGUACounter = Timer
 End If
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.COMCounter) >= IntervaloHambre Then
-    If UserList(UserIndex).flags.Hambre = 0 Then
-        UserList(UserIndex).Counters.COMCounter = Timer
-        UserList(UserIndex).Stats.MinHam = UserList(UserIndex).Stats.MinHam - 10
-        If UserList(UserIndex).Stats.MinHam <= 0 Then
-            UserList(UserIndex).Stats.MinHam = 0
-            UserList(UserIndex).flags.Hambre = 1
+If TiempoTranscurrido(UserList(Userindex).Counters.COMCounter) >= IntervaloHambre Then
+    If UserList(Userindex).flags.Hambre = 0 Then
+        UserList(Userindex).Counters.COMCounter = Timer
+        UserList(Userindex).Stats.MinHam = UserList(Userindex).Stats.MinHam - 10
+        If UserList(Userindex).Stats.MinHam <= 0 Then
+            UserList(Userindex).Stats.MinHam = 0
+            UserList(Userindex).flags.Hambre = 1
         End If
         EnviaInfo = True
     End If
-    UserList(UserIndex).Counters.COMCounter = Timer
+    UserList(Userindex).Counters.COMCounter = Timer
 End If
 
-If EnviaInfo Then Call EnviarHambreYsed(UserIndex)
+If EnviaInfo Then Call EnviarHambreYsed(Userindex)
 
 End Sub
-Sub TimerSanar(UserIndex As Integer)
+Sub TimerSanar(Userindex As Integer)
 
-If (UserList(UserIndex).flags.Descansar And TiempoTranscurrido(UserList(UserIndex).Counters.HPCounter) >= SanaIntervaloDescansar) Or _
-     (Not UserList(UserIndex).flags.Descansar And TiempoTranscurrido(UserList(UserIndex).Counters.HPCounter) >= SanaIntervaloSinDescansar) Then
-    If (Not Lloviendo Or Not Intemperie(UserIndex)) And UserList(UserIndex).Stats.MinHP < UserList(UserIndex).Stats.MaxHP And UserList(UserIndex).flags.Hambre = 0 And UserList(UserIndex).flags.Sed = 0 Then
-        If UserList(UserIndex).flags.Descansar Then
-            UserList(UserIndex).Stats.MinHP = Minimo(UserList(UserIndex).Stats.MaxHP, UserList(UserIndex).Stats.MinHP + Porcentaje(UserList(UserIndex).Stats.MaxHP, 20))
-            If UserList(UserIndex).Stats.MaxHP = UserList(UserIndex).Stats.MinHP And UserList(UserIndex).Stats.MaxSta = UserList(UserIndex).Stats.MinSta Then
-                Call SendData(ToIndex, UserIndex, 0, "DOK")
-                Call SendData(ToIndex, UserIndex, 0, "DN")
-                UserList(UserIndex).flags.Descansar = False
+If (UserList(Userindex).flags.Descansar And TiempoTranscurrido(UserList(Userindex).Counters.HPCounter) >= SanaIntervaloDescansar) Or _
+     (Not UserList(Userindex).flags.Descansar And TiempoTranscurrido(UserList(Userindex).Counters.HPCounter) >= SanaIntervaloSinDescansar) Then
+    If (Not Lloviendo Or Not Intemperie(Userindex)) And UserList(Userindex).Stats.MinHP < UserList(Userindex).Stats.MaxHP And UserList(Userindex).flags.Hambre = 0 And UserList(Userindex).flags.Sed = 0 Then
+        If UserList(Userindex).flags.Descansar Then
+            UserList(Userindex).Stats.MinHP = Minimo(UserList(Userindex).Stats.MaxHP, UserList(Userindex).Stats.MinHP + Porcentaje(UserList(Userindex).Stats.MaxHP, 20))
+            If UserList(Userindex).Stats.MaxHP = UserList(Userindex).Stats.MinHP And UserList(Userindex).Stats.MaxSta = UserList(Userindex).Stats.MinSta Then
+                Call SendData(ToIndex, Userindex, 0, "DOK")
+                Call SendData(ToIndex, Userindex, 0, "DN")
+                UserList(Userindex).flags.Descansar = False
             End If
         Else
-            UserList(UserIndex).Stats.MinHP = Minimo(UserList(UserIndex).Stats.MaxHP, UserList(UserIndex).Stats.MinHP + Porcentaje(UserList(UserIndex).Stats.MaxHP, 5))
+            UserList(Userindex).Stats.MinHP = Minimo(UserList(Userindex).Stats.MaxHP, UserList(Userindex).Stats.MinHP + Porcentaje(UserList(Userindex).Stats.MaxHP, 5))
         End If
-        Call SendData(ToIndex, UserIndex, 0, "1N")
+        Call SendData(ToIndex, Userindex, 0, "1N")
         EnviarEstats = True
     End If
-    UserList(UserIndex).Counters.HPCounter = Timer
+    UserList(Userindex).Counters.HPCounter = Timer
 End If
     
 End Sub
-Sub TimerInvocacion(UserIndex As Integer)
+Sub TimerInvocacion(Userindex As Integer)
 Dim i As Integer
 Dim NpcIndex As Integer
 
-If UserList(UserIndex).flags.Privilegios > 0 Or UserList(UserIndex).flags.Quest Then Exit Sub
+If UserList(Userindex).flags.Privilegios > 0 Or UserList(Userindex).flags.Quest Then Exit Sub
 
-For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(UserIndex).flags.Quest)
-    If UserList(UserIndex).MascotasIndex(i) Then
-        NpcIndex = UserList(UserIndex).MascotasIndex(i)
+For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(Userindex).flags.Quest)
+    If UserList(Userindex).MascotasIndex(i) Then
+        NpcIndex = UserList(Userindex).MascotasIndex(i)
         If Npclist(NpcIndex).Contadores.TiempoExistencia > 0 And TiempoTranscurrido(Npclist(NpcIndex).Contadores.TiempoExistencia) >= IntervaloInvocacion + 10 * Buleano(Npclist(NpcIndex).Numero = 92) Then Call MuereNpc(NpcIndex, 0)
     End If
 Next
 
 End Sub
-Public Sub TimerIdleCount(UserIndex As Integer)
+Public Sub TimerIdleCount(Userindex As Integer)
 
-If UserList(UserIndex).flags.Privilegios = 0 And UserList(UserIndex).flags.Trabajando = 0 And TiempoTranscurrido(UserList(UserIndex).Counters.IdleCount) >= IntervaloParaConexion And Not UserList(UserIndex).Counters.Saliendo Then
-    Call SendData(ToIndex, UserIndex, 0, "!!Demasiado tiempo inactivo. Has sido desconectado..")
-    Call SendData(ToIndex, UserIndex, 0, "FINOK")
-    Call CloseSocket(UserIndex)
+If UserList(Userindex).flags.Privilegios = 0 And UserList(Userindex).flags.Trabajando = 0 And TiempoTranscurrido(UserList(Userindex).Counters.IdleCount) >= IntervaloParaConexion And Not UserList(Userindex).Counters.Saliendo Then
+    Call SendData(ToIndex, Userindex, 0, "!!Demasiado tiempo inactivo. Has sido desconectado..")
+    Call SendData(ToIndex, Userindex, 0, "FINOK")
+    Call CloseSocket(Userindex)
 End If
 
 End Sub
-Sub TimerSalir(UserIndex As Integer)
+Sub TimerSalir(Userindex As Integer)
 
-If TiempoTranscurrido(UserList(UserIndex).Counters.Salir) >= IntervaloCerrarConexion Then
-    Call SendData(ToIndex, UserIndex, 0, "FINOK")
-    Call CloseSocket(UserIndex)
+If TiempoTranscurrido(UserList(Userindex).Counters.Salir) >= IntervaloCerrarConexion Then
+    Call SendData(ToIndex, Userindex, 0, "FINOK")
+    Call CloseSocket(Userindex)
 End If
 
 End Sub

@@ -452,6 +452,8 @@ Public Const FONTTYPE_LVLUP = "~255~150~25~1~0"
 Public Const FONTTYPE_NUEVA = "~255~250~55~1~0"
 Public Const FONTTYPE_MUERTO = "~255~155~55~1~0"
 Public Const FONTTYPE_PARTY = "~50~175~175~1~0"
+Public Const FONTTYPE_CONSEJO = "~90~90~255~1~0"
+Public Const FONTTYPE_CONSEJOCAOS = "~255~90~90~1~0"
 
 Public Const STAT_MAXELV = 45
 Public Const STAT_MAXHP = 999
@@ -948,6 +950,9 @@ Type UserFlags
     Trabajando As Byte
     OldShieldAnim As Integer
     OldCascoAnim As Integer
+    
+    EsConseCaos As Integer
+    EsConseReal As Integer
 End Type
 
 Type UserCounters
@@ -1266,7 +1271,7 @@ End Type
 Type MapBlock
     Blocked As Byte
     Agua As Byte
-    UserIndex As Integer
+    Userindex As Integer
     NpcIndex As Integer
     OBJInfo As Obj
     TileExit As WorldPos
@@ -1291,7 +1296,7 @@ Type MapInfo
     MapVersion As Integer
     Pk As Boolean
     NoMagia As Boolean
-    UserIndex() As Integer
+    Userindex() As Integer
     
     Terreno As String
     Zona As String

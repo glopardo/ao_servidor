@@ -209,6 +209,8 @@ str = str & ",Pena=" & Pena
 str = str & ",Password='" & mUser.Password & "'"
 str = str & ",DenunciasCheat=" & mUser.flags.Denuncias
 str = str & ",DenunciasInsulto=" & mUser.flags.DenunciasInsultos
+str = str & ",EsConseCaos=" & mUser.flags.EsConseCaos
+str = str & ",EsConseReal=" & mUser.flags.EsConseReal
 str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
 Call Con.Execute(str)
 
@@ -372,12 +374,12 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
      str = str & ",CANT" & i & "=" & mUser.Invent.Object(i).Amount
  Next i
  str = str & ",CASCOSLOT=" & mUser.Invent.CascoEqpSlot
-str = str & ",ARMORSLOT=" & mUser.Invent.ArmourEqpSlot
-str = str & ",SHIELDSLOT=" & mUser.Invent.EscudoEqpSlot
-str = str & ",WEAPONSLOT=" & mUser.Invent.WeaponEqpSlot
-str = str & ",HERRAMIENTASLOT=" & mUser.Invent.HerramientaEqpslot
-str = str & ",MUNICIONSLOT=" & mUser.Invent.MunicionEqpSlot
-str = str & ",BARCOSLOT=" & mUser.Invent.BarcoSlot
+ str = str & ",ARMORSLOT=" & mUser.Invent.ArmourEqpSlot
+ str = str & ",SHIELDSLOT=" & mUser.Invent.EscudoEqpSlot
+ str = str & ",WEAPONSLOT=" & mUser.Invent.WeaponEqpSlot
+ str = str & ",HERRAMIENTASLOT=" & mUser.Invent.HerramientaEqpslot
+ str = str & ",MUNICIONSLOT=" & mUser.Invent.MunicionEqpSlot
+ str = str & ",BARCOSLOT=" & mUser.Invent.BarcoSlot
  
  str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
  Call Con.Execute(str)
@@ -391,7 +393,7 @@ ErrHandle:
 End Sub
 Function CalcularTiempoCarcel(UserIndex As Integer) As Integer
 
-If UserList(UserIndex).flags.Encarcelado = 1 Then CalcularTiempoCarcel = 1 + (UserList(UserIndex).Counters.TiempoPena - TiempoTranscurrido(UserList(UserIndex).Counters.Pena)) \ 60
+    If UserList(UserIndex).flags.Encarcelado = 1 Then CalcularTiempoCarcel = 1 + (UserList(UserIndex).Counters.TiempoPena - TiempoTranscurrido(UserList(UserIndex).Counters.Pena)) \ 60
 
 End Function
 Function LoadUserSQL(UserIndex As Integer, ByVal Name As String) As Boolean
@@ -422,6 +424,8 @@ With UserList(UserIndex)
     .Password = RS!Password
     .flags.Denuncias = RS!DenunciasCheat
     .flags.DenunciasInsultos = RS!DenunciasInsulto
+    .flags.EsConseCaos = RS!EsConseCaos
+    .flags.EsConseReal = RS!EsConseReal
 
     Set RS = Nothing
     

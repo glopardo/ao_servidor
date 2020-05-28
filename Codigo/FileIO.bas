@@ -1299,9 +1299,9 @@ Npclist(NpcIndex).flags.RespawnOrigPos = val(GetVar(npcfile, "NPC" & NPCNumber, 
 Npclist(NpcIndex).TipoItems = val(GetVar(npcfile, "NPC" & NPCNumber, "TipoItems"))
 
 End Sub
-Sub LogBan(ByVal BannedIndex As Integer, UserIndex As Integer, ByVal Motivo As String)
+Sub LogBan(ByVal BannedIndex As Integer, Userindex As Integer, ByVal Motivo As String)
 
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "BannedBy", UserList(UserIndex).Name)
+Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "BannedBy", UserList(Userindex).Name)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Reason", Motivo)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "IP", UserList(BannedIndex).ip)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Mail", UserList(BannedIndex).Email)
@@ -1314,9 +1314,9 @@ Print #mifile, UserList(BannedIndex).Name
 Close #mifile
 
 End Sub
-Sub LogBanOffline(ByVal BannedIndex As String, UserIndex As Integer, ByVal Motivo As String)
+Sub LogBanOffline(ByVal BannedIndex As String, Userindex As Integer, ByVal Motivo As String)
 
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "BannedBy", UserList(UserIndex).Name)
+Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "BannedBy", UserList(Userindex).Name)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "Reason", Motivo)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "IP", "Ban offline")
 
