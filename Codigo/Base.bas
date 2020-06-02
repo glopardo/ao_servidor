@@ -52,23 +52,23 @@ errhandler:
 
 End Sub
 Public Function ChangePos(UserName As String) As Boolean
-Dim IndexPJ As Long
+Dim indexPj As Long
 Dim str As String
 
 Dim RS As New ADODB.Recordset
 Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(UserName) & "'")
 If RS.BOF Or RS.EOF Then Exit Function
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & indexPj)
 If RS.BOF Or RS.EOF Then Exit Function
 
 str = "UPDATE `charinit` SET"
-str = str & " IndexPJ=" & IndexPJ
-str = str & ",Email='" & RS!Email & "'"
+str = str & " IndexPJ=" & indexPj
+str = str & ",Email='" & RS!email & "'"
 str = str & ",Genero=" & RS!Genero
 str = str & ",Raza=" & RS!Raza
 str = str & ",Hogar=" & RS!Hogar
@@ -80,7 +80,7 @@ str = str & ",LastIP='" & RS!LastIP & "'"
 str = str & ",Mapa=" & ULLATHORPE.Map
 str = str & ",X=" & ULLATHORPE.X
 str = str & ",Y=" & ULLATHORPE.Y
-str = str & " WHERE IndexPJ=" & IndexPJ
+str = str & " WHERE IndexPJ=" & indexPj
 
 Call Con.Execute(str)
 
@@ -96,10 +96,10 @@ Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) &
 If RS.BOF Or RS.EOF Then Exit Function
 
 Orden = "UPDATE `charflags` SET"
-Orden = Orden & " IndexPJ=" & RS!IndexPJ
+Orden = Orden & " IndexPJ=" & RS!indexPj
 Orden = Orden & ",Nombre='" & UCase$(Name) & "'"
 Orden = Orden & ",Ban=" & Baneado
-Orden = Orden & " WHERE IndexPJ=" & RS!IndexPJ
+Orden = Orden & " WHERE IndexPJ=" & RS!indexPj
 
 Call Con.Execute(Orden)
 
@@ -108,7 +108,7 @@ Set RS = Nothing
 End Function
 Public Sub SendCharInfo(ByVal UserName As String, UserIndex As Integer)
 Dim Data As String
-Dim IndexPJ As Long
+Dim indexPj As Long
 
 If Not ExistePersonaje(UserName) Then Exit Sub
 
@@ -118,11 +118,11 @@ Dim RS As New ADODB.Recordset
 Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(UserName) & "'")
 If RS.BOF Or RS.EOF Then Exit Sub
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & indexPj)
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
@@ -130,7 +130,7 @@ Data = Data & "," & ListaRazas(RS!Raza) & "," & ListaClases(RS!Clase) & "," & Ge
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & indexPj)
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
@@ -138,7 +138,7 @@ Data = Data & RS!ELV & "," & RS!GLD & "," & RS!Banco & ","
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & indexPj)
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
@@ -148,7 +148,7 @@ Data = Data & RS!FundoClan & "," & RS!ClanFundado & "," _
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & indexPj)
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
@@ -185,21 +185,21 @@ If Len(mUser.Name) = 0 Then Exit Sub
 
 Set RS = New ADODB.Recordset
 
-Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
 
 If RS.BOF Or RS.EOF Then
     Con.Execute ("INSERT INTO `charflags` (NOMBRE) VALUES ('" & UCase$(mUser.Name) & "')")
     Set RS = Nothing
     Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(mUser.Name) & "'")
-    UserList(UserIndex).IndexPJ = RS!IndexPJ
+    UserList(UserIndex).indexPj = RS!indexPj
 End If
 
 Set RS = Nothing
 Dim Pena As Integer
 
-Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
 str = "UPDATE `charflags` SET"
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 str = str & ",Nombre='" & UCase$(mUser.Name) & "'"
 str = str & ",Ban=" & mUser.flags.Ban
 str = str & ",Navegando=" & mUser.flags.Navegando
@@ -209,19 +209,26 @@ str = str & ",Pena=" & Pena
 str = str & ",Password='" & mUser.Password & "'"
 str = str & ",DenunciasCheat=" & mUser.flags.Denuncias
 str = str & ",DenunciasInsulto=" & mUser.flags.DenunciasInsultos
-str = str & ",EsConseCaos=" & mUser.flags.EsConseCaos
-str = str & ",EsConseReal=" & mUser.flags.EsConseReal
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
+Set RS = Nothing
 
+str = "UPDATE `charflags` SET"
+str = str & " EsConseCaos=" & mUser.flags.EsConseCaos
+str = str & ",EsConseReal=" & mUser.flags.EsConseReal
+str = str & ",SoporteRespondido=" & mUser.flags.SoporteRespondido
+str = str & ",SoporteRespuesta=" & mUser.flags.SoporteRespuesta
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
+Call Con.Execute(str)
+Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charfaccion` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charfaccion` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
 
 str = "UPDATE `charfaccion` SET"
 
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 str = str & ",Bando=" & mUser.Faccion.Bando
 str = str & ",BandoOriginal=" & mUser.Faccion.BandoOriginal
 str = str & ",Matados0=" & mUser.Faccion.Matados(0)
@@ -232,17 +239,17 @@ str = str & ",Ataco1=" & Buleano(mUser.Faccion.Ataco(1) = 1)
 str = str & ",Ataco2=" & Buleano(mUser.Faccion.Ataco(2) = 1)
 str = str & ",Quests=" & mUser.Faccion.Quests
 str = str & ",Torneos=" & mUser.Faccion.Torneos
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
 
 
-Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charguild` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charguild` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
 
 str = "UPDATE `charguild` SET"
 
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 str = str & ",Echadas=" & mUser.GuildInfo.echadas
 str = str & ",SolicitudesRechazadas=" & mUser.GuildInfo.SolicitudesRechazadas
 str = str & ",Guildname='" & mUser.GuildInfo.GuildName & "'"
@@ -254,45 +261,45 @@ str = str & ",VecesFueGuildLeader=" & mUser.GuildInfo.VecesFueGuildLeader
 str = str & ",YaVoto=" & mUser.GuildInfo.YaVoto
 str = str & ",FundoClan=" & mUser.GuildInfo.FundoClan
 str = str & ",ClanFundado='" & mUser.GuildInfo.ClanFundado & "'"
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
 
 
-Set RS = Con.Execute("SELECT * FROM `charatrib` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charatrib` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charatrib` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charatrib` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
 
 str = "UPDATE `charatrib` SET"
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 For i = 1 To NUMATRIBUTOS
     str = str & ",AT" & i & "=" & mUser.Stats.UserAtributosBackUP(i)
 Next i
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
 
 
-Set RS = Con.Execute("SELECT * FROM `charskills` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charskills` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charskills` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charskills` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
 
 str = "UPDATE `charskills` SET"
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 
 For i = 1 To NUMSKILLS
     str = str & ",SK" & i & "=" & mUser.Stats.UserSkills(i)
 Next i
 
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
 
 
-Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charinit` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charinit` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
 
 str = "UPDATE `charinit` SET"
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
-str = str & ",Email='" & mUser.Email & "'"
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
+str = str & ",Email='" & mUser.email & "'"
 str = str & ",Genero=" & mUser.Genero
 str = str & ",Raza=" & mUser.Raza
 str = str & ",Hogar=" & mUser.Hogar
@@ -304,16 +311,16 @@ str = str & ",LastIP='" & mUser.ip & "'"
 str = str & ",Mapa=" & mUser.POS.Map
 str = str & ",X=" & mUser.POS.X
 str = str & ",Y=" & mUser.POS.Y
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
 Call Con.Execute(str)
 
 
-Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
-If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charstats` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charstats` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
 Set RS = Nothing
  
 str = "UPDATE `charstats` SET"
-str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 str = str & ",GLD=" & mUser.Stats.GLD
 str = str & ",BANCO=" & mUser.Stats.Banco
 str = str & ",MaxHP=" & mUser.Stats.MaxHP
@@ -333,42 +340,42 @@ str = str & ",NpcsMuertes=" & mUser.Stats.NPCsMuertos
 For i = 1 To 3
     str = str & ",Recompensa" & i & "=" & mUser.Recompensas(i)
 Next i
-str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  Call Con.Execute(str)
 
  
- Set RS = Con.Execute("SELECT * FROM `charbanco` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
- If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charbanco` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+ Set RS = Con.Execute("SELECT * FROM `charbanco` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+ If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charbanco` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
  
  str = "UPDATE `charbanco` SET"
- str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_BANCOINVENTORY_SLOTS
      str = str & ",OBJ" & i & "=" & mUser.BancoInvent.Object(i).OBJIndex
      str = str & ",CANT" & i & "=" & mUser.BancoInvent.Object(i).Amount
  Next i
- str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  Call Con.Execute(str)
 
  
- Set RS = Con.Execute("SELECT * FROM `charhechizos` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
- If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charhechizos` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+ Set RS = Con.Execute("SELECT * FROM `charhechizos` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+ If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charhechizos` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
  Set RS = Nothing
  
  str = "UPDATE `charhechizos` SET"
- str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAXUSERHECHIZOS
      str = str & ",H" & i & "=" & mUser.Stats.UserHechizos(i)
  Next i
- str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  Call Con.Execute(str)
  
  
- Set RS = Con.Execute("SELECT * FROM `charinvent` WHERE IndexPJ=" & UserList(UserIndex).IndexPJ)
- If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charinvent` (IndexPJ) VALUES (" & UserList(UserIndex).IndexPJ & ")")
+ Set RS = Con.Execute("SELECT * FROM `charinvent` WHERE IndexPJ=" & UserList(UserIndex).indexPj)
+ If RS.BOF Or RS.EOF Then Call Con.Execute("INSERT INTO `charinvent` (IndexPJ) VALUES (" & UserList(UserIndex).indexPj & ")")
  Set RS = Nothing
  
  str = "UPDATE `charinvent` SET"
- str = str & " IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_INVENTORY_SLOTS
      str = str & ",OBJ" & i & "=" & mUser.Invent.Object(i).OBJIndex
      str = str & ",CANT" & i & "=" & mUser.Invent.Object(i).Amount
@@ -381,7 +388,7 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
  str = str & ",MUNICIONSLOT=" & mUser.Invent.MunicionEqpSlot
  str = str & ",BARCOSLOT=" & mUser.Invent.BarcoSlot
  
- str = str & " WHERE IndexPJ=" & UserList(UserIndex).IndexPJ
+ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  Call Con.Execute(str)
 
 Call RevisarTops(UserIndex)
@@ -408,10 +415,10 @@ With UserList(UserIndex)
         Exit Function
     End If
 
-    .IndexPJ = RS!IndexPJ
+    .indexPj = RS!indexPj
     Set RS = Nothing
     
-    Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charflags` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -426,11 +433,13 @@ With UserList(UserIndex)
     .flags.DenunciasInsultos = RS!DenunciasInsulto
     .flags.EsConseCaos = RS!EsConseCaos
     .flags.EsConseReal = RS!EsConseReal
+    .flags.SoporteRespondido = RS!SoporteRespondido
+    .flags.SoporteRespuesta = RS!SoporteRespuesta
 
     Set RS = Nothing
     
     
-    Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charfaccion` WHERE IndexPJ=" & .indexPj)
     
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
@@ -451,7 +460,7 @@ With UserList(UserIndex)
 
     If Not ModoQuest And UserList(UserIndex).Faccion.Bando <> Neutral And UserList(UserIndex).Faccion.Bando <> UserList(UserIndex).Faccion.BandoOriginal Then UserList(UserIndex).Faccion.Bando = Neutral
 
-    Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -471,7 +480,7 @@ With UserList(UserIndex)
     Set RS = Nothing
     
     
-    Set RS = Con.Execute("SELECT * FROM `charatrib` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charatrib` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -485,7 +494,7 @@ With UserList(UserIndex)
     Set RS = Nothing
     
     
-    Set RS = Con.Execute("SELECT * FROM `charskills` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charskills` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -496,7 +505,7 @@ With UserList(UserIndex)
     Set RS = Nothing
     
     
-    Set RS = Con.Execute("SELECT * FROM `charbanco` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charbanco` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -508,7 +517,7 @@ With UserList(UserIndex)
     Set RS = Nothing
     
     
-    Set RS = Con.Execute("SELECT * FROM `charinvent` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charinvent` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -527,7 +536,7 @@ With UserList(UserIndex)
     Set RS = Nothing
 
     
-    Set RS = Con.Execute("SELECT * FROM `charhechizos` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charhechizos` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -537,7 +546,7 @@ With UserList(UserIndex)
     Next i
     Set RS = Nothing
     
-    Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
@@ -571,12 +580,12 @@ With UserList(UserIndex)
     If .Stats.MinHP < 1 Then .flags.Muerto = 1
         
     
-    Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & .IndexPJ)
+    Set RS = Con.Execute("SELECT * FROM `charinit` WHERE IndexPJ=" & .indexPj)
     If RS.BOF Or RS.EOF Then
         LoadUserSQL = False
         Exit Function
     End If
-    .Email = RS!Email
+    .email = RS!email
     .Genero = RS!Genero
     .Raza = RS!Raza
     .Hogar = RS!Hogar
@@ -584,7 +593,7 @@ With UserList(UserIndex)
     .codigo = RS!codigo
     .Desc = RS!Descripcion
     .OrigChar.Head = RS!Head
-    .POS.Map = RS!mapa
+    .POS.Map = RS!Mapa
     .POS.X = RS!X
     .POS.Y = RS!Y
 
@@ -636,7 +645,7 @@ Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) &
 If RS.BOF Or RS.EOF Then Exit Function
 
 str = "UPDATE `charflags` SET"
-str = str & " IndexPJ=" & RS!IndexPJ
+str = str & " IndexPJ=" & RS!indexPj
 str = str & ",Nombre='" & RS!Nombre & "'"
 str = str & ",Ban=" & RS!Ban
 str = str & ",Navegando=" & RS!Navegando
@@ -656,7 +665,7 @@ Else
     str = str & ",DenunciasInsulto=" & SumarDenuncia
 End If
 
-str = str & " WHERE IndexPJ=" & RS!IndexPJ
+str = str & " WHERE IndexPJ=" & RS!indexPj
 Call Con.Execute(str)
 
 Set RS = Nothing
@@ -693,7 +702,7 @@ BANCheck = (Baneado = 1)
 Set RS = Nothing
 
 End Function
-Public Function IndexPJ(ByVal Name As String) As Integer
+Public Function indexPj(ByVal Name As String) As Integer
 Dim RS As New ADODB.Recordset
 Dim Baneado As Byte
 
@@ -701,7 +710,7 @@ Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) &
 
 If RS.BOF Or RS.EOF Then Exit Function
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
@@ -720,29 +729,29 @@ ExistePersonaje = True
 End Function
 Function AgregarAClan(ByVal Name As String, ByVal Clan As String) As Boolean
 Dim RS As New ADODB.Recordset
-Dim IndexPJ As Long
+Dim indexPj As Long
 Dim str As String
 
 Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) & "'")
 
 If RS.BOF Or RS.EOF Then Exit Function
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & indexPj)
 If RS.BOF Or RS.EOF Then Exit Function
 
 If Len(RS!GuildName) = 0 Then
     str = "UPDATE `charguild` SET"
-    str = str & " IndexPJ=" & IndexPJ
+    str = str & " IndexPJ=" & indexPj
     str = str & ",Echadas=" & RS!echadas
     str = str & ",SolicitudesRechazadas=" & RS!SolicitudesRechazadas
     str = str & ",Guildname='" & Clan & "'"
     str = str & ",ClanesParticipo=" & RS!ClanesParticipo + 1
     str = str & ",Guildpts=" & RS!GuildPts + 25
-    str = str & " WHERE IndexPJ=" & IndexPJ
+    str = str & " WHERE IndexPJ=" & indexPj
     Call Con.Execute(str)
     AgregarAClan = True
 End If
@@ -752,25 +761,25 @@ Set RS = Nothing
 End Function
 Sub RechazarSolicitud(ByVal Name As String)
 Dim RS As New ADODB.Recordset
-Dim IndexPJ As Long
+Dim indexPj As Long
 Dim Orden As String
 
 Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) & "'")
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & indexPj)
 If RS.BOF Or RS.EOF Then Exit Sub
 
 Orden = "UPDATE `charguild` SET"
-Orden = Orden & " IndexPJ=" & IndexPJ
+Orden = Orden & " IndexPJ=" & indexPj
 Orden = Orden & ",Echadas=" & RS!echadas
 Orden = Orden & ",SolicitudesRechazadas=" & RS!SolicitudesRechazadas + 1
-Orden = Orden & " WHERE IndexPJ=" & IndexPJ
+Orden = Orden & " WHERE IndexPJ=" & indexPj
 Call Con.Execute(Orden)
 
 Set RS = Nothing
@@ -778,7 +787,7 @@ Set RS = Nothing
 End Sub
 Sub EcharDeClan(ByVal Name As String)
 Dim RS As New ADODB.Recordset
-Dim IndexPJ As Long
+Dim indexPj As Long
 Dim str As String
 Dim Echa As Integer
 
@@ -786,24 +795,132 @@ Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & UCase$(Name) &
 
 If RS.BOF Or RS.EOF Then Exit Sub
 
-IndexPJ = RS!IndexPJ
+indexPj = RS!indexPj
 
 Set RS = Nothing
 
-Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & IndexPJ)
+Set RS = Con.Execute("SELECT * FROM `charguild` WHERE IndexPJ=" & indexPj)
 If RS.BOF Or RS.EOF Then Exit Sub
 
 str = "UPDATE `charguild` SET"
-str = str & " IndexPJ=" & IndexPJ
+str = str & " IndexPJ=" & indexPj
 Echa = RS!echadas
 Echa = Echa + 1
 str = str & ",Echadas=" & Echa
 str = str & ",SolicitudesRechazadas=" & RS!SolicitudesRechazadas
 str = str & ",Guildname=''"
-str = str & " WHERE IndexPJ=" & IndexPJ
+str = str & " WHERE IndexPJ=" & indexPj
 
 Call Con.Execute(str)
 
 Set RS = Nothing
 
 End Sub
+
+Public Function LoadReclamos() As String()
+    
+    Dim RS As New ADODB.Recordset
+    
+    Dim i As Integer
+    Dim idReclamo As Integer
+    Dim Fecha As String
+    Dim Mapa As String
+    Dim UserIndex As Integer
+    Dim personaje As String
+    Dim email As String
+    Dim Gm As String
+    Dim Asunto As String
+    Dim Mensaje As String
+    Dim Respondido As Boolean
+    Dim Old As Integer
+    Dim ListaReclamos(100) As String
+    
+    Set RS = Con.Execute("SELECT * FROM `reclamos` WHERE respondido =0 LIMIT 0,100")
+    
+    If RS.BOF Or RS.EOF Then Exit Function
+    
+    Do Until RS.EOF
+        idReclamo = RS!ID
+        Fecha = RS!Fecha
+        Mapa = RS!Mapa
+        UserIndex = RS!UserIndex
+        personaje = RS!personaje
+        email = RS!email
+        Gm = RS!Gm
+        Asunto = RS!Asunto
+        Mensaje = RS!Mensaje
+        Respondido = RS!Respondido
+        Old = RS!Old
+        
+        ListaReclamos(i) = idReclamo & "|" & Fecha & "|" & Mapa & "|" & UserIndex & "|" & personaje & "|" & email & "|" & Gm & "|" & Asunto & "|" & Mensaje & "|" & Respondido & "|" & Old
+        i = i + 1
+        Call RS.MoveNext
+    Loop
+    
+    LoadReclamos = ListaReclamos
+    Set RS = Nothing
+    
+End Function
+
+Sub SaveRespuestaReclamo(idReclamo As Integer, respuesta As String, gmResponde As String, indexPj As Integer)
+    Call Logear("test", "SaveRespuestaReclamo: " & idReclamo & " - " & respuesta & " - " & gmResponde)
+    Dim RS As New ADODB.Recordset
+    Dim str As String
+    
+    str = "UPDATE `reclamos` SET"
+    str = str & " respondido=1"
+    str = str & ",respondidopor='" & gmResponde & "'"
+    str = str & ",respondidoel='" & Format(Now, "yyyy-mm-dd hh:mm:ss") & "'"
+    str = str & ",respuesta='" & respuesta & "'"
+    str = str & " WHERE id=" & idReclamo
+    
+    Call Con.Execute(str)
+    
+    Set RS = Nothing
+    
+    str = "UPDATE `charflags` SET"
+    str = str & " SoporteRespondido=1"
+    str = str & ", SoporteRespuesta='" & respuesta & "'"
+    str = str & " WHERE IndexPJ=" & indexPj
+    
+    Call Con.Execute(str)
+    
+    Set RS = Nothing
+End Sub
+
+'Sub LoadRespuestaReclamo(UserIndex As Integer)
+    'borrar sub
+'    Dim RS As New ADODB.Recordset
+'    Set RS = Con.Execute("(UserIndex)SELECT * FROM `charflags` WHERE IndexPJ=" & UserIndex)
+'    With UserList(UserIndex)
+'        .flags.SoporteRespondido = RS!SoporteRespondido
+'        .flags.SoporteRespuesta = RS!SoporteRespuesta
+'    End With
+'End Sub
+
+Sub CloseReclamo(UserIndex As Integer)
+    Dim RS As New ADODB.Recordset
+    Dim str As String
+    
+    str = "UPDATE `charflags` SET"
+    str = str & " SoporteRespondido=0"
+    str = str & ",SoporteRespuesta=''"
+    str = str & " WHERE IndexPJ =" & UserList(UserIndex).indexPj
+    
+    Call Con.Execute(str)
+    
+    Set RS = Nothing
+    
+End Sub
+
+Public Function PuedeMandarSoporte(UserIndex As Integer) As Boolean
+    Dim RS As New ADODB.Recordset
+    Set RS = Con.Execute("SELECT * FROM `reclamos` WHERE userIndex=" & UserList(UserIndex).indexPj & " AND Respondido=0 ORDER BY Fecha DESC")
+    
+    If RS.BOF Or RS.EOF Then
+        PuedeMandarSoporte = True
+        Exit Function
+    End If
+    
+    PuedeMandarSoporte = False
+End Function

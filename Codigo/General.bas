@@ -226,6 +226,25 @@ Next
 
 Call SendData(ToIndex, UserIndex, 0, SD)
 End Sub
+
+Sub EnviarDashboardSoporte(UserIndex As Integer)
+    Dim k As Integer, SD As String
+    Dim ListaReclamos() As String
+    Dim StringLargoReclamos As String
+    ListaReclamos = LoadReclamos()
+    
+    SD = "SPD" & ";"
+    
+    For k = 0 To UBound(ListaReclamos)
+        If ListaReclamos(k) <> "" Then
+            SD = SD & ListaReclamos(k) & ";"
+        End If
+    Next
+    
+    Call Logear("test", "SD: " & SD)
+    Call SendData(ToIndex, UserIndex, 0, SD)
+End Sub
+
 Sub EstablecerRecompensas()
 
 Recompensas(MINERO, 1, 1).SubeHP = 120

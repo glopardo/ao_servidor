@@ -290,6 +290,8 @@ Public Const RopaNewbieElfo = 464
 Public Const RopaNewbieElfoOscuro = 465
 Public Const RopaNewbieEnano = 466
 Public Const PocionRojaNewbie = 461
+Public Const PocionAzulNewbie = 703
+Public Const PocionFuerzaNewbie = 462
 
 Public Const PocionRojaNoCae = 754
 Public Const PocionAzulNoCae = 755
@@ -953,6 +955,9 @@ Type UserFlags
     
     EsConseCaos As Integer
     EsConseReal As Integer
+    
+    SoporteRespondido As Boolean
+    SoporteRespuesta As String
 End Type
 
 Type UserCounters
@@ -1048,7 +1053,7 @@ Type User
     modName As String
     Password As String
     codigo As String
-    IndexPJ As Long
+    indexPj As Long
     
     Char As Char
     OrigChar As Char
@@ -1057,7 +1062,7 @@ Type User
     Clase As Byte
     Raza As Byte
     Genero As Byte
-    Email As String
+    email As String
     Hogar As Byte
     
     Invent As Inventario
@@ -1271,7 +1276,7 @@ End Type
 Type MapBlock
     Blocked As Byte
     Agua As Byte
-    Userindex As Integer
+    UserIndex As Integer
     NpcIndex As Integer
     OBJInfo As Obj
     TileExit As WorldPos
@@ -1296,7 +1301,7 @@ Type MapInfo
     MapVersion As Integer
     Pk As Boolean
     NoMagia As Boolean
-    Userindex() As Integer
+    UserIndex() As Integer
     
     Terreno As String
     Zona As String
