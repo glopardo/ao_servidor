@@ -1300,13 +1300,10 @@ UserList(UserIndex).Counters.IdleCount = Timer
 
         Select Case Left$(rdata, 6)
             Case "OLOGIO"
-
                 rdata = Right$(rdata, Len(rdata) - 6)
-                
                 cliMD5 = ReadField(5, rdata, 44)
                 tName = ReadField(1, rdata, 44)
                 tName = RTrim(tName)
-                
                     
                 If Not AsciiValidos(tName) Then
                     Call SendData(ToIndex, UserIndex, 0, "ERRNombre invalido.")
@@ -1318,14 +1315,15 @@ UserList(UserIndex).Counters.IdleCount = Timer
                     Exit Sub
                 End If
                
-            
                 tStr = ReadField(6, rdata, 44)
-                
-        
                 tStr = ReadField(7, rdata, 44)
-                
-                      
                 Call ConnectUser(UserIndex, tName, ReadField(2, rdata, 44))
+                
+                If CTiempo = "Dia" Then
+                    Call SendData(ToAll, 0, 0, "DIA")
+                ElseIf CTiempo = "Noche" Then
+                    Call SendData(ToAll, 0, 0, "NCE")
+                End If
                 
                 Exit Sub
             Case "TIRDAD"
@@ -1503,6 +1501,20 @@ If UserList(UserIndex).flags.EsConseCaos Or UserList(UserIndex).flags.Privilegio
         End If
     End If
     Exit Sub
+End If
+ 
+If UCase$(rdata) = "/DIA" Then
+    If UserList(UserIndex).flags.Privilegios Then
+        Call SendData(ToAll, 0, 0, "DIA")
+        CTiempo = "Dia"
+    End If
+End If
+ 
+If UCase$(rdata) = "/NOCHE" Then
+    If UserList(UserIndex).flags.Privilegios Then
+        Call SendData(ToAll, 0, 0, "NCE")
+        CTiempo = "Noche"
+    End If
 End If
 
 If UCase$(rdata) = "/HOGAR" Then

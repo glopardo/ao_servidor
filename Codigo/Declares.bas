@@ -36,6 +36,8 @@ Attribute VB_Name = "Declaraciones"
 
 Option Explicit
 
+Public CTiempo As String
+
 Public ModoQuest As Boolean
 Public Recargando As Boolean
 Public MapDatFile As String
