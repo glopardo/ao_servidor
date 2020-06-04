@@ -125,7 +125,7 @@ If Not InMapBounds(POS.X, POS.Y) Or Not MapaValido(POS.Map) Then Exit Function
     MapData(POS.Map, POS.X, POS.Y).trigger <> 1
 
 End Function
-Sub CrearNPC(NroNPC As Integer, mapa As Integer, OrigPos As WorldPos)
+Sub CrearNPC(NroNPC As Integer, Mapa As Integer, OrigPos As WorldPos)
 
 
 Dim POS As WorldPos
@@ -153,7 +153,7 @@ If InMapBounds(OrigPos.X, OrigPos.Y) Then
     
 Else
     
-    POS.Map = mapa
+    POS.Map = Mapa
     
     Do While Not PosicionValida
         DoEvents
@@ -181,7 +181,7 @@ Else
         Iteraciones = Iteraciones + 1
         If Iteraciones > MAXSPAWNATTEMPS Then
             Call QuitarNPC(nIndex)
-            Call LogError(MAXSPAWNATTEMPS & " iteraciones en CrearNpc Mapa:" & mapa & " NroNpc:" & NroNPC)
+            Call LogError(MAXSPAWNATTEMPS & " iteraciones en CrearNpc Mapa:" & Mapa & " NroNpc:" & NroNPC)
             Exit Sub
         End If
     Loop
@@ -195,7 +195,7 @@ End If
 
 Call MakeNPCChar(ToMap, 0, Map, nIndex, Map, X, Y)
 
-If NPCListable(nIndex) Then Call AgregarNPC(Npclist(nIndex).Numero, mapa)
+If NPCListable(nIndex) Then Call AgregarNPC(Npclist(nIndex).Numero, Mapa)
 Exit Sub
 Error:
     
@@ -492,7 +492,7 @@ If S >= 0 Then
     Npclist(NpcIndex).Hostile = INIDarClaveInt(A, S, "Hostile")
     Npclist(NpcIndex).flags.OldHostil = Npclist(NpcIndex).Hostile
     
-    Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP")
+    Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP") * 100
     
     Npclist(NpcIndex).Veneno = INIDarClaveInt(A, S, "Veneno")
     
@@ -502,7 +502,7 @@ If S >= 0 Then
     Npclist(NpcIndex).MinRecom = INIDarClaveInt(A, S, "MinRecom")
     Npclist(NpcIndex).Probabilidad = INIDarClaveInt(A, S, "Probabilidad")
     
-    Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD")
+    Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD") * 50
     
     Npclist(NpcIndex).PoderAtaque = INIDarClaveInt(A, S, "PoderAtaque")
     Npclist(NpcIndex).PoderEvasion = INIDarClaveInt(A, S, "PoderEvasion")

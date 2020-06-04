@@ -1332,11 +1332,11 @@ UserList(UserIndex).Counters.IdleCount = Timer
                     Exit Sub
                 End If
 
-                UserList(UserIndex).Stats.UserAtributosBackUP(1) = 11 + CInt(RandomNumber(1, 2) + RandomNumber(1, 2) + RandomNumber(1, 3))
-                UserList(UserIndex).Stats.UserAtributosBackUP(2) = 11 + CInt(RandomNumber(1, 2) + RandomNumber(1, 2) + RandomNumber(1, 3))
-                UserList(UserIndex).Stats.UserAtributosBackUP(3) = 11 + CInt(RandomNumber(1, 2) + RandomNumber(1, 2) + RandomNumber(1, 3))
-                UserList(UserIndex).Stats.UserAtributosBackUP(4) = 11 + CInt(RandomNumber(1, 2) + RandomNumber(1, 2) + RandomNumber(1, 3))
-                UserList(UserIndex).Stats.UserAtributosBackUP(5) = 11 + CInt(RandomNumber(1, 2) + RandomNumber(1, 2) + RandomNumber(1, 3))
+                UserList(UserIndex).Stats.UserAtributosBackUP(1) = 16 + CInt(RandomNumber(1, 2))
+                UserList(UserIndex).Stats.UserAtributosBackUP(2) = 16 + CInt(RandomNumber(1, 2))
+                UserList(UserIndex).Stats.UserAtributosBackUP(3) = 16 + CInt(RandomNumber(1, 2))
+                UserList(UserIndex).Stats.UserAtributosBackUP(4) = 16 + CInt(RandomNumber(1, 2))
+                UserList(UserIndex).Stats.UserAtributosBackUP(5) = 16 + CInt(RandomNumber(1, 2))
                 
                 Call SendData(ToIndex, UserIndex, 0, ("DADOS" & UserList(UserIndex).Stats.UserAtributosBackUP(1) & "," & UserList(UserIndex).Stats.UserAtributosBackUP(2) & "," & UserList(UserIndex).Stats.UserAtributosBackUP(3) & "," & UserList(UserIndex).Stats.UserAtributosBackUP(4) & "," & UserList(UserIndex).Stats.UserAtributosBackUP(5)))
                 
