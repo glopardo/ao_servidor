@@ -726,13 +726,13 @@ Select Case sndRoute
         
     Case ToAlianza
         For LoopC = 1 To LastUser
-            If UserList(LoopC).ConnID > -1 And UserList(LoopC).Faccion.Bando = Real Then Call WsApiEnviar(LoopC, sndData)
+            If UserList(LoopC).ConnID > -1 And (UserList(LoopC).Faccion.Bando = Real Or UserList(LoopC).flags.Privilegios) Then Call WsApiEnviar(LoopC, sndData)
         Next
         Exit Sub
         
     Case ToCaos
         For LoopC = 1 To LastUser
-            If UserList(LoopC).ConnID > -1 And UserList(LoopC).Faccion.Bando = Caos Then Call WsApiEnviar(LoopC, sndData)
+            If UserList(LoopC).ConnID > -1 And (UserList(LoopC).Faccion.Bando = Caos Or UserList(LoopC).flags.Privilegios) Then Call WsApiEnviar(LoopC, sndData)
         Next
         Exit Sub
 
