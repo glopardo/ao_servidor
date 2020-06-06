@@ -54,6 +54,65 @@ Select Case Left$(UCase$(rdata), 2)
         Else: Call SendData(ToIndex, UserIndex, 0, "1A")
         End If
         Exit Sub
+    Case "#@"
+        '/RETAR
+        
+        rdata = Right$(rdata, Len(rdata) - 2)
+        tIndex = NameIndex(rdata)
+        
+        If UserList(UserIndex).Stats.GLD <= 50000 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Debes tener más de 50.000 moneas de oro para retar a alguien." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).POS.Map <> 160 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Debes ir a Isla Pirata para poder retar a tu contrincante." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+        
+        If UserList(tIndex).POS.Map <> 160 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Tu contrincante debe estar en Isla Pirata para que puedas retarlo." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).flags.Muerto = 1 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Debes estar vivo para retar a tu contrincante." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+        
+        'Call LookatTile(UserIndex, UserList(UserIndex).POS.Map, POS.X, POS.Y)
+     
+        If UserList(tIndex).flags.Muerto = 1 Then
+            Call SendData(ToIndex, UserIndex, 0, "||El usuario que quieres retar está muerto." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+    
+        If UserList(UserIndex).Reto.EstaDueleando Then
+            Call SendData(ToIndex, UserIndex, 0, "||¡Ya Estas en un reto!" & FONTTYPE_TALK)
+            Exit Sub
+        End If
+        
+        If UserList(tIndex).Reto.EstaDueleando Then
+            Call SendData(ToIndex, UserIndex, 0, "||El usuario que quieres retar ya se encuentra en un reto." & FONTTYPE_TALK)
+            Exit Sub
+        End If
+        
+        If MapInfo(178).NumUsers > 2 Then
+            Call SendData(ToIndex, UserIndex, 0, "||¡Las salas de retos están ocupadas!." & FONTTYPE_TALK)
+            Exit Sub
+        End If
+        
+        If UserIndex = tIndex Then
+            Call SendData(ToIndex, UserIndex, 0, "||No puedes retarte a ti mismo." & FONTTYPE_TALK)
+            Exit Sub
+        End If
+     
+        Call SendData(ToIndex, UserIndex, 0, "||Esperando Respuesta." & FONTTYPE_PARTY)
+        UserList(UserIndex).Reto.EsperandoDuelo = True
+        UserList(UserIndex).Reto.Contrincante = tIndex
+        UserList(tIndex).Reto.Contrincante = UserIndex
+        Call SendData(ToIndex, tIndex, 0, "SHOWR" & "," & UserList(UserIndex).Name)
+        
     Case "#]"
         rdata = Right$(rdata, Len(rdata) - 2)
         Call TirarRuleta(UserIndex, rdata)
@@ -76,7 +135,7 @@ Select Case Left$(UCase$(rdata), 2)
         Y = ReadField(2, rdata, 44)
         N = MapaPorUbicacion(X, Y)
         If N Then Call WarpUserChar(UserIndex, N, 50, 50, True)
-        Call LogGM(UserList(UserIndex).Name, "Se transporto por mapa a Mapa" & mapa & " X:" & X & " Y:" & Y, (UserList(UserIndex).flags.Privilegios = 1))
+        Call LogGM(UserList(UserIndex).Name, "Se transporto por mapa a Mapa" & Mapa & " X:" & X & " Y:" & Y, (UserList(UserIndex).flags.Privilegios = 1))
         Exit Sub
     
     Case "#A"
@@ -724,7 +783,7 @@ Select Case Left$(UCase$(rdata), 2)
         UserList(UserIndex).Faccion.Bando = Neutral
         UserList(UserIndex).Faccion.Jerarquia = 0
         Call UpdateUserChar(UserIndex)
-Exit Sub
+        Exit Sub
 
 Case "#3"
     If Len(UserList(UserIndex).GuildInfo.GuildName) = 0 Then
@@ -748,4 +807,5 @@ Case "#3"
     End Select
 
     Procesado = False
+    
 End Sub

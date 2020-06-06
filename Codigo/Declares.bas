@@ -45,7 +45,6 @@ Public MapDatFile As String
 Public Mensajes(1 To 2, 1 To 23) As String
 Public Armaduras(1 To 2, 1 To 3, 1 To 4, 1 To 2) As Integer
 
-
 Public Const CIUDADANO = 1
 Public Const TRABAJADOR = 2
 Public Const EXPERTO_MINERALES = 3
@@ -170,7 +169,6 @@ Public Const MAX_MENSAJES_FORO = 35
 
 Public Const MAXUSERHECHIZOS = 35
 
-
 Public Const EsfuerzoTalarGeneral = 40
 Public Const EsfuerzoTalarLeñador = 20
 
@@ -243,7 +241,6 @@ Public Const FX_TELEPORT_INDEX = 1
 
 Public Const MIN_APUÑALAR = 10
 
-
 Public Const NUMSKILLS = 22
 Public Const NUMATRIBUTOS = 5
 Public Const NUMCLASES = 56
@@ -258,9 +255,7 @@ Public Const EAST = 2
 Public Const SOUTH = 3
 Public Const WEST = 4
 
-
 Public Const MAXMASCOTAS = 20
-
 
 Public Const vlASALTO = 100
 Public Const vlASESINO = 1000
@@ -268,7 +263,6 @@ Public Const vlARQUERO = 5
 Public Const vlNoble = 5
 Public Const vlLadron = 25
 Public Const vlProleta = 2
-
 
 Public Const iCuerpoMuerto = 8
 Public Const iCabezaMuerto = 500
@@ -300,7 +294,6 @@ Public Const PocionAzulNoCae = 755
 Public Const PocionAmarillaNoCae = 756
 Public Const PocionVerdeNoCae = 757
 
-
 Public Const Magia = 1
 Public Const Robar = 2
 Public Const Tacticas = 3
@@ -318,13 +311,14 @@ Public Const Herreria = 14
 Public Const Liderazgo = 15
 Public Const Domar = 16
 Public Const Proyectiles = 17
-Public Const Wresterling = 18
+Public Const Wrestling = 18
 Public Const Navegacion = 19
 Public Const Sastreria = 20
 Public Const Comerciar = 21
 Public Const Resis = 22
 Public Const Resistencia = 22
 Public Const Invitar = 23
+Public Const Retar = 24
 
 Public Const FundirMetal = 88
 
@@ -355,16 +349,13 @@ Public Const AdicionalSTLeñador = 23
 Public Const AdicionalSTPescador = 20
 Public Const AdicionalSTMinero = 25
 
-
 Public Const XMaxMapSize = 100
 Public Const XMinMapSize = 1
 Public Const YMaxMapSize = 100
 Public Const YMinMapSize = 1
 
-
 Public Const TileSizeX = 32
 Public Const TileSizeY = 32
-
 
 Public Const XWindow = 17
 Public Const YWindow = 13
@@ -394,12 +385,10 @@ Public Const SND_CREACIONCLAN = 44
 Public Const SND_ACEPTADOCLAN = 43
 Public Const SND_DECLAREWAR = 45
 
-
 Public Const MAX_INVENTORY_OBJS = 10000
 Public Const MAX_INVENTORY_SLOTS = 25
 Public Const MAX_NPCINVENTORY_SLOTS = 30
 Public Const MAXPARTYUSERS = 4
-
 
 Public Const OBJTYPE_USEONCE = 1
 Public Const OBJTYPE_WEAPON = 2
@@ -434,7 +423,6 @@ Public Const OBJTYPE_RAIZ = 36
 Public Const OBJTYPE_PIEL = 30
 
 Public Const OBJTYPE_WARP = 37
-
 
 Public Const OBJTYPE_ARMADURA = 0
 Public Const OBJTYPE_CASCO = 1
@@ -558,9 +546,7 @@ End Type
 Public Codifico As Integer
 
 Type LevelSkill
-
-LevelValue As Integer
-
+    LevelValue As Integer
 End Type
 
 Type UserOBJ
@@ -594,7 +580,6 @@ Type Inventario
     NroItems As Integer
 End Type
 
-
 Type Position
     X As Integer
     Y As Integer
@@ -612,7 +597,6 @@ Type FXdata
     Delay As Integer
 End Type
 
-
 Type Char
     CharIndex As Integer
     Head As Integer
@@ -627,8 +611,8 @@ Type Char
     
     Heading As Byte
 End Type
-Public Worldsaves As Integer
 
+Public Worldsaves As Integer
 
 Public Type ObjData
     
@@ -644,7 +628,6 @@ Public Type ObjData
     Jerarquia As Byte
     
     Respawn As Byte
-    
     
     MaxItems As Integer
     Conte As Inventario
@@ -667,16 +650,13 @@ Public Type ObjData
     MineralIndex As Integer
     LingoteInex As Integer
     
-    
     proyectil As Integer
     Municion As Integer
     
     Crucial As Byte
     Newbie As Integer
     
-    
     MinSta As Integer
-    
     
     TipoPocion As Byte
     MaxModificador As Integer
@@ -732,7 +712,6 @@ Public Type ObjData
     LingP As Integer
     Madera As Integer
     MaderaElfica As Integer
-    
      
     Raices As Integer
     PielLobo As Integer
@@ -748,7 +727,6 @@ Public Type ObjData
     SkSastreria As Integer
     
     Texto As String
-    
     
     ClaseProhibida(1 To NUMCLASES) As Integer
     RazaProhibida(1 To NUMRAZAS) As Integer
@@ -787,17 +765,6 @@ Type UserTienda
     NroItems As Byte
     Gold As Long
 End Type
-
-
-
-
-
-
-
-
-
-
-
 
 Type UserStats
     GLD As Long
@@ -1046,6 +1013,12 @@ Type tGuild
 
 End Type
 
+Type Retos
+   Contrincante As Integer
+   EstaDueleando As Boolean
+   EsperandoDuelo As Boolean
+   Ring As Integer
+End Type
 
 Type User
     Name As String
@@ -1104,12 +1077,12 @@ Type User
     
     ip As String
     
-     
     ComUsu As tCOmercioUsuario
-    
     
     AntiCuelgue As Long
     PartyIndex As Integer
+    
+    Reto As Retos
 End Type
 
 Type Party
@@ -1118,15 +1091,10 @@ Type Party
     MiembrosIndex(1 To MAXPARTYUSERS) As Integer
 End Type
 
-
-
-
-
-
-
-
-
-
+Type Ring
+    Ocupado As Boolean
+    Participantes() As Integer
+End Type
 
 Type NPCStats
     AutoCurar As Byte
@@ -1196,15 +1164,7 @@ Type NpcPathFindingInfo
     CurPos As Integer
     TargetUser As Integer
     NoPath As Boolean
-    
-    
-    
-    
-    
-    
-    
 End Type
-
 
 Type Npc
     Name As String
@@ -1269,12 +1229,6 @@ Type Npc
  
 End Type
 
-
-
-
-
-
-
 Type MapBlock
     Blocked As Byte
     Agua As Byte
@@ -1289,7 +1243,6 @@ Type InfoNPCs
     Numero As Integer
     Cantidad As Byte
 End Type
-
 
 Type MapInfo
     NumUsers As Integer
@@ -1371,7 +1324,6 @@ Public ENDC As String
 
 Public recordusuarios As Long
 
-
 Public IniPath As String
 Public CharPath As String
 Public MapPath As String
@@ -1418,6 +1370,8 @@ Public UserOffline As User
 Public Tops(1 To 2, 1 To 20) As Top
 Public Npclist() As Npc
 Public Party() As Party
+Public Ring1 As Ring
+Public Ring2 As Ring
 Public NpcNoIniciado As Npc
 Public MapData() As MapBlock
 Public MapInfo() As MapInfo
@@ -1437,7 +1391,6 @@ Public ObjSastre() As Integer
 Public ObjCarpintero() As InfoHerre
 Public Hush() As String
 Public BanIps As New Collection
-
 
 Public NIX As WorldPos
 Public ULLATHORPE As WorldPos

@@ -1203,6 +1203,8 @@ If UserList(UserIndex).POS.Map <> 190 Then
     End If
 End If
 
+If UserList(UserIndex).Reto.EstaDueleando = True Then Call TerminarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
+
 If UserList(UserIndex).Invent.ArmourEqpObjIndex Then Call Desequipar(UserIndex, UserList(UserIndex).Invent.ArmourEqpSlot)
 If UserList(UserIndex).Invent.WeaponEqpObjIndex Then Call Desequipar(UserIndex, UserList(UserIndex).Invent.WeaponEqpSlot)
 If UserList(UserIndex).Invent.EscudoEqpObjIndex Then Call Desequipar(UserIndex, UserList(UserIndex).Invent.EscudoEqpSlot)
@@ -1240,6 +1242,7 @@ For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(UserIndex).flags.Quest)
     End If
     
 Next
+
 
 If UserList(UserIndex).POS.Map <> 190 Then UserList(UserIndex).Stats.VecesMurioUsuario = UserList(UserIndex).Stats.VecesMurioUsuario + 1
 

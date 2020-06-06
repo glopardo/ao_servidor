@@ -38,7 +38,7 @@ Option Explicit
 
 Public Declare Function Minimo Lib "aolib.dll" (ByVal A As Long, ByVal B As Long) As Long
 Public Declare Function Maximo Lib "aolib.dll" (ByVal A As Long, ByVal B As Long) As Long
-Public Declare Function PoderAtaqueWresterling Lib "aolib.dll" (ByVal Skill As Byte, ByVal Agilidad As Integer, Clase As Byte, ByVal Nivel As Byte) As Integer
+Public Declare Function PoderAtaqueWrestling Lib "aolib.dll" (ByVal Skill As Byte, ByVal Agilidad As Integer, Clase As Byte, ByVal Nivel As Byte) As Integer
 Public Declare Function SD Lib "aolib.dll" (ByVal N As Integer) As Integer
 Public Declare Function SDM Lib "aolib.dll" (ByVal N As Integer) As Integer
 Public Declare Function Complex Lib "aolib.dll" (ByVal N As Integer) As Integer
@@ -137,7 +137,7 @@ Arma = UserList(UserIndex).Invent.WeaponEqpObjIndex
 If Arma = 0 Then proyectil = False Else proyectil = ObjData(Arma).proyectil = 1
 
 If Arma = 0 Then
-    PoderAtaque = PoderAtaqueWresterling(UserList(UserIndex).Stats.UserSkills(Wresterling), UserList(UserIndex).Stats.UserAtributos(Agilidad), UserList(UserIndex).Clase, UserList(UserIndex).Stats.ELV) \ 4
+    PoderAtaque = PoderAtaqueWrestling(UserList(UserIndex).Stats.UserSkills(Wrestling), UserList(UserIndex).Stats.UserAtributos(Agilidad), UserList(UserIndex).Clase, UserList(UserIndex).Stats.ELV) \ 4
 ElseIf proyectil Then
     PoderAtaque = (1 + 0.05 * Buleano(UserList(UserIndex).Clase = ARQUERO And UserList(UserIndex).Recompensas(3) = 1) + 0.1 * Buleano(UserList(UserIndex).Recompensas(3) = 1 And (UserList(UserIndex).Clase = GUERRERO Or UserList(UserIndex).Clase = CAZADOR))) _
     * PoderAtaqueProyectil(UserIndex)
@@ -157,7 +157,7 @@ If UserImpactoNpc Then
        Else: Call SubirSkill(UserIndex, Armas)
        End If
     Else
-        Call SubirSkill(UserIndex, Wresterling)
+        Call SubirSkill(UserIndex, Wrestling)
     End If
 End If
 
@@ -476,10 +476,10 @@ If AttackPos.X < XMinMapSize Or AttackPos.X > XMaxMapSize Or AttackPos.Y <= YMin
     Exit Sub
 End If
 
-Dim Index As Integer
-Index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
+Dim index As Integer
+index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
 
-If Index Then
+If index Then
     Call UsuarioAtacaUsuario(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
     Call SendUserSTA(UserIndex)
     Call SendUserHP(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
@@ -596,7 +596,7 @@ If UserList(AtacanteIndex).Invent.WeaponEqpObjIndex Then
         * PoderAtaqueArma(AtacanteIndex)
     End If
 Else
-    PoderAtaque = PoderAtaqueWresterling(UserList(AtacanteIndex).Stats.UserSkills(Wresterling), UserList(AtacanteIndex).Stats.UserAtributos(Agilidad), UserList(AtacanteIndex).Clase, UserList(AtacanteIndex).Stats.ELV)
+    PoderAtaque = PoderAtaqueWrestling(UserList(AtacanteIndex).Stats.UserSkills(Wrestling), UserList(AtacanteIndex).Stats.UserAtributos(Agilidad), UserList(AtacanteIndex).Clase, UserList(AtacanteIndex).Stats.ELV)
 End If
 
 ProbExito = Maximo(10, Minimo(90, 50 + ((PoderAtaque - UserPoderEvasion) * 0.4)))
@@ -627,7 +627,7 @@ If UsuarioImpacto Then
         Else: Call SubirSkill(AtacanteIndex, Proyectiles)
         End If
     Else
-        Call SubirSkill(AtacanteIndex, Wresterling)
+        Call SubirSkill(AtacanteIndex, Wrestling)
     End If
 End If
 
@@ -720,7 +720,7 @@ If UserList(AtacanteIndex).flags.Hambre = 0 And UserList(AtacanteIndex).flags.Se
         Else: Call SubirSkill(AtacanteIndex, Armas)
         End If
     Else
-        Call SubirSkill(AtacanteIndex, Wresterling)
+        Call SubirSkill(AtacanteIndex, Wrestling)
     End If
     
     Call SubirSkill(AtacanteIndex, Tacticas)

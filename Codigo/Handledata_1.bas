@@ -430,6 +430,8 @@ Select Case UCase$(Left$(rdata, 2))
                 Call SendData(ToIndex, UserIndex, 0, "T01" & Domar)
             Case Invitar
                 Call SendData(ToIndex, UserIndex, 0, "T01" & Invitar)
+            Case Retar
+                Call SendData(ToIndex, UserIndex, 0, "T01" & Retar)
                 
             Case Ocultarse
                 
@@ -751,10 +753,38 @@ End Select
                 Call SendData(ToIndex, UserIndex, 0, "||Target invalido." & FONTTYPE_INFO)
             End If
             
+        Case Retar
+             If UserList(UserIndex).flags.Muerto = 1 Then Exit Sub
+             
+             Call LookatTile(UserIndex, UserList(UserIndex).POS.Map, POS.X, POS.Y)
             
-                
-                
-                
+             If UserList(UserIndex).flags.TargetUser = 0 Then
+                Call SendData(ToIndex, UserIndex, 0, "||Debes hacer click sobre el usuario que quieres retar." & FONTTYPE_PARTY)
+                Exit Sub
+            Else
+                If UserList(UserList(UserIndex).flags.TargetUser).flags.Muerto = 1 Then
+                    Call SendData(ToIndex, UserIndex, 0, "||¡El usuario que quieres retar está Muerto!" & FONTTYPE_TALK)
+                    Exit Sub
+                End If
+                If UserList(UserIndex).Reto.EstaDueleando = True Then
+                    Call SendData(ToIndex, UserIndex, 0, "||¡Ya Estas en un reto!" & FONTTYPE_TALK)
+                    Exit Sub
+                End If
+                If MapInfo(178).NumUsers > 2 Then
+                   Call SendData(ToIndex, UserIndex, 0, "||Las salas de retos están ocupadas, vuelve a intentar en unos momentos..." & FONTTYPE_TALK)
+                   Exit Sub
+                End If
+                If UserList(UserIndex).flags.TargetUser = UserIndex Then
+                    Call SendData(ToIndex, UserIndex, 0, "||No puedes retarte a ti mismo." & FONTTYPE_TALK)
+                    Exit Sub
+                End If
+            End If
+            
+           Call SendData(ToIndex, UserIndex, 0, "||Esperando Respuesta." & FONTTYPE_PARTY)
+           UserList(UserIndex).Reto.EsperandoDuelo = True
+           UserList(UserIndex).Reto.Contrincante = UserList(UserIndex).flags.TargetUser
+           UserList(UserList(UserIndex).flags.TargetUser).Reto.Contrincante = UserIndex
+           Call SendData(ToIndex, UserList(UserIndex).flags.TargetUser, 0, "SHOWR" & "," & UserList(UserIndex).Name)
                 
         Case Invitar
             Call LookatTile(UserIndex, UserList(UserIndex).POS.Map, POS.X, POS.Y)
@@ -770,7 +800,6 @@ End Select
             
         Case Magia
 
-            
             If UserList(UserIndex).flags.Privilegios = 1 Then Exit Sub
             
             Call LookatTile(UserIndex, UserList(UserIndex).POS.Map, POS.X, POS.Y)
@@ -1173,9 +1202,17 @@ Select Case UCase$(Left$(rdata, 4))
 End Select
 
 Select Case UCase$(Left$(rdata, 5))
+    Case "ACPRE"
+        If UserList(UserIndex).Stats.GLD <= 0 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Debes tener más de 50.000 moneas de oro para aceptar un duelo." & FONTTYPE_PARTY)
+            Exit Sub
+        End If
+        
+        Call ComenzarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
+    Case "RECRE"
+        UserList(UserList(UserIndex).Reto.Contrincante).Reto.EsperandoDuelo = False
+       Call SendData(ToAll, 0, 0, "||" & UserList(UserIndex).Name & " rechazó el reto Contra " & UserList(UserList(UserIndex).Reto.Contrincante).Name & FONTTYPE_TALK)
     Case "DEMSG"
-        
-        
         If UserList(UserIndex).flags.TargetObj Then
         rdata = Right$(rdata, Len(rdata) - 5)
         Dim f As String, Titu As String, msg As String, f2 As String

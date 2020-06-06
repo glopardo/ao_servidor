@@ -1078,69 +1078,71 @@ Next
 
 End Sub
 Sub CloseUser(ByVal UserIndex As Integer)
-On Error GoTo errhandler
-Dim i As Integer, aN As Integer
-
-aN = UserList(UserIndex).flags.AtacadoPorNpc
-
-If aN Then
-    Npclist(aN).Movement = Npclist(aN).flags.OldMovement
-    Npclist(aN).Hostile = Npclist(aN).flags.OldHostil
-    Npclist(aN).flags.AttackedBy = 0
-End If
-
-If UserList(UserIndex).Tienda.NpcTienda Then
-    Call DevolverItemsVenta(UserIndex)
-    Npclist(UserList(UserIndex).Tienda.NpcTienda).flags.TiendaUser = 0
-End If
-
-If UserList(UserIndex).flags.Privilegios > 0 Then Call SendData(ToMoreAdmins, UserIndex, 0, "||" & UserList(UserIndex).Name & " se desconectó." & FONTTYPE_FENIX)
-
-If UserList(UserIndex).flags.Party Then
-    Call SendData(ToParty, UserIndex, 0, "||" & UserList(UserIndex).Name & " se desconectó." & FONTTYPE_PARTY)
-    If Party(UserList(UserIndex).PartyIndex).NroMiembros = 2 Then
-        Call RomperParty(UserIndex)
-    Else: Call SacarDelParty(UserIndex)
+    On Error GoTo errhandler
+    Dim i As Integer, aN As Integer
+    
+    aN = UserList(UserIndex).flags.AtacadoPorNpc
+    
+    If aN Then
+        Npclist(aN).Movement = Npclist(aN).flags.OldMovement
+        Npclist(aN).Hostile = Npclist(aN).flags.OldHostil
+        Npclist(aN).flags.AttackedBy = 0
     End If
-End If
-
-Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & ",0,0")
-
-If UserList(UserIndex).Caballos.Num And UserList(UserIndex).flags.Montado = 1 Then Call Desmontar(UserIndex)
-
-If UserList(UserIndex).flags.AdminInvisible Then Call DoAdminInvisible(UserIndex)
-If UserList(UserIndex).flags.Transformado Then Call DoTransformar(UserIndex, False)
-
-Call SaveUserSQL(UserIndex)
-
-If MapInfo(UserList(UserIndex).POS.Map).NumUsers Then Call SendData(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, "QDL" & UserList(UserIndex).Char.CharIndex)
-If UserList(UserIndex).Char.CharIndex Then Call EraseUserChar(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, UserIndex)
-If UserList(UserIndex).Caballos.Num Then Call QuitarCaballos(UserIndex)
-
-For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(UserIndex).flags.Quest)
-    If UserList(UserIndex).MascotasIndex(i) Then
-        If Npclist(UserList(UserIndex).MascotasIndex(i)).flags.NPCActive Then _
-                Call QuitarNPC(UserList(UserIndex).MascotasIndex(i))
+    
+    If UserList(UserIndex).Tienda.NpcTienda Then
+        Call DevolverItemsVenta(UserIndex)
+        Npclist(UserList(UserIndex).Tienda.NpcTienda).flags.TiendaUser = 0
     End If
-Next
-
-If UserIndex = LastUser Then
-    Do Until UserList(LastUser).flags.UserLogged
-        LastUser = LastUser - 1
-        If LastUser < 1 Then Exit Do
-    Loop
-End If
-
-If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 And UserList(UserIndex).flags.Privilegios = 0 Then Call SendData(ToGuildMembers, UserIndex, 0, "5B" & UserList(UserIndex).Name)
-
-Call QuitarDeUsersPorMapa(UserIndex)
-
-If MapInfo(UserList(UserIndex).POS.Map).NumUsers < 0 Then MapInfo(UserList(UserIndex).POS.Map).NumUsers = 0
-
-Exit Sub
-
+    
+    If UserList(UserIndex).flags.Privilegios > 0 Then Call SendData(ToMoreAdmins, UserIndex, 0, "||" & UserList(UserIndex).Name & " se desconectó." & FONTTYPE_FENIX)
+    
+    If UserList(UserIndex).flags.Party Then
+        Call SendData(ToParty, UserIndex, 0, "||" & UserList(UserIndex).Name & " se desconectó." & FONTTYPE_PARTY)
+        If Party(UserList(UserIndex).PartyIndex).NroMiembros = 2 Then
+            Call RomperParty(UserIndex)
+        Else: Call SacarDelParty(UserIndex)
+        End If
+    End If
+    
+    If UserList(UserIndex).Reto.EstaDueleando = True Then Call DesconectarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
+    
+    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & ",0,0")
+    
+    If UserList(UserIndex).Caballos.Num And UserList(UserIndex).flags.Montado = 1 Then Call Desmontar(UserIndex)
+    
+    If UserList(UserIndex).flags.AdminInvisible Then Call DoAdminInvisible(UserIndex)
+    If UserList(UserIndex).flags.Transformado Then Call DoTransformar(UserIndex, False)
+    
+    Call SaveUserSQL(UserIndex)
+    
+    If MapInfo(UserList(UserIndex).POS.Map).NumUsers Then Call SendData(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, "QDL" & UserList(UserIndex).Char.CharIndex)
+    If UserList(UserIndex).Char.CharIndex Then Call EraseUserChar(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, UserIndex)
+    If UserList(UserIndex).Caballos.Num Then Call QuitarCaballos(UserIndex)
+    
+    For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(UserIndex).flags.Quest)
+        If UserList(UserIndex).MascotasIndex(i) Then
+            If Npclist(UserList(UserIndex).MascotasIndex(i)).flags.NPCActive Then _
+                    Call QuitarNPC(UserList(UserIndex).MascotasIndex(i))
+        End If
+    Next
+    
+    If UserIndex = LastUser Then
+        Do Until UserList(LastUser).flags.UserLogged
+            LastUser = LastUser - 1
+            If LastUser < 1 Then Exit Do
+        Loop
+    End If
+    
+    If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 And UserList(UserIndex).flags.Privilegios = 0 Then Call SendData(ToGuildMembers, UserIndex, 0, "5B" & UserList(UserIndex).Name)
+    
+    Call QuitarDeUsersPorMapa(UserIndex)
+    
+    If MapInfo(UserList(UserIndex).POS.Map).NumUsers < 0 Then MapInfo(UserList(UserIndex).POS.Map).NumUsers = 0
+    
+    Exit Sub
+    
 errhandler:
-Call LogError("Error en CloseUser " & Err.Description)
+    Call LogError("Error en CloseUser " & Err.Description)
 
 End Sub
 Function EsVigilado(Espiado As Integer) As Boolean
@@ -1448,7 +1450,7 @@ End If
 If UCase$(Left$(rdata, 10)) = "/CONCILIO " Then
    rdata = Right$(rdata, Len(rdata) - 10)
         If UserList(UserIndex).flags.EsConseCaos Or UserList(UserIndex).flags.Privilegios = 3 Or UserList(UserIndex).flags.Privilegios = 2 Then
-            Call SendData(ToAll, 0, 0, "|#" & UserList(UserIndex).Name & "> " & rdata)
+            Call SendData(ToCaos, 0, 0, "|#" & UserList(UserIndex).Name & "> " & rdata)
         End If
     Exit Sub
 End If
@@ -1456,7 +1458,7 @@ End If
 If UCase$(Left$(rdata, 9)) = "/CONSEJO " Then
    rdata = Right$(rdata, Len(rdata) - 9)
         If UserList(UserIndex).flags.EsConseReal Or UserList(UserIndex).flags.Privilegios = 3 Or UserList(UserIndex).flags.Privilegios = 2 Then
-            Call SendData(ToAll, 0, 0, "|&" & UserList(UserIndex).Name & "> " & rdata)
+            Call SendData(ToAlianza, 0, 0, "|&" & UserList(UserIndex).Name & "> " & rdata)
         End If
     Exit Sub
 End If
