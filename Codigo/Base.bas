@@ -322,6 +322,7 @@ Set RS = Nothing
 str = "UPDATE `charstats` SET"
 str = str & " IndexPJ=" & UserList(UserIndex).indexPj
 str = str & ",GLD=" & mUser.Stats.GLD
+str = str & ",PuntosCanje=" & mUser.Stats.PuntosCanje
 str = str & ",BANCO=" & mUser.Stats.Banco
 str = str & ",MaxHP=" & mUser.Stats.MaxHP
 str = str & ",MinHP=" & mUser.Stats.MinHP
@@ -552,6 +553,7 @@ With UserList(UserIndex)
         Exit Function
     End If
     .Stats.GLD = RS!GLD
+    .Stats.PuntosCanje = RS!PuntosCanje
     .Stats.Banco = RS!Banco
     .Stats.MaxHP = RS!MaxHP
     .Stats.MinHP = RS!MinHP

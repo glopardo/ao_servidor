@@ -1089,26 +1089,27 @@ On Error GoTo errhandler
 
 If UserList(UserIndex).flags.Hambre = 1 Or UserList(UserIndex).flags.Sed = 1 Then Exit Sub
 
-If Prob = 0 Then
-    If UserList(UserIndex).Stats.ELV <= 3 Then
-        Prob = 20
-    ElseIf UserList(UserIndex).Stats.ELV > 3 _
-        And UserList(UserIndex).Stats.ELV < 6 Then
-        Prob = 25
-    ElseIf UserList(UserIndex).Stats.ELV >= 6 _
-        And UserList(UserIndex).Stats.ELV < 10 Then
-        Prob = 30
-    ElseIf UserList(UserIndex).Stats.ELV >= 10 _
-        And UserList(UserIndex).Stats.ELV < 20 Then
-        Prob = 35
-    Else
-        Prob = 40
-    End If
-End If
+'If Prob = 0 Then
+'    If UserList(UserIndex).Stats.ELV <= 3 Then
+'        Prob = 20
+'    ElseIf UserList(UserIndex).Stats.ELV > 3 _
+'        And UserList(UserIndex).Stats.ELV < 6 Then
+'        Prob = 25
+'    ElseIf UserList(UserIndex).Stats.ELV >= 6 _
+'        And UserList(UserIndex).Stats.ELV < 10 Then
+'        Prob = 30
+'    ElseIf UserList(UserIndex).Stats.ELV >= 10 _
+'        And UserList(UserIndex).Stats.ELV < 20 Then
+'        Prob = 35
+'    Else
+'        Prob = 40
+'    End If
+'End If
 
 If UserList(UserIndex).Stats.UserSkills(Skill) = MAXSKILLPOINTS Then Exit Sub
 
-If Int(RandomNumber(1, Prob)) = 2 And UserList(UserIndex).Stats.UserSkills(Skill) < LevelSkill(UserList(UserIndex).Stats.ELV).LevelValue Then
+'If Int(RandomNumber(1, Prob)) = 2 And UserList(UserIndex).Stats.UserSkills(Skill) < LevelSkill(UserList(UserIndex).Stats.ELV).LevelValue Then
+If UserList(UserIndex).Stats.UserSkills(Skill) < LevelSkill(UserList(UserIndex).Stats.ELV).LevelValue Then
     Call AddtoVar(UserList(UserIndex).Stats.UserSkills(Skill), 1, MAXSKILLPOINTS)
     Call SendData(ToIndex, UserIndex, 0, "G0" & SkillsNames(Skill) & "," & UserList(UserIndex).Stats.UserSkills(Skill))
     Call AddtoVar(UserList(UserIndex).Stats.Exp, 50, MAXEXP)

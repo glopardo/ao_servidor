@@ -1204,7 +1204,7 @@ End Select
 Select Case UCase$(Left$(rdata, 5))
     Case "ACPRE"
         If UserList(UserIndex).Stats.GLD <= 0 Then
-            Call SendData(ToIndex, UserIndex, 0, "||Debes tener más de 50.000 moneas de oro para aceptar un duelo." & FONTTYPE_PARTY)
+            Call SendData(ToIndex, UserIndex, 0, "||Debes tener más de 50.000 monedas de oro para aceptar un duelo." & FONTTYPE_PARTY)
             Exit Sub
         End If
         

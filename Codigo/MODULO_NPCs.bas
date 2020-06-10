@@ -406,25 +406,25 @@ NPCHostiles = cont
 
 End Function
 Sub NPCTirarOro(MiNPC As Npc, UserIndex As Integer)
-Dim i As Integer, MiembroIndex As Integer
-
-If MiNPC.GiveGLD Then
-    If UserList(UserIndex).PartyIndex = 0 Then
-        If MiNPC.GiveGLD + UserList(UserIndex).Stats.GLD <= MAXORO Then
-            UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + MiNPC.GiveGLD
-            Call SendUserORO(UserIndex)
-        End If
-    Else
-        For i = 1 To Party(UserList(UserIndex).PartyIndex).NroMiembros
-            MiembroIndex = Party(UserList(UserIndex).PartyIndex).MiembrosIndex(i)
-            If MiNPC.GiveGLD + UserList(MiembroIndex).Stats.GLD <= MAXORO Then
-                UserList(MiembroIndex).Stats.GLD = UserList(MiembroIndex).Stats.GLD + MiNPC.GiveGLD / Party(UserList(MiembroIndex).PartyIndex).NroMiembros
-                Call SendUserORO(MiembroIndex)
+    Dim i As Integer, MiembroIndex As Integer
+    
+    If MiNPC.GiveGLD Then
+        If UserList(UserIndex).PartyIndex = 0 Then
+            If MiNPC.GiveGLD + UserList(UserIndex).Stats.GLD <= MAXORO Then
+                UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + MiNPC.GiveGLD
+                Call SendUserORO(UserIndex)
+                Call SendData(ToIndex, UserIndex, 0, "EK" & MiNPC.GiveGLD)
             End If
-        Next
+        Else
+            For i = 1 To Party(UserList(UserIndex).PartyIndex).NroMiembros
+                MiembroIndex = Party(UserList(UserIndex).PartyIndex).MiembrosIndex(i)
+                If MiNPC.GiveGLD + UserList(MiembroIndex).Stats.GLD <= MAXORO Then
+                    UserList(MiembroIndex).Stats.GLD = UserList(MiembroIndex).Stats.GLD + MiNPC.GiveGLD / Party(UserList(MiembroIndex).PartyIndex).NroMiembros
+                    Call SendUserORO(MiembroIndex)
+                End If
+            Next
+        End If
     End If
-End If
-
 End Sub
 Function NameNpc(Number As Integer) As String
 Dim A As Long, S As Long
@@ -492,7 +492,7 @@ If S >= 0 Then
     Npclist(NpcIndex).Hostile = INIDarClaveInt(A, S, "Hostile")
     Npclist(NpcIndex).flags.OldHostil = Npclist(NpcIndex).Hostile
     
-    Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP") * 100
+    Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP") * 15
     
     Npclist(NpcIndex).Veneno = INIDarClaveInt(A, S, "Veneno")
     
@@ -502,7 +502,7 @@ If S >= 0 Then
     Npclist(NpcIndex).MinRecom = INIDarClaveInt(A, S, "MinRecom")
     Npclist(NpcIndex).Probabilidad = INIDarClaveInt(A, S, "Probabilidad")
     
-    Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD") * 50
+    Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD")
     
     Npclist(NpcIndex).PoderAtaque = INIDarClaveInt(A, S, "PoderAtaque")
     Npclist(NpcIndex).PoderEvasion = INIDarClaveInt(A, S, "PoderEvasion")

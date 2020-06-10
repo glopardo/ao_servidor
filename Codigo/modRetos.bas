@@ -1,6 +1,7 @@
 Attribute VB_Name = "modRetos"
 Public Sub TerminarDuelo(Ganador As Integer, Perdedor As Integer)
     UserList(Ganador).Stats.GLD = UserList(Ganador).Stats.GLD + 100000
+    Call SendUserORO(Ganador)
     
     Call WarpUserChar(Ganador, 160, 42, 40, False)
     Call WarpUserChar(Perdedor, 160, 43, 40, False)
@@ -13,11 +14,14 @@ Public Sub TerminarDuelo(Ganador As Integer, Perdedor As Integer)
     UserList(Perdedor).Reto.EstaDueleando = False
     UserList(Perdedor).Reto.Ring = 0
     
-    Call SendData(ToAll, 0, 0, "||" & UserList(Ganador).Name & " ganó el Reto contra " & UserList(Perdedor).Name & FONTTYPE_TALK)
+    Call SendData(ToAll, 0, 0, "||" & UserList(Ganador).Name & " ganó el reto contra " & UserList(Perdedor).Name & FONTTYPE_TALK)
 End Sub
  
 Public Sub DesconectarDuelo(Ganador As Integer, Perdedor As Integer)
-    UserList(Ganador).Stats.GLD = UserList(Ganador).Stats.GLD + 100000
+    UserList(Ganador).Stats.GLD = UserList(Ganador).Stats.GLD + 50000
+    UserList(Perdedor).Stats.GLD = UserList(Perdedor).Stats.GLD + 50000
+    Call SendUserORO(Ganador)
+    Call SendUserORO(Perdedor)
     
     Call WarpUserChar(Ganador, 160, 42, 40, False)
     Call WarpUserChar(Perdedor, 160, 43, 40, False)
@@ -36,6 +40,9 @@ End Sub
 Public Sub ComenzarDuelo(Retador As Integer, Retado As Integer)
     UserList(Retador).Stats.GLD = UserList(Retador).Stats.GLD - 50000
     UserList(Retado).Stats.GLD = UserList(Retado).Stats.GLD - 50000
+    Call SendUserORO(Retador)
+    Call SendUserORO(Retado)
+    
     If Ring1.Ocupado Then
         Ring2.Ocupado = True
         UserList(Retador).Reto.Ring = 2

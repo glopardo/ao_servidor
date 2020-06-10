@@ -768,6 +768,7 @@ End Type
 
 Type UserStats
     GLD As Long
+    PuntosCanje As Long
     Banco As Long
     MET As Integer
     

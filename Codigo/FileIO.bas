@@ -1250,12 +1250,12 @@ Npclist(NpcIndex).Char.Heading = val(GetVar(npcfile, "NPC" & NPCNumber, "Heading
 Npclist(NpcIndex).Attackable = val(GetVar(npcfile, "NPC" & NPCNumber, "Attackable"))
 Npclist(NpcIndex).Comercia = val(GetVar(npcfile, "NPC" & NPCNumber, "Comercia"))
 Npclist(NpcIndex).Hostile = val(GetVar(npcfile, "NPC" & NPCNumber, "Hostile"))
-Npclist(NpcIndex).GiveEXP = val(GetVar(npcfile, "NPC" & NPCNumber, "GiveEXP")) * 50
+Npclist(NpcIndex).GiveEXP = val(GetVar(npcfile, "NPC" & NPCNumber, "GiveEXP")) * 15
 Npclist(NpcIndex).VeInvis = val(GetVar(npcfile, "NPC" & NPCNumber, "VeInvis"))
 Npclist(NpcIndex).flags.PocaParalisis = val(GetVar(npcfile, "NPC" & NPCNumber, "pocaparalisis"))
 Npclist(NpcIndex).flags.Apostador = val(GetVar(npcfile, "NPC" & NPCNumber, "Apostador"))
 
-Npclist(NpcIndex).GiveGLD = val(GetVar(npcfile, "NPC" & NPCNumber, "GiveGLD")) * 50
+Npclist(NpcIndex).GiveGLD = val(GetVar(npcfile, "NPC" & NPCNumber, "GiveGLD"))
 
 Npclist(NpcIndex).InvReSpawn = val(GetVar(npcfile, "NPC" & NPCNumber, "InvReSpawn"))
 
@@ -1299,12 +1299,12 @@ Npclist(NpcIndex).flags.RespawnOrigPos = val(GetVar(npcfile, "NPC" & NPCNumber, 
 Npclist(NpcIndex).TipoItems = val(GetVar(npcfile, "NPC" & NPCNumber, "TipoItems"))
 
 End Sub
-Sub LogBan(ByVal BannedIndex As Integer, Userindex As Integer, ByVal Motivo As String)
+Sub LogBan(ByVal BannedIndex As Integer, UserIndex As Integer, ByVal Motivo As String)
 
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "BannedBy", UserList(Userindex).Name)
+Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "BannedBy", UserList(UserIndex).Name)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Reason", Motivo)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "IP", UserList(BannedIndex).ip)
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Mail", UserList(BannedIndex).Email)
+Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Mail", UserList(BannedIndex).email)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", UserList(BannedIndex).Name, "Fecha", Format(Now, "dd/mm/yy hh:mm:ss"))
 
 Dim mifile As Integer
@@ -1314,9 +1314,9 @@ Print #mifile, UserList(BannedIndex).Name
 Close #mifile
 
 End Sub
-Sub LogBanOffline(ByVal BannedIndex As String, Userindex As Integer, ByVal Motivo As String)
+Sub LogBanOffline(ByVal BannedIndex As String, UserIndex As Integer, ByVal Motivo As String)
 
-Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "BannedBy", UserList(Userindex).Name)
+Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "BannedBy", UserList(UserIndex).Name)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "Reason", Motivo)
 Call WriteVar(App.Path & "\logs\" & "BanDetail.dat", BannedIndex, "IP", "Ban offline")
 
