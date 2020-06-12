@@ -476,10 +476,10 @@ If AttackPos.X < XMinMapSize Or AttackPos.X > XMaxMapSize Or AttackPos.Y <= YMin
     Exit Sub
 End If
 
-Dim index As Integer
-index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
+Dim Index As Integer
+Index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
 
-If index Then
+If Index Then
     Call UsuarioAtacaUsuario(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
     Call SendUserSTA(UserIndex)
     Call SendUserHP(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
@@ -925,12 +925,12 @@ If UserList(AttackerIndex).Faccion.Bando <> Neutral And UserList(AttackerIndex).
 End If
 
 If EsNewbie(VictimIndex) And (EsNewbie(AttackerIndex) Or UserList(AttackerIndex).Faccion.Bando = Real) Then
-    Call SendData(ToIndex, AttackerIndex, 0, "||Los miembros de la Alianza del Fénix no pueden atacar mascotas de newbies." & FONTTYPE_INFO)
+    Call SendData(ToIndex, AttackerIndex, 0, "||Los miembros de la Alianza de Rivendel no pueden atacar mascotas de newbies." & FONTTYPE_INFO)
     Exit Function
 End If
 
 If EsNewbie(AttackerIndex) And UserList(VictimIndex).Faccion.Bando = Real Then
-    Call SendData(ToIndex, AttackerIndex, 0, "||Los newbies no pueden atacar mascotas de la Alianza del Fénix." & FONTTYPE_INFO)
+    Call SendData(ToIndex, AttackerIndex, 0, "||Los newbies no pueden atacar mascotas de la Alianza de Rivendel." & FONTTYPE_INFO)
     Exit Function
 End If
 

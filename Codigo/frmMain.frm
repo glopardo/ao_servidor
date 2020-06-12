@@ -507,7 +507,7 @@ Dim i As Integer
 Dim S As String
 Dim nid As NOTIFYICONDATA
 
-S = "Servidor Fenix AO"
+S = "Servidor Rivendel AO"
 nid = setNOTIFYICONDATA(frmMain.hwnd, vbNull, NIF_MESSAGE Or NIF_ICON Or NIF_TIP, WM_MOUSEMOVE, frmMain.Icon, S)
 i = Shell_NotifyIconA(NIM_ADD, nid)
     

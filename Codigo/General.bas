@@ -390,7 +390,7 @@ Sub LoadMensajes()
 
 Mensajes(Real, 1) = "||&HFF8080°¡No eres fiel al rey!°"
 Mensajes(Real, 2) = "||&HFF8080°¡¡Maldito insolente!! ¡Los seguidores de Lord Thek no tienen lugar en nuestro ejército!°"
-Mensajes(Real, 3) = "||&HFF8080°Tu Clan no responde a la Alianza del Fénix, debes retirarte de él para poder enlistarte.°"
+Mensajes(Real, 3) = "||&HFF8080°Tu Clan no responde a la Alianza de Rivendel, debes retirarte de él para poder enlistarte.°"
 Mensajes(Real, 4) = "||&HFF8080°¡Ya perteneces a las tropas reales! ¡Ve a combatir criminales!°"
 Mensajes(Real, 5) = "||&HFF8080°¡Para unirte a nuestras fuerzas debes matar al menos 150 criminales, solo has matado "
 Mensajes(Real, 6) = "||&HFF8080°¡Para unirte a nuestras fuerzas debes ser al menos de nivel 25!°"
@@ -409,8 +409,8 @@ Mensajes(Real, 18) = "||&HFF8080°¿Has decidido abandonarnos? Bien, ya nunca volv
 Mensajes(Real, 19) = "1W"
 Mensajes(Real, 20) = "||Si ambos juraron fidelidad a la Alianza tienen que estar en clanes enemigos para poder atacarse." & FONTTYPE_FIGHT
 Mensajes(Real, 21) = "/E"
-Mensajes(Real, 22) = "||&HFF8080°¡Ya haz alcanzado la jerarquia más alta en las filas de la Alianza del Fenix!°"
-Mensajes(Real, 23) = "||&HFF8080°¡No puedes abandonar la Alianza del Fénix! Perteneces a un clan ya, debes abandonarlo primero.°"
+Mensajes(Real, 22) = "||&HFF8080°¡Ya haz alcanzado la jerarquia más alta en las filas de la Alianza de Rivendel!°"
+Mensajes(Real, 23) = "||&HFF8080°¡No puedes abandonar la Alianza de Rivendel! Perteneces a un clan ya, debes abandonarlo primero.°"
 
 Mensajes(Caos, 1) = "||&H8080FF°¡No eres fiel a Lord Thek!°"
 Mensajes(Caos, 2) = "||&H8080FF°¡¡Maldito insolente!! ¡Los seguidores del rey no tienen lugar en nuestro ejército!°"
@@ -525,7 +525,7 @@ ListaRazas(5) = "Gnomo"
 
 ReDim ListaBandos(0 To 2) As String
 ListaBandos(0) = "Neutral"
-ListaBandos(1) = "Alianza del Fenix"
+ListaBandos(1) = "Alianza de Rivendel"
 ListaBandos(2) = "Ejército de Lord Thek"
 
 ReDim ListaClases(1 To NUMCLASES) As String

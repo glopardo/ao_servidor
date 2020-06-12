@@ -844,11 +844,11 @@ End If
 If BANCheck(Name) Then
     For LoopC = 1 To Baneos.Count
         If Baneos(LoopC).Name = UCase$(Name) Then
-            Call SendData(ToIndex, UserIndex, 0, "ERRSe te ha prohibido la entrada a FénixAO hasta el día " & Format(Baneos(LoopC).FechaLiberacion, "dddddd") & " a las " & Format(Baneos(LoopC).FechaLiberacion, "hh:mm am/pm"))
+            Call SendData(ToIndex, UserIndex, 0, "ERRSe te ha prohibido la entrada a RivendelAO hasta el día " & Format(Baneos(LoopC).FechaLiberacion, "dddddd") & " a las " & Format(Baneos(LoopC).FechaLiberacion, "hh:mm am/pm"))
             Exit Sub
         End If
     Next
-    Call SendData(ToIndex, UserIndex, 0, "ERRSe te ha prohibido la entrada a FénixAO.")
+    Call SendData(ToIndex, UserIndex, 0, "ERRSe te ha prohibido la entrada a RivendelAO.")
     Exit Sub
 End If
 

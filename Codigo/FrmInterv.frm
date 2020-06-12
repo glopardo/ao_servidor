@@ -714,7 +714,7 @@ Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloParaConexion", str
 Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloLanzaHechizo", str(IntervaloUserPuedeCastear))
 Call WriteVar(IniPath & "Server.ini", "INTERVALOS", "IntervaloUserPuedeAtacar", str(IntervaloUserPuedeAtacar))
 
-MsgBox "Los intervalos se han guardado sin problemas.", vbInformation, "Servidor Fenix AO"
+MsgBox "Los intervalos se han guardado sin problemas.", vbInformation, "Servidor Rivendel AO"
 
 Exit Sub
 Err:
