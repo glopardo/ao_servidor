@@ -351,7 +351,7 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  str = "UPDATE `charbanco` SET"
  str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_BANCOINVENTORY_SLOTS
-     str = str & ",OBJ" & i & "=" & mUser.BancoInvent.Object(i).OBJIndex
+     str = str & ",OBJ" & i & "=" & mUser.BancoInvent.Object(i).ObjIndex
      str = str & ",CANT" & i & "=" & mUser.BancoInvent.Object(i).Amount
  Next i
  str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
@@ -378,7 +378,7 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  str = "UPDATE `charinvent` SET"
  str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_INVENTORY_SLOTS
-     str = str & ",OBJ" & i & "=" & mUser.Invent.Object(i).OBJIndex
+     str = str & ",OBJ" & i & "=" & mUser.Invent.Object(i).ObjIndex
      str = str & ",CANT" & i & "=" & mUser.Invent.Object(i).Amount
  Next i
  str = str & ",CASCOSLOT=" & mUser.Invent.CascoEqpSlot
@@ -512,7 +512,7 @@ With UserList(UserIndex)
         Exit Function
     End If
     For i = 1 To MAX_BANCOINVENTORY_SLOTS
-        .BancoInvent.Object(i).OBJIndex = RS.Fields("OBJ" & i)
+        .BancoInvent.Object(i).ObjIndex = RS.Fields("OBJ" & i)
         .BancoInvent.Object(i).Amount = RS.Fields("CANT" & i)
     Next i
     Set RS = Nothing
@@ -524,7 +524,7 @@ With UserList(UserIndex)
         Exit Function
     End If
     For i = 1 To MAX_INVENTORY_SLOTS
-        .Invent.Object(i).OBJIndex = RS.Fields("OBJ" & i)
+        .Invent.Object(i).ObjIndex = RS.Fields("OBJ" & i)
         .Invent.Object(i).Amount = RS.Fields("CANT" & i)
     Next i
     .Invent.CascoEqpSlot = RS!CASCOSLOT
@@ -865,7 +865,6 @@ Public Function LoadReclamos() As String()
 End Function
 
 Sub SaveRespuestaReclamo(idReclamo As Integer, respuesta As String, gmResponde As String, indexPj As Integer)
-    Call Logear("test", "SaveRespuestaReclamo: " & idReclamo & " - " & respuesta & " - " & gmResponde)
     Dim RS As New ADODB.Recordset
     Dim str As String
     
@@ -889,16 +888,6 @@ Sub SaveRespuestaReclamo(idReclamo As Integer, respuesta As String, gmResponde A
     
     Set RS = Nothing
 End Sub
-
-'Sub LoadRespuestaReclamo(UserIndex As Integer)
-    'borrar sub
-'    Dim RS As New ADODB.Recordset
-'    Set RS = Con.Execute("(UserIndex)SELECT * FROM `charflags` WHERE IndexPJ=" & UserIndex)
-'    With UserList(UserIndex)
-'        .flags.SoporteRespondido = RS!SoporteRespondido
-'        .flags.SoporteRespuesta = RS!SoporteRespuesta
-'    End With
-'End Sub
 
 Sub CloseReclamo(UserIndex As Integer)
     Dim RS As New ADODB.Recordset

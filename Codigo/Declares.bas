@@ -233,6 +233,7 @@ Public Const NPCTYPE_GUARDIAS = 2
 Public Const NPCTYPE_ENTRENADOR = 3
 Public Const NPCTYPE_BANQUERO = 4
 Public Const NPCTYPE_NOBLE = 5
+Public Const NPCTYPE_CANJE = 6
 Public Const NPCTYPE_APOSTADOR = 7
 Public Const NPCTYPE_TIENDA = 8
 Public Const NPCTYPE_VIEJO = 11
@@ -617,6 +618,7 @@ Public Worldsaves As Integer
 Public Type ObjData
     
     Name As String
+    Descripcion As String
     NoComerciable As Integer
     
     NoSeCae As Boolean
@@ -682,6 +684,7 @@ Public Type ObjData
     CascoAnim As Integer
     Gorro As Byte
     
+    PuntosCanje As Long
     Valor As Long
     
     Cerrada As Integer

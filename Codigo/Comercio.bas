@@ -35,58 +35,58 @@ Attribute VB_Name = "Comercio"
 'www.fenixao.com.ar
 
 Option Explicit
-Sub UserCompraObj(UserIndex As Integer, ByVal OBJIndex As Integer, NpcIndex As Integer, Cantidad As Integer)
-Dim Infla As Integer
-Dim Desc As Single
-Dim unidad As Long, monto As Long
-Dim Slot As Byte
-Dim ObjI As Integer
-Dim Encontre As Boolean
-
-ObjI = Npclist(UserList(UserIndex).flags.TargetNpc).Invent.Object(OBJIndex).OBJIndex
-
-Slot = 1
-Do Until UserList(UserIndex).Invent.Object(Slot).OBJIndex = ObjI And _
-   UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad <= MAX_INVENTORY_OBJS
+Sub UserCompraObj(UserIndex As Integer, ByVal ObjIndex As Integer, NpcIndex As Integer, Cantidad As Integer)
+    Dim Infla As Integer
+    Dim Desc As Single
+    Dim unidad As Long, monto As Long
+    Dim Slot As Byte
+    Dim ObjI As Integer
+    Dim Encontre As Boolean
     
-    Slot = Slot + 1
-    If Slot > MAX_INVENTORY_SLOTS Then Exit Do
-Loop
-
-If Slot > MAX_INVENTORY_SLOTS Then
+    ObjI = Npclist(UserList(UserIndex).flags.TargetNpc).Invent.Object(ObjIndex).ObjIndex
+    
     Slot = 1
-    Do Until UserList(UserIndex).Invent.Object(Slot).OBJIndex = 0
+    Do Until UserList(UserIndex).Invent.Object(Slot).ObjIndex = ObjI And _
+       UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad <= MAX_INVENTORY_OBJS
+        
         Slot = Slot + 1
-
-        If Slot > MAX_INVENTORY_SLOTS Then
-            Call SendData(ToIndex, UserIndex, 0, "5P")
-            Exit Sub
-        End If
+        If Slot > MAX_INVENTORY_SLOTS Then Exit Do
     Loop
-    UserList(UserIndex).Invent.NroItems = UserList(UserIndex).Invent.NroItems + 1
-End If
-
-If UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad <= MAX_INVENTORY_OBJS Then
-    UserList(UserIndex).Invent.Object(Slot).OBJIndex = ObjI
-    UserList(UserIndex).Invent.Object(Slot).Amount = UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad
-    Infla = (Npclist(NpcIndex).Inflacion * ObjData(ObjI).Valor) \ 100
-
-    Desc = Descuento(UserIndex)
     
-    unidad = Int(((ObjData(Npclist(NpcIndex).Invent.Object(OBJIndex).OBJIndex).Valor + Infla) / Desc))
-    If unidad = 0 Then unidad = 1
-    monto = unidad * Cantidad
-    UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - monto
+    If Slot > MAX_INVENTORY_SLOTS Then
+        Slot = 1
+        Do Until UserList(UserIndex).Invent.Object(Slot).ObjIndex = 0
+            Slot = Slot + 1
     
-    Call SubirSkill(UserIndex, Comerciar)
+            If Slot > MAX_INVENTORY_SLOTS Then
+                Call SendData(ToIndex, UserIndex, 0, "5P")
+                Exit Sub
+            End If
+        Loop
+        UserList(UserIndex).Invent.NroItems = UserList(UserIndex).Invent.NroItems + 1
+    End If
     
-    If ObjData(ObjI).ObjType = OBJTYPE_LLAVES Then Call LogVentaCasa(UserList(UserIndex).Name & " compro " & ObjData(ObjI).Name)
-    Call QuitarNpcInvItem(UserList(UserIndex).flags.TargetNpc, CByte(OBJIndex), Cantidad, UserIndex)
+    If UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad <= MAX_INVENTORY_OBJS Then
+        UserList(UserIndex).Invent.Object(Slot).ObjIndex = ObjI
+        UserList(UserIndex).Invent.Object(Slot).Amount = UserList(UserIndex).Invent.Object(Slot).Amount + Cantidad
+        Infla = (Npclist(NpcIndex).Inflacion * ObjData(ObjI).Valor) \ 100
     
-    Call UpdateUserInv(False, UserIndex, Slot)
-Else
-    Call SendData(ToIndex, UserIndex, 0, "5P")
-End If
+        Desc = Descuento(UserIndex)
+        
+        unidad = Int(((ObjData(Npclist(NpcIndex).Invent.Object(ObjIndex).ObjIndex).Valor + Infla) / Desc))
+        If unidad = 0 Then unidad = 1
+        monto = unidad * Cantidad
+        UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - monto
+        
+        Call SubirSkill(UserIndex, Comerciar)
+        
+        If ObjData(ObjI).ObjType = OBJTYPE_LLAVES Then Call LogVentaCasa(UserList(UserIndex).Name & " compro " & ObjData(ObjI).Name)
+        Call QuitarNpcInvItem(UserList(UserIndex).flags.TargetNpc, CByte(ObjIndex), Cantidad, UserIndex)
+        
+        Call UpdateUserInv(False, UserIndex, Slot)
+    Else
+        Call SendData(ToIndex, UserIndex, 0, "5P")
+    End If
 
 End Sub
 Sub UpdateNPCInv(UpdateAll As Boolean, UserIndex As Integer, NpcIndex As Integer, Slot As Byte)
@@ -103,45 +103,41 @@ End If
 
 End Sub
 Sub SendNPCItem(UserIndex As Integer, NpcIndex As Integer, Slot As Byte, ByVal AllInfo As Boolean)
-Dim MiObj As UserOBJ
-Dim Infla As Long
-Dim Desc As Single
-Dim val As Long
-
-MiObj = Npclist(NpcIndex).Invent.Object(Slot)
-
-Desc = Descuento(UserIndex)
-
-If Desc >= 0 And Desc <= 1 Then Desc = 1
-
-
-
-
-If MiObj.OBJIndex Then
-    If AllInfo Then
-        Infla = (Npclist(NpcIndex).Inflacion * ObjData(MiObj.OBJIndex).Valor) / 100
-        val = Maximo(1, Int((ObjData(MiObj.OBJIndex).Valor + Infla) / Desc))
-        Call SendData(ToIndex, UserIndex, 0, "OTII" & Slot _
-        & "," & ObjData(MiObj.OBJIndex).Name _
-        & "," & MiObj.Amount _
-        & "," & val _
-        & "," & ObjData(MiObj.OBJIndex).GrhIndex _
-        & "," & MiObj.OBJIndex _
-        & "," & ObjData(MiObj.OBJIndex).ObjType _
-        & "," & ObjData(MiObj.OBJIndex).MaxHit _
-        & "," & ObjData(MiObj.OBJIndex).MinHit _
-        & "," & ObjData(MiObj.OBJIndex).MaxDef _
-        & "," & ObjData(MiObj.OBJIndex).MinDef _
-        & "," & ObjData(MiObj.OBJIndex).TipoPocion _
-        & "," & ObjData(MiObj.OBJIndex).MaxModificador _
-        & "," & ObjData(MiObj.OBJIndex).MinModificador _
-        & "," & PuedeUsarObjeto(UserIndex, MiObj.OBJIndex))
+    Dim MiObj As UserOBJ
+    Dim Infla As Long
+    Dim Desc As Single
+    Dim val As Long
+    
+    MiObj = Npclist(NpcIndex).Invent.Object(Slot)
+    Desc = Descuento(UserIndex)
+    
+    If Desc >= 0 And Desc <= 1 Then Desc = 1
+    
+    If MiObj.ObjIndex Then
+        If AllInfo Then
+            Infla = (Npclist(NpcIndex).Inflacion * ObjData(MiObj.ObjIndex).Valor) / 100
+            val = Maximo(1, Int((ObjData(MiObj.ObjIndex).Valor + Infla) / Desc))
+            Call SendData(ToIndex, UserIndex, 0, "OTII" & Slot _
+            & "," & ObjData(MiObj.ObjIndex).Name _
+            & "," & MiObj.Amount _
+            & "," & val _
+            & "," & ObjData(MiObj.ObjIndex).GrhIndex _
+            & "," & MiObj.ObjIndex _
+            & "," & ObjData(MiObj.ObjIndex).ObjType _
+            & "," & ObjData(MiObj.ObjIndex).MaxHit _
+            & "," & ObjData(MiObj.ObjIndex).MinHit _
+            & "," & ObjData(MiObj.ObjIndex).MaxDef _
+            & "," & ObjData(MiObj.ObjIndex).MinDef _
+            & "," & ObjData(MiObj.ObjIndex).TipoPocion _
+            & "," & ObjData(MiObj.ObjIndex).MaxModificador _
+            & "," & ObjData(MiObj.ObjIndex).MinModificador _
+            & "," & PuedeUsarObjeto(UserIndex, MiObj.ObjIndex))
+        Else
+            Call SendData(ToIndex, UserIndex, 0, "OTIC" & Slot & "," & MiObj.Amount)
+        End If
     Else
-        Call SendData(ToIndex, UserIndex, 0, "OTIC" & Slot & "," & MiObj.Amount)
+        Call SendData(ToIndex, UserIndex, 0, "OTIV" & Slot)
     End If
-Else
-    Call SendData(ToIndex, UserIndex, 0, "OTIV" & Slot)
-End If
   
 End Sub
 Sub IniciarComercioNPC(UserIndex As Integer)
@@ -163,10 +159,10 @@ Dim Desc As Single
 If Cantidad < 1 Then Exit Sub
 
 
-Infla = (Npclist(NpcIndex).Inflacion * ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).Valor) / 100
+Infla = (Npclist(NpcIndex).Inflacion * ObjData(Npclist(NpcIndex).Invent.Object(i).ObjIndex).Valor) / 100
 Desc = Descuento(UserIndex)
 
-val = Fix((ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).Valor + Infla) / Desc)
+val = Fix((ObjData(Npclist(NpcIndex).Invent.Object(i).ObjIndex).Valor + Infla) / Desc)
 If val = 0 Then val = 1
 
 If UserList(UserIndex).Stats.GLD >= (val * Cantidad) Then
@@ -186,12 +182,12 @@ End Sub
 Sub NPCCompraItem(UserIndex As Integer, ByVal Item As Byte, Cantidad As Integer)
 On Error GoTo errhandler
 
-If ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).Newbie = 1 Then
+If ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).Newbie = 1 Then
     Call SendData(ToIndex, UserIndex, 0, "6P")
     Exit Sub
 End If
 
-If ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).NoSeCae = 1 Or ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).Real > 0 Or ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).Caos > 0 Or ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).Newbie = 1 Then
+If ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).NoSeCae = 1 Or ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).Real > 0 Or ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).Caos > 0 Or ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).Newbie = 1 Then
     Call SendData(ToIndex, UserIndex, 0, "||No puedes vender este item." & FONTTYPE_WARNING)
     Exit Sub
 End If
@@ -199,10 +195,10 @@ End If
 If UserList(UserIndex).Invent.Object(Item).Amount > 0 And UserList(UserIndex).Invent.Object(Item).Equipped = 0 Then
     If Cantidad > 0 And Cantidad > UserList(UserIndex).Invent.Object(Item).Amount Then Cantidad = UserList(UserIndex).Invent.Object(Item).Amount
     UserList(UserIndex).Invent.Object(Item).Amount = UserList(UserIndex).Invent.Object(Item).Amount - Cantidad
-    UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + (ObjData(UserList(UserIndex).Invent.Object(Item).OBJIndex).Valor / 3 * Cantidad)
+    UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + (ObjData(UserList(UserIndex).Invent.Object(Item).ObjIndex).Valor / 3 * Cantidad)
     If UserList(UserIndex).Invent.Object(Item).Amount <= 0 Then
         UserList(UserIndex).Invent.Object(Item).Amount = 0
-        UserList(UserIndex).Invent.Object(Item).OBJIndex = 0
+        UserList(UserIndex).Invent.Object(Item).ObjIndex = 0
         UserList(UserIndex).Invent.Object(Item).Equipped = 0
     End If
     Call SubirSkill(UserIndex, Comerciar)
@@ -215,7 +211,9 @@ errhandler:
 
 End Sub
 Public Function Descuento(UserIndex As Integer) As Single
+    Descuento = CSng(Minimo(10 + (Fix((UserList(UserIndex).Stats.UserSkills(Comerciar) + UserList(UserIndex).Stats.UserAtributos(Carisma) - 10) / 10)), 20)) / 10
+End Function
 
-Descuento = CSng(Minimo(10 + (Fix((UserList(UserIndex).Stats.UserSkills(Comerciar) + UserList(UserIndex).Stats.UserAtributos(Carisma) - 10) / 10)), 20)) / 10
+Public Function CanjearItem(UserIndex As Integer, ObjIndex As Integer, PrecioItem As Integer) As Boolean
 
 End Function

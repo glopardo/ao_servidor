@@ -471,14 +471,9 @@ Select Case UCase$(rdata)
         Exit Sub
     Case "AG"
         If UserList(UserIndex).flags.Muerto Then
-                Call SendData(ToIndex, UserIndex, 0, "MU")
-                Exit Sub
+            Call SendData(ToIndex, UserIndex, 0, "MU")
+            Exit Sub
         End If
-        
-   
-   
-   
-   
         Call GetObj(UserIndex)
         Exit Sub
     Case "SEG"
@@ -541,7 +536,6 @@ Select Case UCase$(rdata)
         Exit Sub
 
     Case "COMUSUOK"
-        
         Call AceptarComercioUsu(UserIndex)
         Exit Sub
     Case "COMUSUNO"
@@ -941,7 +935,7 @@ End Select
     Case "RGM"
         Dim LoopC As Integer
         rdata = Right$(rdata, Len(rdata) - 3) 'idReclamo|userindex|personaje|mail|respuesta
-        Call Logear("test", "GMR:" & rdata)
+
         UserList(ReadField(2, rdata, 124)).flags.SoporteRespondido = True
         UserList(ReadField(2, rdata, 124)).flags.SoporteRespuesta = ReadField(5, rdata, 124)
         
@@ -950,14 +944,11 @@ End Select
         'Call LoadRespuestaReclamo(ReadField(2, rdata, 124))
         
         For LoopC = 1 To LastUser
-            Call Logear("test", "LoopC: " & LoopC)
-            
             If ((UserList(LoopC).ConnID > -1) And UserList(LoopC).Name = ReadField(3, rdata, 124)) Then
                 'avisar al usuario
                 UserList(LoopC).flags.SoporteRespondido = True
                 UserList(LoopC).flags.SoporteRespuesta = ReadField(5, rdata, 124)
                 Call SendData(ToIndex, LoopC, 0, "||Tu soporte fue respondido." & FONTTYPE_FENIX)
-                Call Logear("test", "Username: " & UserList(LoopC).Name)
                 Call SendData(ToIndex, LoopC, 0, "RESP" & ReadField(5, rdata, 124))
             End If
         Next
@@ -1426,6 +1417,19 @@ Select Case UCase$(Left$(rdata, 8))
     Case "1HRINFO<"
         rdata = Right$(rdata, Len(rdata) - 8)
         Call SendCharInfo(rdata, UserIndex)
+        Exit Sub
+    Case "FINCANJE"
+        rdata = Right$(rdata, Len(rdata) - 8)
+        Dim MiObj As Obj
+        MiObj.OBJIndex = CInt(ReadField(1, rdata, 124))
+        MiObj.Amount = 1
+        If Not MeterItemEnInventario(UserIndex, MiObj) Then
+            Call SendData(ToIndex, UserIndex, 0, "||Tenés tu inventario lleno, asegurate de hacer lugar antes de canjear este ítem." & FONTTYPE_INFO)
+            Exit Sub
+        End If
+        
+        UserList(UserIndex).Stats.PuntosCanje = UserList(UserIndex).Stats.PuntosCanje - CInt(ReadField(2, rdata, 124))
+        Call SendData(ToIndex, UserIndex, 0, "||Transacción realizada exitosamente, ¡muchas gracias!." & FONTTYPE_TALK)
         Exit Sub
 End Select
 

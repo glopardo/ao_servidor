@@ -944,7 +944,7 @@ If UserList(UserIndex).flags.SoporteRespondido Then
 Else
     strAux = "SR0"
 End If
-Call Logear("test", "strAux: " & strAux)
+
 Call SendData(ToIndex, UserIndex, 0, strAux)
 
 If UserList(UserIndex).POS.Map = 0 Or UserList(UserIndex).POS.Map > NumMaps Then

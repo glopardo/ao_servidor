@@ -561,18 +561,12 @@ Next
 End Sub
 Sub LoadOBJData()
 
-
-
 On Error GoTo errhandler
 On Error GoTo 0
 
 If frmMain.Visible Then frmMain.txStatus.Caption = "Cargando base de datos de los objetos."
 
-
-
-
 Dim Object As Integer
-
 Dim A As Long, S As Long
 
 A = INICarga(DatPath & "Obj.dat")
@@ -597,6 +591,7 @@ For Object = 1 To NumObjDatas
 
     If S >= 0 Then
         ObjData(Object).Name = INIDarClaveStr(A, S, "Name")
+        ObjData(Object).Descripcion = INIDarClaveStr(A, S, "Descripcion")
         ObjData(Object).NoComerciable = INIDarClaveInt(A, S, "NoComerciable")
         
         ObjData(Object).GrhIndex = INIDarClaveInt(A, S, "GrhIndex")
@@ -712,6 +707,7 @@ For Object = 1 To NumObjDatas
         
         ObjData(Object).RazaEnana = INIDarClaveInt(A, S, "RazaEnana")
         
+        ObjData(Object).PuntosCanje = INIDarClaveInt(A, S, "PuntosCanje")
         ObjData(Object).Valor = INIDarClaveInt(A, S, "Valor")
         
         ObjData(Object).Crucial = INIDarClaveInt(A, S, "Crucial")

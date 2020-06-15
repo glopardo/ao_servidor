@@ -442,166 +442,146 @@ NameNpc = INIDarClaveStr(A, S, "Name")
 End Function
 Function OpenNPC(NPCNumber As Integer, Optional ByVal Respawn = True) As Integer
 
-Dim NpcIndex As Integer
+    Dim NpcIndex As Integer
+    Dim A As Long, S As Long
+    
+    If NPCNumber > 499 Then
+        A = Anpc_host
+    Else
+        A = ANpc
+    End If
 
-Dim A As Long, S As Long
+    S = INIBuscarSeccion(A, "NPC" & NPCNumber)
+    
+    NpcIndex = NextOpenNPC
+    
+    If NpcIndex > MAXNPCS Then
+        OpenNPC = NpcIndex
+        Exit Function
+    End If
+    
+    Npclist(NpcIndex).Numero = NPCNumber
 
-If NPCNumber > 499 Then
-
-    A = Anpc_host
-Else
-
-    A = ANpc
-End If
-
-S = INIBuscarSeccion(A, "NPC" & NPCNumber)
-
-NpcIndex = NextOpenNPC
-
-If NpcIndex > MAXNPCS Then
-    OpenNPC = NpcIndex
-    Exit Function
-End If
-
-Npclist(NpcIndex).Numero = NPCNumber
-
-
-
-
-
-
-If S >= 0 Then
-    Npclist(NpcIndex).Name = INIDarClaveStr(A, S, "Name")
-    Npclist(NpcIndex).Desc = INIDarClaveStr(A, S, "Desc")
-    
-    Npclist(NpcIndex).Movement = INIDarClaveInt(A, S, "Movement")
-    Npclist(NpcIndex).flags.OldMovement = Npclist(NpcIndex).Movement
-    
-    Npclist(NpcIndex).flags.AguaValida = INIDarClaveInt(A, S, "AguaValida")
-    Npclist(NpcIndex).flags.TierraInvalida = INIDarClaveInt(A, S, "TierraInValida")
-    Npclist(NpcIndex).flags.Faccion = INIDarClaveInt(A, S, "Faccion")
-    
-    Npclist(NpcIndex).NPCtype = INIDarClaveInt(A, S, "NpcType")
-    
-    Npclist(NpcIndex).Char.Body = INIDarClaveInt(A, S, "Body")
-    Npclist(NpcIndex).Char.Head = INIDarClaveInt(A, S, "Head")
-    Npclist(NpcIndex).Char.Heading = INIDarClaveInt(A, S, "Heading")
-    
-    Npclist(NpcIndex).Attackable = INIDarClaveInt(A, S, "Attackable")
-    Npclist(NpcIndex).Comercia = INIDarClaveInt(A, S, "Comercia")
-    Npclist(NpcIndex).Hostile = INIDarClaveInt(A, S, "Hostile")
-    Npclist(NpcIndex).flags.OldHostil = Npclist(NpcIndex).Hostile
-    
-    Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP") * 15
-    
-    Npclist(NpcIndex).Veneno = INIDarClaveInt(A, S, "Veneno")
-    
-    Npclist(NpcIndex).flags.Domable = INIDarClaveInt(A, S, "Domable")
-    
-    Npclist(NpcIndex).MaxRecom = INIDarClaveInt(A, S, "MaxRecom")
-    Npclist(NpcIndex).MinRecom = INIDarClaveInt(A, S, "MinRecom")
-    Npclist(NpcIndex).Probabilidad = INIDarClaveInt(A, S, "Probabilidad")
-    
-    Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD")
-    
-    Npclist(NpcIndex).PoderAtaque = INIDarClaveInt(A, S, "PoderAtaque")
-    Npclist(NpcIndex).PoderEvasion = INIDarClaveInt(A, S, "PoderEvasion")
-    
-    Npclist(NpcIndex).AutoCurar = INIDarClaveInt(A, S, "Autocurar")
-    Npclist(NpcIndex).Stats.MaxHP = INIDarClaveInt(A, S, "MaxHP")
-    Npclist(NpcIndex).Stats.MinHP = INIDarClaveInt(A, S, "MinHP")
-    Npclist(NpcIndex).Stats.MaxHit = INIDarClaveInt(A, S, "MaxHIT")
-    Npclist(NpcIndex).Stats.MinHit = INIDarClaveInt(A, S, "MinHIT")
-    Npclist(NpcIndex).Stats.Def = INIDarClaveInt(A, S, "DEF")
-    Npclist(NpcIndex).Stats.Alineacion = INIDarClaveInt(A, S, "Alineacion")
-    Npclist(NpcIndex).Stats.ImpactRate = INIDarClaveInt(A, S, "ImpactRate")
-    Npclist(NpcIndex).InvReSpawn = INIDarClaveInt(A, S, "InvReSpawn")
-    
-    
-    Dim LoopC As Integer
-    Dim ln As String
-    Npclist(NpcIndex).Invent.NroItems = INIDarClaveInt(A, S, "NROITEMS")
-    
-    For LoopC = 1 To Minimo(30, Npclist(NpcIndex).Invent.NroItems)
-        ln = INIDarClaveStr(A, S, "Obj" & LoopC)
-        Npclist(NpcIndex).Invent.Object(LoopC).OBJIndex = val(ReadField(1, ln, 45))
-    Next
-    
-    If Npclist(NpcIndex).InvReSpawn Or Npclist(NpcIndex).Comercia = 0 Then
+    If S >= 0 Then
+        Npclist(NpcIndex).Name = INIDarClaveStr(A, S, "Name")
+        Npclist(NpcIndex).Desc = INIDarClaveStr(A, S, "Desc")
+        
+        Npclist(NpcIndex).Movement = INIDarClaveInt(A, S, "Movement")
+        Npclist(NpcIndex).flags.OldMovement = Npclist(NpcIndex).Movement
+        
+        Npclist(NpcIndex).flags.AguaValida = INIDarClaveInt(A, S, "AguaValida")
+        Npclist(NpcIndex).flags.TierraInvalida = INIDarClaveInt(A, S, "TierraInValida")
+        Npclist(NpcIndex).flags.Faccion = INIDarClaveInt(A, S, "Faccion")
+        
+        Npclist(NpcIndex).NPCtype = INIDarClaveInt(A, S, "NpcType")
+        
+        Npclist(NpcIndex).Char.Body = INIDarClaveInt(A, S, "Body")
+        Npclist(NpcIndex).Char.Head = INIDarClaveInt(A, S, "Head")
+        Npclist(NpcIndex).Char.Heading = INIDarClaveInt(A, S, "Heading")
+        
+        Npclist(NpcIndex).Attackable = INIDarClaveInt(A, S, "Attackable")
+        Npclist(NpcIndex).Comercia = INIDarClaveInt(A, S, "Comercia")
+        Npclist(NpcIndex).Hostile = INIDarClaveInt(A, S, "Hostile")
+        Npclist(NpcIndex).flags.OldHostil = Npclist(NpcIndex).Hostile
+        
+        Npclist(NpcIndex).GiveEXP = INIDarClaveInt(A, S, "GiveEXP") * 15
+        
+        Npclist(NpcIndex).Veneno = INIDarClaveInt(A, S, "Veneno")
+        
+        Npclist(NpcIndex).flags.Domable = INIDarClaveInt(A, S, "Domable")
+        
+        Npclist(NpcIndex).MaxRecom = INIDarClaveInt(A, S, "MaxRecom")
+        Npclist(NpcIndex).MinRecom = INIDarClaveInt(A, S, "MinRecom")
+        Npclist(NpcIndex).Probabilidad = INIDarClaveInt(A, S, "Probabilidad")
+        
+        Npclist(NpcIndex).GiveGLD = INIDarClaveInt(A, S, "GiveGLD")
+        
+        Npclist(NpcIndex).PoderAtaque = INIDarClaveInt(A, S, "PoderAtaque")
+        Npclist(NpcIndex).PoderEvasion = INIDarClaveInt(A, S, "PoderEvasion")
+        
+        Npclist(NpcIndex).AutoCurar = INIDarClaveInt(A, S, "Autocurar")
+        Npclist(NpcIndex).Stats.MaxHP = INIDarClaveInt(A, S, "MaxHP")
+        Npclist(NpcIndex).Stats.MinHP = INIDarClaveInt(A, S, "MinHP")
+        Npclist(NpcIndex).Stats.MaxHit = INIDarClaveInt(A, S, "MaxHIT")
+        Npclist(NpcIndex).Stats.MinHit = INIDarClaveInt(A, S, "MinHIT")
+        Npclist(NpcIndex).Stats.Def = INIDarClaveInt(A, S, "DEF")
+        Npclist(NpcIndex).Stats.Alineacion = INIDarClaveInt(A, S, "Alineacion")
+        Npclist(NpcIndex).Stats.ImpactRate = INIDarClaveInt(A, S, "ImpactRate")
+        Npclist(NpcIndex).InvReSpawn = INIDarClaveInt(A, S, "InvReSpawn")
+                
+        Dim LoopC As Integer
+        Dim ln As String
+        Npclist(NpcIndex).Invent.NroItems = INIDarClaveInt(A, S, "NROITEMS")
+        
         For LoopC = 1 To Minimo(30, Npclist(NpcIndex).Invent.NroItems)
             ln = INIDarClaveStr(A, S, "Obj" & LoopC)
-            Npclist(NpcIndex).Invent.Object(LoopC).Amount = val(ReadField(2, ln, 45))
+            Npclist(NpcIndex).Invent.Object(LoopC).OBJIndex = val(ReadField(1, ln, 45))
         Next
-    End If
-    
-    Npclist(NpcIndex).flags.LanzaSpells = INIDarClaveInt(A, S, "LanzaSpells")
-    If Npclist(NpcIndex).flags.LanzaSpells Then ReDim Npclist(NpcIndex).Spells(1 To Npclist(NpcIndex).flags.LanzaSpells)
-    For LoopC = 1 To Npclist(NpcIndex).flags.LanzaSpells
-        Npclist(NpcIndex).Spells(LoopC) = INIDarClaveInt(A, S, "Sp" & LoopC)
-    Next
-    
-    
-    If Npclist(NpcIndex).NPCtype = NPCTYPE_ENTRENADOR Then
-        Npclist(NpcIndex).NroCriaturas = INIDarClaveInt(A, S, "NroCriaturas")
-        ReDim Npclist(NpcIndex).Criaturas(1 To Npclist(NpcIndex).NroCriaturas) As tCriaturasEntrenador
-        For LoopC = 1 To Npclist(NpcIndex).NroCriaturas
-            Npclist(NpcIndex).Criaturas(LoopC).NpcIndex = INIDarClaveInt(A, S, "CI" & LoopC)
-            Npclist(NpcIndex).Criaturas(LoopC).NpcName = INIDarClaveStr(A, S, "CN" & LoopC)
-    
-        Next
-    End If
-    
-    
-    Npclist(NpcIndex).Inflacion = INIDarClaveInt(A, S, "Inflacion")
-    
-    Npclist(NpcIndex).flags.NPCActive = True
-    Npclist(NpcIndex).flags.UseAINow = False
-    
-    If Respawn Then
-        Npclist(NpcIndex).flags.Respawn = INIDarClaveInt(A, S, "ReSpawn")
-    Else
-        Npclist(NpcIndex).flags.Respawn = 1
-    End If
-    
-    Npclist(NpcIndex).flags.RespawnOrigPos = INIDarClaveInt(A, S, "OrigPos")
-    Npclist(NpcIndex).flags.AfectaParalisis = INIDarClaveInt(A, S, "AfectaParalisis")
-    Npclist(NpcIndex).flags.GolpeExacto = INIDarClaveInt(A, S, "GolpeExacto")
-    Npclist(NpcIndex).flags.Apostador = INIDarClaveInt(A, S, "Apostador")
-    Npclist(NpcIndex).flags.PocaParalisis = INIDarClaveInt(A, S, "PocaParalisis")
-    Npclist(NpcIndex).flags.NoMagia = INIDarClaveInt(A, S, "NoMagia")
-    Npclist(NpcIndex).VeInvis = INIDarClaveInt(A, S, "VerInvis")
-    
-    Npclist(NpcIndex).flags.Snd1 = INIDarClaveInt(A, S, "Snd1")
-    Npclist(NpcIndex).flags.Snd2 = INIDarClaveInt(A, S, "Snd2")
-    Npclist(NpcIndex).flags.Snd3 = INIDarClaveInt(A, S, "Snd3")
-    Npclist(NpcIndex).flags.Snd4 = INIDarClaveInt(A, S, "Snd4")
-    
-    
-    
-    Dim aux As Long
-    aux = INIDarClaveInt(A, S, "NROEXP")
-    Npclist(NpcIndex).NroExpresiones = (aux)
         
-    If aux Then
-        ReDim Npclist(NpcIndex).Expresiones(1 To Npclist(NpcIndex).NroExpresiones) As String
-        For LoopC = 1 To Npclist(NpcIndex).NroExpresiones
-            Npclist(NpcIndex).Expresiones(LoopC) = INIDarClaveStr(A, S, "Exp" & LoopC)
+        If Npclist(NpcIndex).InvReSpawn Or Npclist(NpcIndex).Comercia = 0 Then
+            For LoopC = 1 To Minimo(30, Npclist(NpcIndex).Invent.NroItems)
+                ln = INIDarClaveStr(A, S, "Obj" & LoopC)
+                Npclist(NpcIndex).Invent.Object(LoopC).Amount = val(ReadField(2, ln, 45))
+            Next
+        End If
+        
+        Npclist(NpcIndex).flags.LanzaSpells = INIDarClaveInt(A, S, "LanzaSpells")
+        If Npclist(NpcIndex).flags.LanzaSpells Then ReDim Npclist(NpcIndex).Spells(1 To Npclist(NpcIndex).flags.LanzaSpells)
+        For LoopC = 1 To Npclist(NpcIndex).flags.LanzaSpells
+            Npclist(NpcIndex).Spells(LoopC) = INIDarClaveInt(A, S, "Sp" & LoopC)
         Next
+        
+        If Npclist(NpcIndex).NPCtype = NPCTYPE_ENTRENADOR Then
+            Npclist(NpcIndex).NroCriaturas = INIDarClaveInt(A, S, "NroCriaturas")
+            ReDim Npclist(NpcIndex).Criaturas(1 To Npclist(NpcIndex).NroCriaturas) As tCriaturasEntrenador
+            For LoopC = 1 To Npclist(NpcIndex).NroCriaturas
+                Npclist(NpcIndex).Criaturas(LoopC).NpcIndex = INIDarClaveInt(A, S, "CI" & LoopC)
+                Npclist(NpcIndex).Criaturas(LoopC).NpcName = INIDarClaveStr(A, S, "CN" & LoopC)
+            Next
+        End If
+        
+        Npclist(NpcIndex).Inflacion = INIDarClaveInt(A, S, "Inflacion")
+        
+        Npclist(NpcIndex).flags.NPCActive = True
+        Npclist(NpcIndex).flags.UseAINow = False
+        
+        If Respawn Then
+            Npclist(NpcIndex).flags.Respawn = INIDarClaveInt(A, S, "ReSpawn")
+        Else
+            Npclist(NpcIndex).flags.Respawn = 1
+        End If
+        
+        Npclist(NpcIndex).flags.RespawnOrigPos = INIDarClaveInt(A, S, "OrigPos")
+        Npclist(NpcIndex).flags.AfectaParalisis = INIDarClaveInt(A, S, "AfectaParalisis")
+        Npclist(NpcIndex).flags.GolpeExacto = INIDarClaveInt(A, S, "GolpeExacto")
+        Npclist(NpcIndex).flags.Apostador = INIDarClaveInt(A, S, "Apostador")
+        Npclist(NpcIndex).flags.PocaParalisis = INIDarClaveInt(A, S, "PocaParalisis")
+        Npclist(NpcIndex).flags.NoMagia = INIDarClaveInt(A, S, "NoMagia")
+        Npclist(NpcIndex).VeInvis = INIDarClaveInt(A, S, "VerInvis")
+        
+        Npclist(NpcIndex).flags.Snd1 = INIDarClaveInt(A, S, "Snd1")
+        Npclist(NpcIndex).flags.Snd2 = INIDarClaveInt(A, S, "Snd2")
+        Npclist(NpcIndex).flags.Snd3 = INIDarClaveInt(A, S, "Snd3")
+        Npclist(NpcIndex).flags.Snd4 = INIDarClaveInt(A, S, "Snd4")
+        
+        Dim aux As Long
+        aux = INIDarClaveInt(A, S, "NROEXP")
+        Npclist(NpcIndex).NroExpresiones = (aux)
+            
+        If aux Then
+            ReDim Npclist(NpcIndex).Expresiones(1 To Npclist(NpcIndex).NroExpresiones) As String
+            For LoopC = 1 To Npclist(NpcIndex).NroExpresiones
+                Npclist(NpcIndex).Expresiones(LoopC) = INIDarClaveStr(A, S, "Exp" & LoopC)
+            Next
+        End If
+        
+        Npclist(NpcIndex).TipoItems = INIDarClaveInt(A, S, "TipoItems")
     End If
     
+    If NpcIndex > LastNPC Then LastNPC = NpcIndex
+    NumNPCs = NumNPCs + 1
     
-    
-    
-    Npclist(NpcIndex).TipoItems = INIDarClaveInt(A, S, "TipoItems")
-End If
-
-
-If NpcIndex > LastNPC Then LastNPC = NpcIndex
-NumNPCs = NumNPCs + 1
-
-
-
-OpenNPC = NpcIndex
+    OpenNPC = NpcIndex
 
 End Function
 
@@ -677,7 +657,6 @@ Npclist(NpcIndex).Stats.Def = val(GetVar(npcfile, "NPC" & NPCNumber, "DEF"))
 Npclist(NpcIndex).Stats.Alineacion = val(GetVar(npcfile, "NPC" & NPCNumber, "Alineacion"))
 Npclist(NpcIndex).Stats.ImpactRate = val(GetVar(npcfile, "NPC" & NPCNumber, "ImpactRate"))
 
-
 Dim LoopC As Integer
 Dim ln As String
 Npclist(NpcIndex).Invent.NroItems = val(GetVar(npcfile, "NPC" & NPCNumber, "NROITEMS"))
@@ -685,7 +664,6 @@ For LoopC = 1 To Npclist(NpcIndex).Invent.NroItems
     ln = GetVar(npcfile, "NPC" & NPCNumber, "Obj" & LoopC)
     Npclist(NpcIndex).Invent.Object(LoopC).OBJIndex = val(ReadField(1, ln, 45))
     Npclist(NpcIndex).Invent.Object(LoopC).Amount = val(ReadField(2, ln, 45))
-
 Next
 
 Npclist(NpcIndex).flags.LanzaSpells = val(GetVar(npcfile, "NPC" & NPCNumber, "LanzaSpells"))
@@ -693,7 +671,6 @@ If Npclist(NpcIndex).flags.LanzaSpells Then ReDim Npclist(NpcIndex).Spells(1 To 
 For LoopC = 1 To Npclist(NpcIndex).flags.LanzaSpells
     Npclist(NpcIndex).Spells(LoopC) = val(GetVar(npcfile, "NPC" & NPCNumber, "Sp" & LoopC))
 Next
-
 
 If Npclist(NpcIndex).NPCtype = NPCTYPE_ENTRENADOR Then
     Npclist(NpcIndex).NroCriaturas = val(GetVar(npcfile, "NPC" & NPCNumber, "NroCriaturas"))
@@ -722,14 +699,10 @@ Npclist(NpcIndex).flags.GolpeExacto = val(GetVar(npcfile, "NPC" & NPCNumber, "Go
 Npclist(NpcIndex).flags.PocaParalisis = val(GetVar(npcfile, "NPC" & NPCNumber, "PocaParalisis"))
 Npclist(NpcIndex).VeInvis = val(GetVar(npcfile, "NPC" & NPCNumber, "veinvis"))
 
-
-
 Npclist(NpcIndex).flags.Snd1 = val(GetVar(npcfile, "NPC" & NPCNumber, "Snd1"))
 Npclist(NpcIndex).flags.Snd2 = val(GetVar(npcfile, "NPC" & NPCNumber, "Snd2"))
 Npclist(NpcIndex).flags.Snd3 = val(GetVar(npcfile, "NPC" & NPCNumber, "Snd3"))
 Npclist(NpcIndex).flags.Snd4 = val(GetVar(npcfile, "NPC" & NPCNumber, "Snd4"))
-
-
 
 Dim aux As String
 aux = GetVar(npcfile, "NPC" & NPCNumber, "NROEXP")
@@ -743,16 +716,10 @@ Else
     Next
 End If
 
-
-
-
 Npclist(NpcIndex).TipoItems = val(GetVar(npcfile, "NPC" & NPCNumber, "TipoItems"))
-
 
 If NpcIndex > LastNPC Then LastNPC = NpcIndex
 NumNPCs = NumNPCs + 1
-
-
 
 OpenNPC_Viejo = NpcIndex
 
@@ -767,6 +734,24 @@ Sub EnviarListaCriaturas(UserIndex As Integer, NpcIndex)
   Next
   SD = "LSTCRI" & SD
   Call SendData(ToIndex, UserIndex, 0, SD)
+End Sub
+
+Sub EnviarListaItemsCanjeo(UserIndex As Integer, NpcIndex)
+    Dim SD As String
+    Dim i As Integer
+    
+    SD = SD & Npclist(NpcIndex).Invent.NroItems & "," & UserList(UserIndex).Stats.PuntosCanje & ","
+    
+    For i = 1 To Npclist(NpcIndex).Invent.NroItems
+        SD = SD & ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).Name & "|" & Npclist(NpcIndex).Invent.Object(i).OBJIndex & "|" & ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).Descripcion & "|" & ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).PuntosCanje & "|" & ObjData(Npclist(NpcIndex).Invent.Object(i).OBJIndex).GrhIndex & ","
+    Next
+    
+    SD = "LSTCAN" & SD
+    
+    'BORRAR
+    Call Logear("test", "SD: " & SD)
+    Call SendData(ToIndex, UserIndex, 0, SD)
+
 End Sub
 
 

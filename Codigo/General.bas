@@ -241,7 +241,6 @@ Sub EnviarDashboardSoporte(UserIndex As Integer)
         End If
     Next
     
-    Call Logear("test", "SD: " & SD)
     Call SendData(ToIndex, UserIndex, 0, SD)
 End Sub
 

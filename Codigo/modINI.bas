@@ -53,17 +53,16 @@ Public Declare Function INIConf Lib "LeeInis.dll" (ByVal A As Long, ByVal Defect
 
 
 Public Function INIDarClaveStr(A As Long, Seccion As Long, Clave As String) As String
-Dim Tmp As String
-Dim P As Long, r As Long
-
-Tmp = Space$(3000)
-r = INIDarClave(A, Seccion, Clave, Tmp, 3000)
-P = InStr(1, Tmp, Chr$(0))
-If P Then
-    Tmp = Left$(Tmp, P - 1)
+    Dim Tmp As String
+    Dim P As Long, r As Long
     
-    INIDarClaveStr = Tmp
-End If
+    Tmp = Space$(3000)
+    r = INIDarClave(A, Seccion, Clave, Tmp, 3000)
+    P = InStr(1, Tmp, Chr$(0))
+    If P Then
+        Tmp = Left$(Tmp, P - 1)
+        INIDarClaveStr = Tmp
+    End If
 
 End Function
 

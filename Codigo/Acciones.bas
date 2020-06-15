@@ -110,6 +110,11 @@ If MapData(Map, X, Y).NpcIndex Then
         Exit Sub
     End If
     
+    If Npclist(MapData(Map, X, Y).NpcIndex).NPCtype = NPCTYPE_CANJE Then
+        Call EnviarListaItemsCanjeo(UserIndex, UserList(UserIndex).flags.TargetNpc)
+        Exit Sub
+    End If
+    
     If Npclist(MapData(Map, X, Y).NpcIndex).NPCtype = NPCTYPE_VIEJO Then
         If (UserList(UserIndex).Stats.ELV >= 40 And UserList(UserIndex).Stats.RecompensaLevel <= 2) Then
             If Distancia(Npclist(UserList(UserIndex).flags.TargetNpc).POS, UserList(UserIndex).POS) > 4 Then
