@@ -584,6 +584,7 @@ If UserList(UserIndex).Stats.Exp >= UserList(UserIndex).Stats.ELU Then
             Call UpdateUserChar(UserIndex)
         End If
         Call QuitarNewbieObj(UserIndex)
+        Call DarRecompenzaDejaDeSerNewbie(UserIndex)
         Call SendData(ToIndex, UserIndex, 0, "SUFA1")
     End If
     

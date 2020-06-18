@@ -286,17 +286,23 @@ manejador:
     LogError ("Error en RazaPuedeUsarItem")
 End Function
 Sub QuitarNewbieObj(UserIndex As Integer)
-Dim j As Byte
-
-For j = 1 To MAX_INVENTORY_SLOTS
-    If UserList(UserIndex).Invent.Object(j).OBJIndex Then
-        If ObjData(UserList(UserIndex).Invent.Object(j).OBJIndex).Newbie = 1 Then _
-            Call QuitarVariosItem(UserIndex, j, MAX_INVENTORY_OBJS)
-            Call UpdateUserInv(False, UserIndex, j)
-    End If
-Next
-
+    Dim j As Byte
+    
+    For j = 1 To MAX_INVENTORY_SLOTS
+        If UserList(UserIndex).Invent.Object(j).OBJIndex Then
+            If ObjData(UserList(UserIndex).Invent.Object(j).OBJIndex).Newbie = 1 Then _
+                Call QuitarVariosItem(UserIndex, j, MAX_INVENTORY_OBJS)
+                Call UpdateUserInv(False, UserIndex, j)
+        End If
+    Next
 End Sub
+
+Sub DarRecompenzaDejaDeSerNewbie(UserIndex As Integer)
+    UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD + 20000
+    SendUserORO (UserIndex)
+    Call SendData(ToIndex, UserIndex, 0, "||Felicidades, has recibido 20.000 monedas de oro para que te ayuden en tu nuevo camino." & FONTTYPE_TALK)
+End Sub
+
 Sub LimpiarInventario(UserIndex As Integer)
 Dim j As Byte
 
