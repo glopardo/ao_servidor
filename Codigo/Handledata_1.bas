@@ -1202,7 +1202,7 @@ Select Case UCase$(Left$(rdata, 5))
         Call ComenzarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
     Case "RECRE"
         UserList(UserList(UserIndex).Reto.Contrincante).Reto.EsperandoDuelo = False
-       Call SendData(ToAll, 0, 0, "||" & UserList(UserIndex).Name & " rechazó el reto Contra " & UserList(UserList(UserIndex).Reto.Contrincante).Name & FONTTYPE_TALK)
+        Call SendData(ToAll, 0, 0, "||" & UserList(UserIndex).Name & " rechazó el reto Contra " & UserList(UserList(UserIndex).Reto.Contrincante).Name & FONTTYPE_TALK)
     Case "DEMSG"
         If UserList(UserIndex).flags.TargetObj Then
         rdata = Right$(rdata, Len(rdata) - 5)

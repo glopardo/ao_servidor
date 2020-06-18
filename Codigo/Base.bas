@@ -351,7 +351,7 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  str = "UPDATE `charbanco` SET"
  str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_BANCOINVENTORY_SLOTS
-     str = str & ",OBJ" & i & "=" & mUser.BancoInvent.Object(i).ObjIndex
+     str = str & ",OBJ" & i & "=" & mUser.BancoInvent.Object(i).OBJIndex
      str = str & ",CANT" & i & "=" & mUser.BancoInvent.Object(i).Amount
  Next i
  str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
@@ -378,7 +378,7 @@ str = str & " WHERE IndexPJ=" & UserList(UserIndex).indexPj
  str = "UPDATE `charinvent` SET"
  str = str & " IndexPJ=" & UserList(UserIndex).indexPj
  For i = 1 To MAX_INVENTORY_SLOTS
-     str = str & ",OBJ" & i & "=" & mUser.Invent.Object(i).ObjIndex
+     str = str & ",OBJ" & i & "=" & mUser.Invent.Object(i).OBJIndex
      str = str & ",CANT" & i & "=" & mUser.Invent.Object(i).Amount
  Next i
  str = str & ",CASCOSLOT=" & mUser.Invent.CascoEqpSlot
@@ -512,7 +512,7 @@ With UserList(UserIndex)
         Exit Function
     End If
     For i = 1 To MAX_BANCOINVENTORY_SLOTS
-        .BancoInvent.Object(i).ObjIndex = RS.Fields("OBJ" & i)
+        .BancoInvent.Object(i).OBJIndex = RS.Fields("OBJ" & i)
         .BancoInvent.Object(i).Amount = RS.Fields("CANT" & i)
     Next i
     Set RS = Nothing
@@ -524,7 +524,7 @@ With UserList(UserIndex)
         Exit Function
     End If
     For i = 1 To MAX_INVENTORY_SLOTS
-        .Invent.Object(i).ObjIndex = RS.Fields("OBJ" & i)
+        .Invent.Object(i).OBJIndex = RS.Fields("OBJ" & i)
         .Invent.Object(i).Amount = RS.Fields("CANT" & i)
     Next i
     .Invent.CascoEqpSlot = RS!CASCOSLOT
@@ -914,4 +914,30 @@ Public Function PuedeMandarSoporte(UserIndex As Integer) As Boolean
     End If
     
     PuedeMandarSoporte = False
+End Function
+
+Public Function SendOroToUserOffline(toUserName As String, cantOro As Integer) As Boolean
+    Dim RS As New ADODB.Recordset
+    Dim encontrado As Boolean
+    Dim toUserIndex, toUserOro, toUserOroTotal As Integer
+    Dim str As String
+    
+    Set RS = Con.Execute("SELECT * FROM `charflags` WHERE Nombre='" & toUserName & "'")
+    If RS.BOF Or RS.EOF Then SendOroToUserOffline = False
+    
+    toUserIndexPJ = RS!indexPj
+    Set RS = Nothing
+    
+    Set RS = Con.Execute("SELECT * FROM `charstats` WHERE IndexPJ=" & toUserIndexPJ)
+    If RS.BOF Or RS.EOF Then SendOroToUserOffline = False
+    
+    toUserOro = RS!GLD
+    
+    toUserOroTotal = toUserOro + cantOro
+    
+    str = "UPDATE `charstats` SET GLD =" & toUserOroTotal & " WHERE IndexPJ=" & toUserIndexPJ
+    Call Con.Execute(str)
+    Set RS = Nothing
+    
+    SendOroToUserOffline = True
 End Function

@@ -785,27 +785,40 @@ Select Case Left$(UCase$(rdata), 2)
         Call UpdateUserChar(UserIndex)
         Exit Sub
 
-Case "#3"
-    If Len(UserList(UserIndex).GuildInfo.GuildName) = 0 Then
-        Call SendData(ToIndex, UserIndex, 0, "5V")
-        Exit Sub
-    End If
-    
-    For LoopC = 1 To LastUser
-        If UserList(LoopC).GuildInfo.GuildName = UserList(UserIndex).GuildInfo.GuildName Then
-            tStr = tStr & UserList(LoopC).Name & ", "
+    Case "#3"
+        If Len(UserList(UserIndex).GuildInfo.GuildName) = 0 Then
+            Call SendData(ToIndex, UserIndex, 0, "5V")
+            Exit Sub
         End If
-    Next
+        
+        For LoopC = 1 To LastUser
+            If UserList(LoopC).GuildInfo.GuildName = UserList(UserIndex).GuildInfo.GuildName Then
+                tStr = tStr & UserList(LoopC).Name & ", "
+            End If
+        Next
+        
+        If Len(tStr) > 0 Then
+            tStr = Left$(tStr, Len(tStr) - 2)
+            Call SendData(ToIndex, UserIndex, 0, "||Miembros de tu clan online:" & tStr & "." & FONTTYPE_GUILD)
+        Else: Call SendData(ToIndex, UserIndex, 0, "8V")
+        End If
+        Exit Sub
+        
+    Case "#%"
+        Call IniciarDeposito(UserIndex)
+        Exit Sub
     
-    If Len(tStr) > 0 Then
-        tStr = Left$(tStr, Len(tStr) - 2)
-        Call SendData(ToIndex, UserIndex, 0, "||Miembros de tu clan online:" & tStr & "." & FONTTYPE_GUILD)
-    Else: Call SendData(ToIndex, UserIndex, 0, "8V")
-    End If
-    Exit Sub
-    
-    End Select
+    Case "#&"
+        Dim toUserName As String
+        Dim cantOro As Integer
+        rdata = Right$(rdata, Len(rdata) - 2)
+        
+        toUserName = ReadField(1, rdata, 124)
+        cantOro = ReadField(2, rdata, 124)
+        
+        Call SendOroToUser(UserIndex, toUserName, cantOro)
+        Exit Sub
+End Select
+Procesado = False
 
-    Procesado = False
-    
 End Sub

@@ -44,6 +44,38 @@ UserList(UserIndex).flags.Comerciando = True
 errhandler:
 
 End Sub
+
+Sub SendOroToUser(UserIndex As Integer, toUserName As String, cantOro As Integer)
+    Dim i, toUserIndex As Integer
+    
+    Dim encontrado As Boolean
+    For i = 1 To LastUser
+        If UCase(UserList(i).Name) = UCase(toUserName) Then
+            encontrado = True
+            UserList(i).Stats.GLD = UserList(i).Stats.GLD + cantOro
+            SendUserORO (i)
+            toUserIndex = i
+            Call SendData(ToIndex, toUserIndex, 0, "||Has recibido " & cantOro & " monedas de oro de parte de " & UserList(UserIndex).Name & "." & FONTTYPE_TALK)
+            Exit For
+        End If
+    Next
+    
+    If Not encontrado Then
+        encontrado = SendOroToUserOffline(toUserName, cantOro)
+    End If
+    
+    If Not encontrado Then
+        Call SendData(ToIndex, UserIndex, 0, "||El usuario al que intentas enviar oro no existe, intentá nuevamente." & FONTTYPE_INFO)
+        Exit Sub
+    End If
+    
+    UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - cantOro
+    SendUserORO (UserIndex)
+    
+    Call SendData(ToIndex, UserIndex, 0, "||Se han enviado correctamente " & cantOro & " monedas de oro a " & toUserName & "." & FONTTYPE_TALK)
+    
+End Sub
+
 Sub UpdateBancoInv(UpdateAll As Boolean, UserIndex As Integer, Slot As Byte, Optional ByVal TodaInfo As Boolean)
 Dim i As Byte
 
@@ -226,4 +258,6 @@ End If
 
 End Sub
 
-
+Sub IniciarBanco(UserIndex As Integer)
+    Call SendData(ToIndex, UserIndex, 0, "ABRBAN")
+End Sub

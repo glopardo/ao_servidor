@@ -81,7 +81,8 @@ If MapData(Map, X, Y).NpcIndex Then
     End If
 
     If Npclist(MapData(Map, X, Y).NpcIndex).NPCtype = NPCTYPE_BANQUERO Then
-        Call IniciarDeposito(UserIndex)
+        'Call IniciarDeposito(UserIndex)
+        Call IniciarBanco(UserIndex)
         Exit Sub
     End If
     

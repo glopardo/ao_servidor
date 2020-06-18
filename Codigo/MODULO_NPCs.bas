@@ -747,9 +747,6 @@ Sub EnviarListaItemsCanjeo(UserIndex As Integer, NpcIndex)
     Next
     
     SD = "LSTCAN" & SD
-    
-    'BORRAR
-    Call Logear("test", "SD: " & SD)
     Call SendData(ToIndex, UserIndex, 0, SD)
 
 End Sub
