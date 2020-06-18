@@ -990,6 +990,11 @@ If TiempoTranscurrido(UserList(UserIndex).flags.DuracionEfecto) >= 45 Then
     UserList(UserIndex).Stats.UserAtributos(Agilidad) = UserList(UserIndex).Stats.UserAtributosBackUP(Agilidad)
     UserList(UserIndex).Stats.UserAtributos(fuerza) = UserList(UserIndex).Stats.UserAtributosBackUP(fuerza)
     Call UpdateFuerzaYAg(UserIndex)
+ElseIf TiempoTranscurrido(UserList(UserIndex).flags.DuracionEfecto) >= 35 Then
+    Dim ind As Integer
+    ind = CInt(TiempoTranscurrido(UserList(UserIndex).flags.DuracionEfecto)) Mod 2
+    
+    Call SendData(ToIndex, UserIndex, 0, "TITDR" & ind) 'Titilar drogas
 End If
 
 End Sub

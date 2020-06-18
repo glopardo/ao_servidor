@@ -968,16 +968,16 @@ For j = 1 To NUMSKILLS
 Next
 End Sub
 Sub UpdateFuerzaYAg(UserIndex As Integer)
-Dim Fue As Integer
-Dim Agi As Integer
-
-Fue = UserList(UserIndex).Stats.UserAtributos(fuerza)
-If Fue = UserList(UserIndex).Stats.UserAtributosBackUP(fuerza) Then Fue = 0
-
-Agi = UserList(UserIndex).Stats.UserAtributos(Agilidad)
-If Agi = UserList(UserIndex).Stats.UserAtributosBackUP(Agilidad) Then Agi = 0
-
-Call SendData(ToIndex, UserIndex, 0, "EIFYA" & Fue & "," & Agi)
+    Dim Fue As Integer
+    Dim Agi As Integer
+    
+    Fue = UserList(UserIndex).Stats.UserAtributos(fuerza)
+    If Fue = UserList(UserIndex).Stats.UserAtributosBackUP(fuerza) Then Fue = 0
+    
+    Agi = UserList(UserIndex).Stats.UserAtributos(Agilidad)
+    If Agi = UserList(UserIndex).Stats.UserAtributosBackUP(Agilidad) Then Agi = 0
+    
+    Call SendData(ToIndex, UserIndex, 0, "EIFYA" & Fue & "," & Agi)
 
 End Sub
 Sub UpdateUserMap(UserIndex As Integer)
