@@ -136,6 +136,7 @@ Public Const FXCURAR = 2
 Public Const FXMEDITARCHICO = 4
 Public Const FXMEDITARMEDIANO = 5
 Public Const FXMEDITARGRANDE = 6
+Public Const FXMEDITARGIGANTE = 50
 Public Const FXMEDITARGRANDECAOS = 18
 Public Const FXMEDITARGRANDEREAL = 19
 
@@ -294,6 +295,7 @@ Public Const PocionRojaNoCae = 754
 Public Const PocionAzulNoCae = 755
 Public Const PocionAmarillaNoCae = 756
 Public Const PocionVerdeNoCae = 757
+Public Const Petrificar = 927
 
 Public Const Magia = 1
 Public Const Robar = 2

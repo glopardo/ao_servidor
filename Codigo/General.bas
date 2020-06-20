@@ -250,8 +250,8 @@ Recompensas(MINERO, 1, 1).SubeHP = 120
 
 Recompensas(MAGO, 1, 1).Obj(1).OBJIndex = PocionAzulNoCae
 Recompensas(MAGO, 1, 1).Obj(1).Amount = 1000
-Recompensas(MAGO, 1, 2).Obj(1).OBJIndex = PocionRojaNoCae
-Recompensas(MAGO, 1, 2).Obj(1).Amount = 1000
+Recompensas(MAGO, 1, 2).Obj(1).OBJIndex = Petrificar
+Recompensas(MAGO, 1, 2).Obj(1).Amount = 1
 Recompensas(MAGO, 2, 1).SubeHP = 10
 
 Recompensas(NIGROMANTE, 1, 1).Obj(1).OBJIndex = PocionAzulNoCae

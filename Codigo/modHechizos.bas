@@ -113,127 +113,126 @@ End If
 
 End Sub
 Function TieneHechizo(ByVal i As Integer, UserIndex As Integer) As Boolean
-
-On Error GoTo errhandler
+    On Error GoTo errhandler
+        
+        Dim j As Integer
+        For j = 1 To MAXUSERHECHIZOS
+            If UserList(UserIndex).Stats.UserHechizos(j) = i Then
+                TieneHechizo = True
+                Exit Function
+            End If
+        Next
     
-    Dim j As Integer
-    For j = 1 To MAXUSERHECHIZOS
-        If UserList(UserIndex).Stats.UserHechizos(j) = i Then
-            TieneHechizo = True
-            Exit Function
-        End If
-    Next
-
-Exit Function
+    Exit Function
 errhandler:
 
 End Function
 Sub AgregarHechizo(UserIndex As Integer, Slot As Byte)
-Dim hIndex As Integer, j As Integer
-
-hIndex = ObjData(UserList(UserIndex).Invent.Object(Slot).OBJIndex).HechizoIndex
-
-If Not TieneHechizo(hIndex, UserIndex) Then
-    For j = 1 To MAXUSERHECHIZOS
-        If UserList(UserIndex).Stats.UserHechizos(j) = 0 Then Exit For
-    Next
-        
-    If UserList(UserIndex).Stats.UserHechizos(j) Then
-        Call SendData(ToIndex, UserIndex, 0, "%C")
+    Dim hIndex As Integer, j As Integer
+    
+    hIndex = ObjData(UserList(UserIndex).Invent.Object(Slot).OBJIndex).HechizoIndex
+    
+    If Not TieneHechizo(hIndex, UserIndex) Then
+        For j = 1 To MAXUSERHECHIZOS
+            If UserList(UserIndex).Stats.UserHechizos(j) = 0 Then Exit For
+        Next
+            
+        If UserList(UserIndex).Stats.UserHechizos(j) Then
+            Call SendData(ToIndex, UserIndex, 0, "%C")
+        Else
+            UserList(UserIndex).Stats.UserHechizos(j) = hIndex
+            Call UpdateUserHechizos(False, UserIndex, CByte(j))
+            
+            Call QuitarUnItem(UserIndex, CByte(Slot))
+        End If
     Else
-        UserList(UserIndex).Stats.UserHechizos(j) = hIndex
-        Call UpdateUserHechizos(False, UserIndex, CByte(j))
-        
-        Call QuitarUnItem(UserIndex, CByte(Slot))
+        Call SendData(ToIndex, UserIndex, 0, "%D")
     End If
-Else
-    Call SendData(ToIndex, UserIndex, 0, "%D")
-End If
 
 End Sub
 Sub Aprenderhechizo(UserIndex As Integer, ByVal hechizoespecial As Integer)
-Dim hIndex As Integer
-Dim j As Integer
-hIndex = hechizoespecial
-
-If Not TieneHechizo(hIndex, UserIndex) Then
+    Dim hIndex As Integer
+    Dim j As Integer
+    hIndex = hechizoespecial
     
-    For j = 1 To MAXUSERHECHIZOS
-        If UserList(UserIndex).Stats.UserHechizos(j) = 0 Then Exit For
-    Next
+    If Not TieneHechizo(hIndex, UserIndex) Then
         
-    If UserList(UserIndex).Stats.UserHechizos(j) Then
-        Call SendData(ToIndex, UserIndex, 0, "%C")
+        For j = 1 To MAXUSERHECHIZOS
+            If UserList(UserIndex).Stats.UserHechizos(j) = 0 Then Exit For
+        Next
+            
+        If UserList(UserIndex).Stats.UserHechizos(j) Then
+            Call SendData(ToIndex, UserIndex, 0, "%C")
+        Else
+            UserList(UserIndex).Stats.UserHechizos(j) = hIndex
+            Call UpdateUserHechizos(False, UserIndex, CByte(j))
+            
+        End If
     Else
-        UserList(UserIndex).Stats.UserHechizos(j) = hIndex
-        Call UpdateUserHechizos(False, UserIndex, CByte(j))
-        
+        Call SendData(ToIndex, UserIndex, 0, "%D")
     End If
-Else
-    Call SendData(ToIndex, UserIndex, 0, "%D")
-End If
 
 End Sub
 Sub DecirPalabrasMagicas(ByVal S As String, UserIndex As Integer)
-On Error Resume Next
-
-Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "||" & vbCyan & "°" & S & "°" & UserList(UserIndex).Char.CharIndex)
+    On Error Resume Next
+    
+    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "||" & vbCyan & "°" & S & "°" & UserList(UserIndex).Char.CharIndex)
 
 End Sub
 Function ManaHechizo(UserIndex As Integer, Hechizo As Integer) As Integer
 
-If UserList(UserIndex).flags.Privilegios > 2 Or UserList(UserIndex).flags.Quest Then Exit Function
-
-If UserList(UserIndex).Recompensas(3) = 1 And _
-    ((UserList(UserIndex).Clase = DRUIDA And Hechizo = 24) Or _
-    (UserList(UserIndex).Clase = PALADIN And Hechizo = 10)) Then
-    ManaHechizo = 250
-ElseIf UserList(UserIndex).Clase = CLERIGO And UserList(UserIndex).Recompensas(3) = 2 And Hechizo = 11 Then
-    ManaHechizo = 1100
-Else: ManaHechizo = Hechizos(Hechizo).ManaRequerido
-End If
+    If UserList(UserIndex).flags.Privilegios > 2 Or UserList(UserIndex).flags.Quest Then Exit Function
+    
+    If UserList(UserIndex).Recompensas(3) = 1 And _
+        ((UserList(UserIndex).Clase = DRUIDA And Hechizo = 24) Or _
+        (UserList(UserIndex).Clase = PALADIN And Hechizo = 10)) Then
+        ManaHechizo = 250
+    ElseIf UserList(UserIndex).Clase = CLERIGO And UserList(UserIndex).Recompensas(3) = 2 And Hechizo = 11 Then
+        ManaHechizo = 1100
+    Else: ManaHechizo = Hechizos(Hechizo).ManaRequerido
+    End If
 
 End Function
 Function PuedeLanzar(UserIndex As Integer, ByVal HechizoIndex As Integer) As Boolean
-Dim wp2 As WorldPos
-
-wp2.Map = UserList(UserIndex).flags.TargetMap
-wp2.X = UserList(UserIndex).flags.TargetX
-wp2.Y = UserList(UserIndex).flags.TargetY
-
-If Not EnPantalla(UserList(UserIndex).POS, wp2, 1) Then Exit Function
-
-If UserList(UserIndex).flags.Muerto Then
-    Call SendData(ToIndex, UserIndex, 0, "MU")
-    Exit Function
-End If
-
-If MapInfo(UserList(UserIndex).POS.Map).NoMagia Then
-    Call SendData(ToIndex, UserIndex, 0, "/T")
-    Exit Function
-End If
-
-If UserList(UserIndex).Stats.ELV < Hechizos(HechizoIndex).Nivel Then
-    Call SendData(ToIndex, UserIndex, 0, "%%" & Hechizos(HechizoIndex).Nivel)
-    Exit Function
-End If
-
-If UserList(UserIndex).Stats.UserSkills(Magia) < Hechizos(HechizoIndex).MinSkill Then
-    Call SendData(ToIndex, UserIndex, 0, "%E")
-    Exit Function
-End If
-
-If UserList(UserIndex).Stats.MinMAN < ManaHechizo(UserIndex, HechizoIndex) Then
-    Call SendData(ToIndex, UserIndex, 0, "%F")
-    Exit Function
-End If
-
-If UserList(UserIndex).Stats.MinSta < Hechizos(HechizoIndex).StaRequerido Then
-    Call SendData(ToIndex, UserIndex, 0, "9C")
-    Exit Function
-End If
-
-PuedeLanzar = True
+    Dim wp2 As WorldPos
+    
+    wp2.Map = UserList(UserIndex).flags.TargetMap
+    wp2.X = UserList(UserIndex).flags.TargetX
+    wp2.Y = UserList(UserIndex).flags.TargetY
+    
+    If Not EnPantalla(UserList(UserIndex).POS, wp2, 1) Then Exit Function
+    
+    If UserList(UserIndex).flags.Muerto Then
+        Call SendData(ToIndex, UserIndex, 0, "MU")
+        Exit Function
+    End If
+    
+    If MapInfo(UserList(UserIndex).POS.Map).NoMagia Then
+        Call SendData(ToIndex, UserIndex, 0, "/T")
+        Exit Function
+    End If
+    
+    If UserList(UserIndex).Stats.ELV < Hechizos(HechizoIndex).Nivel Then
+        Call SendData(ToIndex, UserIndex, 0, "%%" & Hechizos(HechizoIndex).Nivel)
+        Exit Function
+    End If
+    
+    If UserList(UserIndex).Stats.UserSkills(Magia) < Hechizos(HechizoIndex).MinSkill Then
+        Call SendData(ToIndex, UserIndex, 0, "%E")
+        Exit Function
+    End If
+    
+    If UserList(UserIndex).Stats.MinMAN < ManaHechizo(UserIndex, HechizoIndex) Then
+        Call SendData(ToIndex, UserIndex, 0, "%F")
+        Exit Function
+    End If
+    
+    If UserList(UserIndex).Stats.MinSta < Hechizos(HechizoIndex).StaRequerido Then
+        Call SendData(ToIndex, UserIndex, 0, "9C")
+        Exit Function
+    End If
+    
+    PuedeLanzar = True
 
 End Function
 Sub HechizoInvocacion(UserIndex As Integer, B As Boolean)
@@ -322,6 +321,7 @@ If Hechizos(H).Invisibilidad = 2 Then
         TU = MapInfo(UserList(UserIndex).POS.Map).UserIndex(i)
         If EnPantalla(PosCasteada, UserList(TU).POS, -1) And UserList(TU).flags.Invisible = 1 And UserList(TU).flags.AdminInvisible = 0 Then
             Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(TU).Char.CharIndex & "," & Hechizos(H).FXgrh & "," & Hechizos(H).loops)
+            UserList(TU).flags.Invisible = 0
         End If
     Next
     B = True

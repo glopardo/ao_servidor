@@ -164,9 +164,12 @@ Select Case Left$(UCase$(rdata), 2)
             ElseIf UserList(UserIndex).Stats.ELV < 30 Then
                 Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARMEDIANO & "," & LoopAdEternum)
                 UserList(UserIndex).Char.FX = FXMEDITARMEDIANO
-            Else
+            ElseIf UserList(UserIndex).Stats.ELV < 42 Then
                 Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARGRANDE & "," & LoopAdEternum)
                 UserList(UserIndex).Char.FX = FXMEDITARGRANDE
+            Else
+                Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARGIGANTE & "," & LoopAdEternum)
+                UserList(UserIndex).Char.FX = FXMEDITARGIGANTE
             End If
         Else
             UserList(UserIndex).Char.FX = 0
