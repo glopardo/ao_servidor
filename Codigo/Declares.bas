@@ -531,6 +531,7 @@ Type tHechizo
     Revivir As Byte
     Flecha As Byte
     Morph As Byte
+    Proteger As Byte
     
     Invoca As Byte
     NumNPC As Integer
@@ -938,6 +939,7 @@ End Type
 Type UserCounters
     Sincroniza As Single
     Protegido As Byte
+    PuedeLanzarProteccionDivina As Byte
     IdleCount As Single
     AttackCounter As Integer
     HPCounter As Single

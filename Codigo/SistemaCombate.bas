@@ -801,6 +801,9 @@ If UserList(VictimIndex).flags.Protegido = 1 Then
 ElseIf UserList(VictimIndex).flags.Protegido = 2 Then
     Call SendData(ToIndex, AttackerIndex, 0, "||El usuario está siendo protegido por conexión." & FONTTYPE_FIGHT)
     Exit Function
+ElseIf UserList(VictimIndex).flags.Protegido = 4 Then
+    Call SendData(ToIndex, AttackerIndex, 0, "||El usuario está siendo protegido por los dioses." & FONTTYPE_FIGHT)
+    Exit Function
 End If
 
 If UserList(VictimIndex).flags.Privilegios >= 1 Then
@@ -813,6 +816,9 @@ If UserList(AttackerIndex).flags.Protegido = 1 Then
     Exit Function
 ElseIf UserList(AttackerIndex).flags.Protegido = 2 Then
     Call SendData(ToIndex, AttackerIndex, 0, "||No podes atacar tan pronto al conectarte." & FONTTYPE_FIGHT)
+    Exit Function
+ElseIf UserList(AttackerIndex).flags.Protegido = 4 Then
+    Call SendData(ToIndex, AttackerIndex, 0, "||No podes atacar minetras te protegen los dioses." & FONTTYPE_FIGHT)
     Exit Function
 End If
 

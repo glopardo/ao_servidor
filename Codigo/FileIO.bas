@@ -265,6 +265,7 @@ For Hechizo = 1 To NumeroHechizos
     Hechizos(Hechizo).RemoverParalisis = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "RemoverParalisis"))
     Hechizos(Hechizo).CuraVeneno = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "CuraVeneno"))
     Hechizos(Hechizo).RemoverMaldicion = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "RemoverMaldicion"))
+    Hechizos(Hechizo).Proteger = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "Proteger"))
     
     Hechizos(Hechizo).Invoca = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "Invoca"))
     Hechizos(Hechizo).NumNPC = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "NumNpc"))

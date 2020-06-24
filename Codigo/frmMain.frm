@@ -732,6 +732,7 @@ For UI = 1 To LastUser
     If UserList(UI).flags.UserLogged And UserList(UI).ConnID <> -1 Then
         Call TimerPiquete(UI)
         If UserList(UI).flags.Protegido > 1 Then Call TimerProtEntro(UI)
+        If UserList(UI).flags.Protegido = 4 Then Call TimerLanzarProteccionDivina(UI)
         If UserList(UI).flags.Encarcelado Then Call TimerCarcel(UI)
         If UserList(UI).flags.Muerto = 0 Then
             If UserList(UI).flags.Paralizado Then Call TimerParalisis(UI)
@@ -844,6 +845,19 @@ Exit Sub
 Error:
     Call LogError("Error en TimerProtEntro" & " " & Err.Description)
 End Sub
+
+Public Sub TimerLanzarProteccionDivina(UserIndex As Integer)
+    On Error GoTo Error:
+    
+    UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = UserList(UserIndex).Counters.PuedeLanzarProteccionDivina - 1
+    If UserList(UserIndex).Counters.PuedeLanzarProteccionDivina <= 0 Then UserList(UserIndex).flags.Protegido = 0
+    Exit Sub
+    
+Error:
+    Call LogError("Error en TimerLanzarProteccionDivina" & " " & Err.Description)
+    
+End Sub
+
 Sub TimerParalisis(UserIndex As Integer)
 
 If TiempoTranscurrido(UserList(UserIndex).Counters.Paralisis) >= IntervaloParalizadoUsuario Then

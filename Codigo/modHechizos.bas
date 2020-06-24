@@ -319,9 +319,10 @@ H = UserList(UserIndex).Stats.UserHechizos(UserList(UserIndex).flags.Hechizo)
 If Hechizos(H).Invisibilidad = 2 Then
     For i = 1 To MapInfo(UserList(UserIndex).POS.Map).NumUsers
         TU = MapInfo(UserList(UserIndex).POS.Map).UserIndex(i)
-        If EnPantalla(PosCasteada, UserList(TU).POS, -1) And UserList(TU).flags.Invisible = 1 And UserList(TU).flags.AdminInvisible = 0 Then
-            Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(TU).Char.CharIndex & "," & Hechizos(H).FXgrh & "," & Hechizos(H).loops)
-            UserList(TU).flags.Invisible = 0
+        If EnPantalla(PosCasteada, UserList(TU).POS, -1) Then 'And UserList(TU).flags.Invisible = 1 And UserList(TU).flags.AdminInvisible = 0 Then
+            'Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(TU).Char.CharIndex & "," & Hechizos(H).FXgrh & "," & Hechizos(H).loops)
+            UserList(i).flags.Invisible = 0
+            Call SendData(ToMap, 0, UserList(i).POS.Map, ("V3" & UserList(i).Char.CharIndex & ",0"))
         End If
     Next
     B = True
@@ -536,7 +537,7 @@ Dim H As Integer, TU As Integer, HechizoBueno As Boolean
 H = UserList(UserIndex).Stats.UserHechizos(UserList(UserIndex).flags.Hechizo)
 TU = UserList(UserIndex).flags.TargetUser
 
-HechizoBueno = Hechizos(H).RemoverParalisis Or Hechizos(H).CuraVeneno Or Hechizos(H).Invisibilidad Or Hechizos(H).Revivir Or Hechizos(H).Flecha Or Hechizos(H).Estupidez = 2 Or Hechizos(H).Transforma
+HechizoBueno = Hechizos(H).Proteger Or Hechizos(H).RemoverParalisis Or Hechizos(H).CuraVeneno Or Hechizos(H).Invisibilidad Or Hechizos(H).Revivir Or Hechizos(H).Flecha Or Hechizos(H).Estupidez = 2 Or Hechizos(H).Transforma
 
 If HechizoBueno Then
     If Not Amigos(UserIndex, TU) Then
@@ -669,6 +670,24 @@ If Hechizos(H).Invisibilidad = 1 Then
     Call SendData(ToMap, 0, UserList(TU).POS.Map, ("V3" & UserList(TU).Char.CharIndex & ",1"))
     Call InfoHechizo(UserIndex)
     B = True
+    Exit Sub
+End If
+
+If Hechizos(H).Proteger = 1 Then
+    If UserList(TU).flags.Protegido Then
+        Call SendData(ToIndex, UserIndex, 0, "||El usuario ya se encuentra protegido." & FONTTYPE_WARNING)
+        Exit Sub
+    End If
+    
+    If UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 0 Then
+        UserList(UserIndex).Counters.Protegido = 4
+        UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 15
+        UserList(UserIndex).flags.Protegido = 4
+        Call InfoHechizo(UserIndex)
+        B = True
+    Else
+        Call SendData(ToIndex, UserIndex, 0, "||Debes esperar " & UserList(UserIndex).Counters.PuedeLanzarProteccionDivina & " segundos para volver a lanzar este hechizo." & FONTTYPE_WARNING)
+    End If
     Exit Sub
 End If
 
