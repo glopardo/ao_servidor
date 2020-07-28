@@ -915,6 +915,7 @@ Type UserFlags
     AdminInvisible As Byte
 
     Protegido As Byte
+    PuedeLanzarProteccionDivina As Boolean
     Ignorar As Byte
     OldWeaponAnim As Integer
     TimesWalk As Integer
@@ -1028,6 +1029,11 @@ Type Retos
    Ring As Integer
 End Type
 
+Type Torneos
+    Contrincante As Integer
+    EstaDueleando As Boolean
+End Type
+
 Type User
     Name As String
     ID As Long
@@ -1091,6 +1097,7 @@ Type User
     PartyIndex As Integer
     
     Reto As Retos
+    Torneo As Torneos
 End Type
 
 Type Party

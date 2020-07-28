@@ -1193,6 +1193,26 @@ Select Case UCase$(Left$(rdata, 4))
 End Select
 
 Select Case UCase$(Left$(rdata, 5))
+    Case "INIDT"
+        rdata = Right$(rdata, Len(rdata) - 5)
+        Dim nameJ1, namej2 As String
+        Dim uIndex1 As Integer
+        Dim uIndex2 As Integer
+        
+        nameJ1 = ReadField(1, rdata, 124)
+        namej2 = ReadField(2, rdata, 124)
+        
+        For LoopC = 1 To LastUser
+            If UserList(LoopC).Name = nameJ1 Then
+                uIndex1 = LoopC
+            End If
+            If UserList(LoopC).Name = namej2 Then
+                uIndex2 = LoopC
+            End If
+        Next
+        
+        Call ComenzarDueloTorneo(uIndex1, uIndex2)
+        Exit Sub
     Case "ACPRE"
         If UserList(UserIndex).Stats.GLD <= 0 Then
             Call SendData(ToIndex, UserIndex, 0, "||Debes tener más de 50.000 monedas de oro para aceptar un duelo." & FONTTYPE_PARTY)

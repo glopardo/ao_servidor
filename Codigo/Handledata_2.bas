@@ -54,9 +54,23 @@ Select Case Left$(UCase$(rdata), 2)
         Else: Call SendData(ToIndex, UserIndex, 0, "1A")
         End If
         Exit Sub
+    Case "#^"
+        'Comienza duelo torneo
+        Dim uIndex1, uIndex2 As Integer
+        
+        rdata = Right$(rdata, Len(rdata) - 2)
+        uIndex1 = ReadField(1, rdata, 124)
+        uIndex2 = ReadField(2, rdata, 124)
+        
+        UserList(uIndex1).Torneo.EstaDueleando = True
+        UserList(uIndex2).Torneo.EstaDueleando = True
+        
+        UserList(uIndex1).Torneo.Contrincante = uIndex2
+        UserList(uIndex2).Torneo.Contrincante = uIndex1
+        
+        Call SendData(ToIndex, tIndex, 0, "SHOWR" & "," & UserList(UserIndex).Name)
     Case "#@"
         '/RETAR
-        
         rdata = Right$(rdata, Len(rdata) - 2)
         tIndex = NameIndex(rdata)
         
@@ -530,7 +544,6 @@ Select Case Left$(UCase$(rdata), 2)
 
     Case "#Y"
     
-    
         If UserList(UserIndex).flags.TargetNpc = 0 Then
             Call SendData(ToIndex, UserIndex, 0, "ZP")
             Exit Sub
@@ -555,7 +568,7 @@ Select Case Left$(UCase$(rdata), 2)
             Call SendData(ToIndex, UserIndex, 0, "ZP")
             Exit Sub
         End If
-        If Npclist(UserList(UserIndex).flags.TargetNpc).NPCtype <> NPCTYPE_NOBLE Or UserList(UserIndex).flags.Muerto Or Not Npclist(UserList(UserIndex).flags.TargetNpc).flags.Faccion Then Exit Sub
+        If Npclist(UserList(UserIndex).flags.TargetNpc).NPCtype <> NPCTYPE_NOBLE Or UserList(UserIndex).flags.Muerto Or Npclist(UserList(UserIndex).flags.TargetNpc).flags.Faccion = 0 Then Exit Sub
         If Distancia(UserList(UserIndex).POS, Npclist(UserList(UserIndex).flags.TargetNpc).POS) > 4 Then
             Call SendData(ToIndex, UserIndex, 0, "DL")
             Exit Sub

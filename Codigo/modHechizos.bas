@@ -674,19 +674,23 @@ If Hechizos(H).Invisibilidad = 1 Then
 End If
 
 If Hechizos(H).Proteger = 1 Then
-    If UserList(TU).flags.Protegido Then
-        Call SendData(ToIndex, UserIndex, 0, "||El usuario ya se encuentra protegido." & FONTTYPE_WARNING)
-        Exit Sub
-    End If
-    
-    If UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 0 Then
-        UserList(UserIndex).Counters.Protegido = 4
-        UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 15
-        UserList(UserIndex).flags.Protegido = 4
-        Call InfoHechizo(UserIndex)
-        B = True
+    If UserIndex = TU Then
+        If UserList(TU).flags.Protegido Then
+            Call SendData(ToIndex, UserIndex, 0, "||El usuario ya se encuentra protegido." & FONTTYPE_WARNING)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 0 Then
+            UserList(UserIndex).Counters.Protegido = 4
+            UserList(UserIndex).Counters.PuedeLanzarProteccionDivina = 60
+            UserList(UserIndex).flags.Protegido = 4
+            Call InfoHechizo(UserIndex)
+            B = True
+        Else
+            Call SendData(ToIndex, UserIndex, 0, "||Debes esperar " & UserList(UserIndex).Counters.PuedeLanzarProteccionDivina & " segundos para volver a lanzar este hechizo." & FONTTYPE_WARNING)
+        End If
     Else
-        Call SendData(ToIndex, UserIndex, 0, "||Debes esperar " & UserList(UserIndex).Counters.PuedeLanzarProteccionDivina & " segundos para volver a lanzar este hechizo." & FONTTYPE_WARNING)
+        Call SendData(ToIndex, UserIndex, 0, "||Sólo te podés lanzar este hechizo a vos mismo." & FONTTYPE_INFO)
     End If
     Exit Sub
 End If

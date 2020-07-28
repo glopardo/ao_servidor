@@ -1208,7 +1208,11 @@ If UserList(UserIndex).POS.Map <> 190 Then
     End If
 End If
 
-If UserList(UserIndex).Reto.EstaDueleando = True Then Call TerminarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
+'User estaba en reto 1 vs 1
+If UserList(UserIndex).Reto.EstaDueleando Then Call TerminarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
+
+'User estaba en duelo de torneo
+If UserList(UserIndex).Torneo.EstaDueleando Then Call TerminarDueloTorneo(UserList(UserIndex).Torneo.Contrincante, UserIndex)
 
 If UserList(UserIndex).Invent.ArmourEqpObjIndex Then Call Desequipar(UserIndex, UserList(UserIndex).Invent.ArmourEqpSlot)
 If UserList(UserIndex).Invent.WeaponEqpObjIndex Then Call Desequipar(UserIndex, UserList(UserIndex).Invent.WeaponEqpSlot)

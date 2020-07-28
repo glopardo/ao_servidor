@@ -1988,6 +1988,15 @@ If UCase$(Left$(rdata, 10)) = "/VERTORNEO" Then
     Exit Sub
 End If
 
+If UCase$(Left$(rdata, 12)) = "/PANELTORNEO" Then
+    Dim stringJugadores
+    For i = 1 To 16
+        stringJugadores = stringJugadores & GetVar(App.Path & "/logs/torneo.log", "JUGADORES", "JUGADOR" & i) & "|"
+    Next
+    
+    Call SendData(ToIndex, UserIndex, 0, "PNLT" & stringJugadores)
+    Exit Sub
+End If
 
 If UCase$(rdata) = "/INVISIBLE" Then
     Call DoAdminInvisible(UserIndex)
@@ -2300,6 +2309,15 @@ If UCase$(Left$(rdata, 6)) = "/RMSG " Then
     Call LogGM(UserList(UserIndex).Name, "Mensaje Broadcast:" & rdata, False)
     If Len(rdata) > 0 Then
         Call SendData(ToAll, 0, 0, "|$" & UserList(UserIndex).Name & "> " & rdata & ENDC)
+    End If
+    Exit Sub
+End If
+
+If UCase$(Left$(rdata, 6)) = "/TMSG " Then
+    rdata = Right$(rdata, Len(rdata) - 6)
+    Call LogGM(UserList(UserIndex).Name, "Mensaje Broadcast Torneo:" & rdata, False)
+    If Len(rdata) > 0 Then
+        Call SendData(ToAll, 0, 0, "|$Torneo> " & rdata & ENDC)
     End If
     Exit Sub
 End If

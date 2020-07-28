@@ -35,145 +35,138 @@ Attribute VB_Name = "ModFacciones"
 'www.fenixao.com.ar
 
 Option Explicit
-Public Sub Recompensado(Userindex As Integer)
-Dim Fuerzas As Byte
-Dim MiObj As Obj
+Public Sub Recompensado(UserIndex As Integer)
+    Dim Fuerzas As Byte
+    Dim MiObj As Obj
+    
+    Fuerzas = UserList(UserIndex).Faccion.Bando
+    
+    If UserList(UserIndex).Faccion.Jerarquia = 0 Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 11))
+        Exit Sub
+    End If
+    
+    If UserList(UserIndex).Faccion.Jerarquia = 1 Then
+        If UserList(UserIndex).Faccion.Matados(Enemigo(Fuerzas)) < 100 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 12) & 100)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Faccion.Torneos < 1 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 13) & 1)
+            Exit Sub
+        End If
+        
+        UserList(UserIndex).Faccion.Jerarquia = 2
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 15) & Titulo(UserIndex))
+    ElseIf UserList(UserIndex).Faccion.Jerarquia = 2 Then
+        If UserList(UserIndex).Faccion.Matados(Enemigo(Fuerzas)) < 150 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 12) & 150)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Faccion.Torneos < 2 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 13) & 2)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Faccion.Quests < 1 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 14) & 1)
+            Exit Sub
+        End If
+        
+        UserList(UserIndex).Faccion.Jerarquia = 3
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 15) & Titulo(UserIndex))
+    ElseIf UserList(UserIndex).Faccion.Jerarquia = 3 Then
+        If UserList(UserIndex).Faccion.Matados(Enemigo(Fuerzas)) < 200 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 12) & 200)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Faccion.Torneos < 2 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 13) & 2)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).Faccion.Quests < 2 Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 14) & 2)
+            Exit Sub
+        End If
+        
+        UserList(UserIndex).Faccion.Jerarquia = 4
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 15) & Titulo(UserIndex))
+    End If
+    
+    If UserList(UserIndex).Faccion.Jerarquia < 4 Then
+        MiObj.Amount = 1
+        MiObj.OBJIndex = Armaduras(Fuerzas, UserList(UserIndex).Faccion.Jerarquia, TipoClase(UserIndex), TipoRaza(UserIndex))
+        If Not MeterItemEnInventario(UserIndex, MiObj) Then Call TirarItemAlPiso(UserList(UserIndex).POS, MiObj)
+    Else
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 22) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
+    End If
 
-Fuerzas = UserList(Userindex).Faccion.Bando
+End Sub
+Public Sub Expulsar(UserIndex As Integer)
 
+Call SendData(ToIndex, UserIndex, 0, Mensajes(UserList(UserIndex).Faccion.Bando, 8))
+UserList(UserIndex).Faccion.Bando = Neutral
+Call UpdateUserChar(UserIndex)
 
-If UserList(Userindex).Faccion.Jerarquia = 0 Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 11))
-    Exit Sub
-End If
-
-If UserList(Userindex).Faccion.Jerarquia = 1 Then
-    If UserList(Userindex).Faccion.Matados(Enemigo(Fuerzas)) < 500 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 12) & 500)
+End Sub
+Public Sub Enlistar(UserIndex As Integer, ByVal Fuerzas As Byte)
+    Dim MiObj As Obj
+    
+    If UserList(UserIndex).Faccion.Bando = Neutral Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 1) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
         Exit Sub
     End If
     
-    If UserList(Userindex).Faccion.Torneos < 1 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 13) & 1)
+    If UserList(UserIndex).Faccion.Bando = Enemigo(Fuerzas) Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 2) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
         Exit Sub
     End If
     
-    If UserList(Userindex).Faccion.Quests < 1 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 14) & 1)
+    Dim oGuild As cGuild
+    
+    Set oGuild = FetchGuild(UserList(UserIndex).GuildInfo.GuildName)
+    
+    If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 Then
+        If oGuild.Bando <> Fuerzas Then
+            Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 3) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
+            Exit Sub
+        End If
+    End If
+    
+    If UserList(UserIndex).Faccion.Jerarquia Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 4) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
         Exit Sub
     End If
     
-    UserList(Userindex).Faccion.Jerarquia = 2
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 15) & Titulo(Userindex))
-ElseIf UserList(Userindex).Faccion.Jerarquia = 2 Then
-    If UserList(Userindex).Faccion.Matados(Enemigo(Fuerzas)) < 1000 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 12) & 1000)
+    If UserList(UserIndex).Faccion.Matados(Enemigo(Fuerzas)) < 50 Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 5) & UserList(UserIndex).Faccion.Matados(Enemigo(Fuerzas)) & "!°" & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
         Exit Sub
     End If
     
-    If UserList(Userindex).Faccion.Torneos < 5 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 13) & 5)
+    If UserList(UserIndex).Stats.ELV < 25 Then
+        Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 6) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
         Exit Sub
     End If
     
-    If UserList(Userindex).Faccion.Quests < 2 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 14) & 2)
-        Exit Sub
-    End If
+    Call SendData(ToIndex, UserIndex, 0, Mensajes(Fuerzas, 7) & str(Npclist(UserList(UserIndex).flags.TargetNpc).Char.CharIndex))
     
-    UserList(Userindex).Faccion.Jerarquia = 3
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 15) & Titulo(Userindex))
-ElseIf UserList(Userindex).Faccion.Jerarquia = 3 Then
-    If UserList(Userindex).Faccion.Matados(Enemigo(Fuerzas)) < 1500 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 12) & 1500)
-        Exit Sub
-    End If
+    UserList(UserIndex).Faccion.Jerarquia = 1
     
-    If UserList(Userindex).Faccion.Torneos < 10 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 13) & 10)
-        Exit Sub
-    End If
-    
-    If UserList(Userindex).Faccion.Quests < 5 Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 14) & 5)
-        Exit Sub
-    End If
-    
-    UserList(Userindex).Faccion.Jerarquia = 4
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 15) & Titulo(Userindex))
-End If
-
-
-If UserList(Userindex).Faccion.Jerarquia < 4 Then
     MiObj.Amount = 1
-    MiObj.OBJIndex = Armaduras(Fuerzas, UserList(Userindex).Faccion.Jerarquia, TipoClase(Userindex), TipoRaza(Userindex))
-    If Not MeterItemEnInventario(Userindex, MiObj) Then Call TirarItemAlPiso(UserList(Userindex).POS, MiObj)
-Else
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 22) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-End If
+    MiObj.OBJIndex = Armaduras(Fuerzas, UserList(UserIndex).Faccion.Jerarquia, TipoClase(UserIndex), TipoRaza(UserIndex))
+    If Not MeterItemEnInventario(UserIndex, MiObj) Then Call TirarItemAlPiso(UserList(UserIndex).POS, MiObj)
+    
+    Call LogBando(Fuerzas, UserList(UserIndex).Name)
 
 End Sub
-Public Sub Expulsar(Userindex As Integer)
-
-Call SendData(ToIndex, Userindex, 0, Mensajes(UserList(Userindex).Faccion.Bando, 8))
-UserList(Userindex).Faccion.Bando = Neutral
-Call UpdateUserChar(Userindex)
-
-End Sub
-Public Sub Enlistar(Userindex As Integer, ByVal Fuerzas As Byte)
-Dim MiObj As Obj
-
-If UserList(Userindex).Faccion.Bando = Neutral Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 1) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-    Exit Sub
-End If
-
-If UserList(Userindex).Faccion.Bando = Enemigo(Fuerzas) Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 2) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-    Exit Sub
-End If
-
-Dim oGuild As cGuild
-
-Set oGuild = FetchGuild(UserList(Userindex).GuildInfo.GuildName)
-
-If Len(UserList(Userindex).GuildInfo.GuildName) > 0 Then
-    If oGuild.Bando <> Fuerzas Then
-        Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 3) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-        Exit Sub
-    End If
-End If
-
-If UserList(Userindex).Faccion.Jerarquia Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 4) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-    Exit Sub
-End If
-
-If UserList(Userindex).Faccion.Matados(Enemigo(Fuerzas)) < 150 Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 5) & UserList(Userindex).Faccion.Matados(Enemigo(Fuerzas)) & "!°" & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-    Exit Sub
-End If
-
-If UserList(Userindex).Stats.ELV < 25 Then
-    Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 6) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-    Exit Sub
-End If
-
-Call SendData(ToIndex, Userindex, 0, Mensajes(Fuerzas, 7) & str(Npclist(UserList(Userindex).flags.TargetNpc).Char.CharIndex))
-
-UserList(Userindex).Faccion.Jerarquia = 1
-
-MiObj.Amount = 1
-MiObj.OBJIndex = Armaduras(Fuerzas, UserList(Userindex).Faccion.Jerarquia, TipoClase(Userindex), TipoRaza(Userindex))
-If Not MeterItemEnInventario(Userindex, MiObj) Then Call TirarItemAlPiso(UserList(Userindex).POS, MiObj)
-
-Call LogBando(Fuerzas, UserList(Userindex).Name)
-
-End Sub
-Public Function Titulo(Userindex As Integer) As String
-    Select Case UserList(Userindex).Faccion.Bando
+Public Function Titulo(UserIndex As Integer) As String
+    Select Case UserList(UserIndex).Faccion.Bando
         Case Real
-            Select Case UserList(Userindex).Faccion.Jerarquia
+            Select Case UserList(UserIndex).Faccion.Jerarquia
                 Case 0
                     Titulo = "Fiel al Rey"
                 Case 1
@@ -186,7 +179,7 @@ Public Function Titulo(Userindex As Integer) As String
                     Titulo = "Héroe Real"
             End Select
         Case Caos
-            Select Case UserList(Userindex).Faccion.Jerarquia
+            Select Case UserList(UserIndex).Faccion.Jerarquia
                 Case 0
                     Titulo = "Fiel a Lord Thek"
                 Case 1
@@ -201,10 +194,10 @@ Public Function Titulo(Userindex As Integer) As String
     End Select
 End Function
 
-Public Function Cargo(Userindex As Integer) As String
-    If UserList(Userindex).flags.EsConseCaos = 1 Then
+Public Function Cargo(UserIndex As Integer) As String
+    If UserList(UserIndex).flags.EsConseCaos = 1 Then
         Cargo = " - <Concilio de Arghal>"
-    ElseIf UserList(Userindex).flags.EsConseReal = 1 Then
+    ElseIf UserList(UserIndex).flags.EsConseReal = 1 Then
         Cargo = " - <Consejo de Banderbill>"
     End If
 End Function
