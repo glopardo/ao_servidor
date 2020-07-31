@@ -551,16 +551,15 @@ End If
     
 End Sub
 Sub UpdateUserInv(ByVal UpdateAll As Boolean, UserIndex As Integer, Slot As Byte, Optional JustAmount As Boolean)
-Dim i As Byte
-
-If UpdateAll Then
-    For i = 1 To MAX_INVENTORY_SLOTS
-        Call SendUserItem(UserIndex, i, JustAmount)
-    Next
-Else
-    Call SendUserItem(UserIndex, Slot, JustAmount)
-End If
-
+    Dim i As Byte
+    
+    If UpdateAll Then
+        For i = 1 To MAX_INVENTORY_SLOTS
+            Call SendUserItem(UserIndex, i, JustAmount)
+        Next
+    Else
+        Call SendUserItem(UserIndex, Slot, JustAmount)
+    End If
 End Sub
 Sub DropObj(UserIndex As Integer, Slot As Byte, ByVal Num As Integer, Map As Integer, X As Integer, Y As Integer)
 Dim Obj As Obj

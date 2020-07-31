@@ -479,61 +479,47 @@ End
 
 End Sub
 Private Sub mnuCerrar_Click()
-
-Call SaveGuildsNew
-
-If MsgBox("Si cierra el servidor puede provocar la perdida de datos." & vbCrLf & vbCrLf & "¿Desea hacerlo de todas maneras?", vbYesNo + vbExclamation, "Advertencia") = vbYes Then Call ApagarSistema
-
+    Call SaveGuildsNew
+    If MsgBox("Si cierra el servidor puede provocar la perdida de datos." & vbCrLf & vbCrLf & "¿Desea hacerlo de todas maneras?", vbYesNo + vbExclamation, "Advertencia") = vbYes Then Call ApagarSistema
 End Sub
 Private Sub mnusalir_Click()
-
-Call mnuCerrar_Click
-
+    Call mnuCerrar_Click
 End Sub
 Public Sub mnuMostrar_Click()
-On Error Resume Next
-
-WindowState = vbNormal
-Form_MouseMove 0, 0, 7725, 0
-
+    On Error Resume Next
+    
+    WindowState = vbNormal
+    Form_MouseMove 0, 0, 7725, 0
 End Sub
 Private Sub mnuServidor_Click()
-
-frmServidor.Visible = True
-
+    frmServidor.Visible = True
 End Sub
 Private Sub mnuSystray_Click()
-Dim i As Integer
-Dim S As String
-Dim nid As NOTIFYICONDATA
-
-S = "Servidor Rivendel AO"
-nid = setNOTIFYICONDATA(frmMain.hwnd, vbNull, NIF_MESSAGE Or NIF_ICON Or NIF_TIP, WM_MOUSEMOVE, frmMain.Icon, S)
-i = Shell_NotifyIconA(NIM_ADD, nid)
+    Dim i As Integer
+    Dim S As String
+    Dim nid As NOTIFYICONDATA
     
-If WindowState <> vbMinimized Then WindowState = vbMinimized
-Visible = False
-
+    S = "Servidor Rivendel AO"
+    nid = setNOTIFYICONDATA(frmMain.hwnd, vbNull, NIF_MESSAGE Or NIF_ICON Or NIF_TIP, WM_MOUSEMOVE, frmMain.Icon, S)
+    i = Shell_NotifyIconA(NIM_ADD, nid)
+        
+    If WindowState <> vbMinimized Then WindowState = vbMinimized
+    Visible = False
 End Sub
 Private Sub Socket1_Blocking(Status As Integer, Cancel As Integer)
-Cancel = True
+    Cancel = True
 End Sub
 Private Sub Socket2_Connect(Index As Integer)
-
-Set UserList(Index).CommandsBuffer = New CColaArray
-
+    Set UserList(Index).CommandsBuffer = New CColaArray
 End Sub
 Private Sub Socket2_Disconnect(Index As Integer)
-
-If UserList(Index).flags.UserLogged And _
-    UserList(Index).Counters.Saliendo = False Then
-    Call Cerrar_Usuario(Index)
-Else: Call CloseSocket(Index)
-End If
-
+    If UserList(Index).flags.UserLogged And _
+        UserList(Index).Counters.Saliendo = False Then
+        Call Cerrar_Usuario(Index)
+    Else: Call CloseSocket(Index)
+    End If
 End Sub
 Private Sub Socket2_Read(Index As Integer, DataLength As Integer, IsUrgent As Integer)
-
 
 #If UsarQueSocket = 0 Then
 On Error GoTo ErrorHandler

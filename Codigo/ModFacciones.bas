@@ -107,11 +107,9 @@ Public Sub Recompensado(UserIndex As Integer)
 
 End Sub
 Public Sub Expulsar(UserIndex As Integer)
-
-Call SendData(ToIndex, UserIndex, 0, Mensajes(UserList(UserIndex).Faccion.Bando, 8))
-UserList(UserIndex).Faccion.Bando = Neutral
-Call UpdateUserChar(UserIndex)
-
+    Call SendData(ToIndex, UserIndex, 0, Mensajes(UserList(UserIndex).Faccion.Bando, 8))
+    UserList(UserIndex).Faccion.Bando = Neutral
+    Call UpdateUserChar(UserIndex)
 End Sub
 Public Sub Enlistar(UserIndex As Integer, ByVal Fuerzas As Byte)
     Dim MiObj As Obj

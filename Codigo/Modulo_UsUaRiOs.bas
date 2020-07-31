@@ -309,27 +309,32 @@ ErrorHandler:
 
 End Sub
 Sub UpdateUserChar(UserIndex As Integer)
-On Error Resume Next
-Dim bCr As Byte
-Dim Info As String
-
-If UserList(UserIndex).flags.Privilegios Then
-    bCr = 1
-ElseIf UserList(UserIndex).Faccion.Bando = Real Then
-    bCr = 2
-ElseIf UserList(UserIndex).Faccion.Bando = Caos Then
-    bCr = 3
-ElseIf EsNewbie(UserIndex) Then
-    bCr = 4
-Else: bCr = 5
-End If
-
-Info = "PW" & UserList(UserIndex).Char.CharIndex & "," & bCr & "," & UserList(UserIndex).Name
-
-If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 Then Info = Info & " <" & UserList(UserIndex).GuildInfo.GuildName & ">"
-
-Call SendData(ToMap, UserIndex, UserList(UserIndex).POS.Map, (Info))
-
+    On Error Resume Next
+    
+    Dim Info As String
+    Dim bCr As Byte
+    
+    If UserList(UserIndex).flags.Privilegios Then
+        bCr = 1
+    ElseIf UserList(UserIndex).Faccion.Bando = Real And UserList(UserIndex).flags.EsConseReal = 0 Then
+        bCr = 2
+    ElseIf UserList(UserIndex).Faccion.Bando = Caos And UserList(UserIndex).flags.EsConseCaos = 0 Then
+        bCr = 3
+    ElseIf EsNewbie(UserIndex) Then
+        bCr = 4
+    ElseIf UserList(UserIndex).flags.EsConseCaos Then
+        bCr = 6
+    ElseIf UserList(UserIndex).flags.EsConseReal Then
+        bCr = 7
+    Else
+        bCr = 5
+    End If
+    
+    Info = "PW" & UserList(UserIndex).Char.CharIndex & "," & bCr & "," & UserList(UserIndex).Name
+    
+    If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 Then Info = Info & " <" & UserList(UserIndex).GuildInfo.GuildName & ">"
+    
+    Call SendData(ToMap, UserIndex, UserList(UserIndex).POS.Map, (Info))
 End Sub
 Sub MakeUserChar(sndRoute As Byte, sndIndex As Integer, sndMap As Integer, UserIndex As Integer, Map As Integer, X As Integer, Y As Integer)
 On Error Resume Next

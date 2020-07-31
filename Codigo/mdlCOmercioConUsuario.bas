@@ -72,27 +72,26 @@ errhandler:
 
 End Sub
 Public Sub EnviarObjetoTransaccion(ByVal AQuien As Integer)
-Dim ObjInd As Integer
-Dim ObjCant As Long
-
-ObjCant = UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Cant
-If UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Objeto = FLAGORO Then
-    ObjInd = iORO
-Else
-    ObjInd = UserList(UserList(AQuien).ComUsu.DestUsu).Invent.Object(UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Objeto).OBJIndex
-End If
-
-If ObjCant <= 0 Or ObjInd <= 0 Then Exit Sub
-
-If ObjInd > 0 And ObjCant Then
-    Call SendData(ToIndex, AQuien, 0, "COMUSUINV" & 1 & "," & ObjInd & "," & ObjData(ObjInd).Name & "," & ObjCant & "," & 0 & "," & ObjData(ObjInd).GrhIndex & "," _
-    & ObjData(ObjInd).ObjType & "," _
-    & ObjData(ObjInd).MaxHit & "," _
-    & ObjData(ObjInd).MinHit & "," _
-    & ObjData(ObjInd).MaxDef & "," _
-    & ObjData(ObjInd).Valor \ 3)
-End If
-
+    Dim ObjInd As Integer
+    Dim ObjCant As Long
+    
+    ObjCant = UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Cant
+    If UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Objeto = FLAGORO Then
+        ObjInd = iORO
+    Else
+        ObjInd = UserList(UserList(AQuien).ComUsu.DestUsu).Invent.Object(UserList(UserList(AQuien).ComUsu.DestUsu).ComUsu.Objeto).OBJIndex
+    End If
+    
+    If ObjCant <= 0 Or ObjInd <= 0 Then Exit Sub
+    
+    If ObjInd > 0 And ObjCant Then
+        Call SendData(ToIndex, AQuien, 0, "COMUSUINV" & 1 & "," & ObjInd & "," & ObjData(ObjInd).Name & "," & ObjCant & "," & 0 & "," & ObjData(ObjInd).GrhIndex & "," _
+        & ObjData(ObjInd).ObjType & "," _
+        & ObjData(ObjInd).MaxHit & "," _
+        & ObjData(ObjInd).MinHit & "," _
+        & ObjData(ObjInd).MaxDef & "," _
+        & ObjData(ObjInd).Valor \ 3)
+    End If
 End Sub
 Public Sub FinComerciarUsu(UserIndex As Integer)
 

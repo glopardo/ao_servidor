@@ -915,15 +915,25 @@ End Select
     Case "CIG"
         rdata = Right$(rdata, Len(rdata) - 3)
         X = Guilds.Count
-        
+   
         If CreateGuild(UserList(UserIndex).Name, UserIndex, rdata) Then
+            UserList(UserIndex).Stats.GLD = UserList(UserIndex).Stats.GLD - 2000000
+            Call SendUserORO(UserIndex)
+            
+            For i = 1 To MAX_INVENTORY_SLOTS
+                If UserList(UserIndex).Invent.Object(i).OBJIndex = GemaFundarClan Then
+                    Call QuitarUnItem(UserIndex, i)
+                End If
+            Next
+            
             If X = 1 Then
-                Call SendData(ToIndex, UserIndex, 0, "3T")
+                Call SendData(ToIndex, UserIndex, 0, "||¡Felicidades, has creado el primer clan de las tierras de Rivendel!" & FONTTYPE_INFO)
+                'Call SendData(ToIndex, UserIndex, 0, "3T")
             Else
-                Call SendData(ToIndex, UserIndex, 0, "4T" & X)
+                Call SendData(ToIndex, UserIndex, 0, "||¡Felicidades, has creado el clan número " & X & " de las tierras de Rivendel!" & FONTTYPE_INFO)
+                'Call SendData(ToIndex, UserIndex, 0, "4T" & X)
             End If
             Call UpdateUserChar(UserIndex)
-            
         End If
         
         Exit Sub
@@ -1370,12 +1380,9 @@ Case "OFRECER"
             Else
                 
                 If UserList(UserList(UserIndex).ComUsu.DestUsu).ComUsu.Acepto Then
-                    
                     UserList(UserList(UserIndex).ComUsu.DestUsu).ComUsu.Acepto = False
                     Call SendData(ToIndex, UserList(UserIndex).ComUsu.DestUsu, 0, "5R" & UserList(UserIndex).Name)
                 End If
-                
-                
                 Call EnviarObjetoTransaccion(UserList(UserIndex).ComUsu.DestUsu)
             End If
         End If

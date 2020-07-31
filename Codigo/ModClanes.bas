@@ -863,31 +863,27 @@ DameGuildMemberIndex = LoopC
 End Function
 
 Public Sub SendGuildsList(UserIndex As Integer)
-
-Dim cad As String, T%
-
-cad = "GL" & Guilds.Count & ","
-
-For T% = 1 To Guilds.Count
-    cad = cad & Guilds(T%).GuildName & ","
-Next
-
-UserList(UserIndex).flags.InfoClanEstatica = 1
-
-Call SendData(ToIndex, UserIndex, 0, cad)
-
+    Dim cad As String, T%
+    cad = "GL" & Guilds.Count & ","
+    
+    For T% = 1 To Guilds.Count
+        cad = cad & Guilds(T%).GuildName & ","
+    Next
+    
+    UserList(UserIndex).flags.InfoClanEstatica = 1
+    Call SendData(ToIndex, UserIndex, 0, cad)
 End Sub
 Public Function FetchGuild(ByVal GuildName As String) As Object
-Dim k As Integer
-
-For k = 1 To Guilds.Count
-    If UCase$(Guilds.Item(k).GuildName) = UCase$(GuildName) Then
-        Set FetchGuild = Guilds.Item(k)
-        Exit Function
-    End If
-Next
-
-Set FetchGuild = Nothing
+    Dim k As Integer
+    
+    For k = 1 To Guilds.Count
+        If UCase$(Guilds.Item(k).GuildName) = UCase$(GuildName) Then
+            Set FetchGuild = Guilds.Item(k)
+            Exit Function
+        End If
+    Next
+    
+    Set FetchGuild = Nothing
 
 End Function
 
@@ -933,23 +929,18 @@ If UserList(UserIndex).Stats.UserAtributos(Carisma) < 18 Then
     Exit Function
 End If
 
-If UserList(UserIndex).Stats.UserAtributos(Inteligencia) < 15 Then
-    Call SendData(ToIndex, UserIndex, 0, "!Y")
-    Exit Function
-End If
-
 If UserList(UserIndex).GuildInfo.FundoClan > 0 Then
     Call SendData(ToIndex, UserIndex, 0, "8L")
     Exit Function
 End If
 
 If Len(UserList(UserIndex).GuildInfo.GuildName) > 0 Then
-    Call SendData(ToIndex, UserIndex, 0, "||Ya perteneces a un clan." & FONTTYPE_INFO)
+    Call SendData(ToIndex, UserIndex, 0, "||Ya perteneces a un clan." & FONTTYPE_GUILD)
     Exit Function
 End If
 
-If UserList(UserIndex).Stats.ELV < 25 Then
-    Call SendData(ToIndex, UserIndex, 0, "!Z")
+If UserList(UserIndex).Stats.ELV < 43 Then
+    Call SendData(ToIndex, UserIndex, 0, "||Para fundar un clan tenés que ser nivel 43 o superior." & FONTTYPE_GUILD)
     Exit Function
 End If
 
@@ -958,21 +949,38 @@ If UserList(UserIndex).Stats.UserSkills(Liderazgo) < 100 Then
     Exit Function
 End If
 
+Dim i As Integer
+Dim tieneGema As Boolean
+For i = 1 To MAX_INVENTORY_SLOTS
+    If UserList(UserIndex).Invent.Object(i).OBJIndex = GemaFundarClan Then
+        tieneGema = True
+    End If
+Next
+
+If Not tieneGema Then
+    Call SendData(ToIndex, UserIndex, 0, "||Debes tener la GEMA para fundar clan en tu inventario." & FONTTYPE_GUILD)
+    Exit Function
+End If
+
+
+If UserList(UserIndex).Stats.GLD < 2000000 Then
+    Call SendData(ToIndex, UserIndex, 0, "||Debes tener al menos 2.000.000 monedas de oro encima para poder fundar un clan." & FONTTYPE_GUILD)
+    Exit Function
+End If
+
 CanCreateGuild = True
 
 End Function
 Public Function ExisteGuild(ByVal Name As String) As Boolean
-
-Dim k As Integer
-Name = UCase$(Name)
-
-For k = 1 To Guilds.Count
-    If UCase$(Guilds(k).GuildName) = Name Then
-            ExisteGuild = True
-            Exit Function
-    End If
-Next
-
+    Dim k As Integer
+    Name = UCase$(Name)
+    
+    For k = 1 To Guilds.Count
+        If UCase$(Guilds(k).GuildName) = Name Then
+                ExisteGuild = True
+                Exit Function
+        End If
+    Next
 End Function
 Public Function CreateGuild(ByVal FounderName As String, ByVal Index As Integer, ByVal GuildInfo As String) As Boolean
 Dim i As Integer

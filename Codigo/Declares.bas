@@ -237,6 +237,7 @@ Public Const NPCTYPE_NOBLE = 5
 Public Const NPCTYPE_CANJE = 6
 Public Const NPCTYPE_APOSTADOR = 7
 Public Const NPCTYPE_TIENDA = 8
+Public Const NPCTYPE_FUNDACLAN = 9
 Public Const NPCTYPE_VIEJO = 11
 
 Public Const FX_TELEPORT_INDEX = 1
@@ -296,6 +297,8 @@ Public Const PocionAzulNoCae = 755
 Public Const PocionAmarillaNoCae = 756
 Public Const PocionVerdeNoCae = 757
 Public Const Petrificar = 927
+
+Public Const GemaFundarClan = 925
 
 Public Const Magia = 1
 Public Const Robar = 2
@@ -933,7 +936,7 @@ Type UserFlags
     EsConseCaos As Integer
     EsConseReal As Integer
     
-    SoporteRespondido As Boolean
+    SoporteRespondido As Integer
     SoporteRespuesta As String
 End Type
 
