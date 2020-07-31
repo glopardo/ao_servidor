@@ -299,6 +299,7 @@ Public Const PocionVerdeNoCae = 757
 Public Const Petrificar = 927
 
 Public Const GemaFundarClan = 925
+Public Const GemaMapaFundarClan = 926
 
 Public Const Magia = 1
 Public Const Robar = 2
@@ -411,29 +412,29 @@ Public Const OBJTYPE_BEBIDA = 13
 Public Const OBJTYPE_LEÑA = 14
 Public Const OBJTYPE_FOGATA = 15
 Public Const OBJTYPE_HERRAMIENTAS = 18
-Public Const OBJTYPE_YACIMIENTO = 22
-Public Const OBJTYPE_PERGAMINOS = 24
 Public Const OBJTYPE_TELEPORT = 19
+Public Const OBJTYPE_YACIMIENTO = 22
+Public Const OBJTYPE_MINERALES = 23
+Public Const OBJTYPE_PERGAMINOS = 24
+Public Const OBJTYPE_INSTRUMENTOS = 26
 Public Const OBJTYPE_YUNQUE = 27
 Public Const OBJTYPE_FRAGUA = 28
-Public Const OBJTYPE_MINERALES = 23
-Public Const OBJTYPE_CUALQUIERA = 1000
-Public Const OBJTYPE_INSTRUMENTOS = 26
+Public Const OBJTYPE_GEMA = 29
+Public Const OBJTYPE_PIEL = 30
 Public Const OBJTYPE_BARCOS = 31
 Public Const OBJTYPE_FLECHAS = 32
 Public Const OBJTYPE_BOTELLAVACIA = 33
 Public Const OBJTYPE_BOTELLALLENA = 34
 Public Const OBJTYPE_MANCHAS = 35
-
 Public Const OBJTYPE_RAIZ = 36
-Public Const OBJTYPE_PIEL = 30
-
 Public Const OBJTYPE_WARP = 37
 
 Public Const OBJTYPE_ARMADURA = 0
 Public Const OBJTYPE_CASCO = 1
 Public Const OBJTYPE_ESCUDO = 2
 Public Const OBJTYPE_CAÑA = 138
+
+Public Const OBJTYPE_CUALQUIERA = 1000
 
 Public Const FONTTYPE_TALK = "~255~255~255~0~0"
 Public Const FONTTYPE_FENIX = "~255~150~50~1~0"

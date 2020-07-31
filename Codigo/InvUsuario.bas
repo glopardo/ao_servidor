@@ -381,22 +381,22 @@ End If
     
 End Sub
 Sub QuitarUnItem(UserIndex As Integer, ByVal Slot As Byte)
-Dim MiObj As Obj
-
-If Slot < 1 Or Slot > MAX_INVENTORY_SLOTS Then Exit Sub
-
-If UserList(UserIndex).Invent.Object(Slot).Equipped = 1 And UserList(UserIndex).Invent.Object(Slot).Amount = 1 Then Call Desequipar(UserIndex, Slot)
-
-UserList(UserIndex).Invent.Object(Slot).Amount = UserList(UserIndex).Invent.Object(Slot).Amount - 1
-
-If UserList(UserIndex).Invent.Object(Slot).Amount <= 0 Then
-    UserList(UserIndex).Invent.NroItems = UserList(UserIndex).Invent.NroItems - 1
-    UserList(UserIndex).Invent.Object(Slot).OBJIndex = 0
-    UserList(UserIndex).Invent.Object(Slot).Amount = 0
-    Call SendData(ToIndex, UserIndex, 0, "3I" & Slot)
-Else
-    Call SendData(ToIndex, UserIndex, 0, "2I" & Slot)
-End If
+    Dim MiObj As Obj
+    
+    If Slot < 1 Or Slot > MAX_INVENTORY_SLOTS Then Exit Sub
+    
+    If UserList(UserIndex).Invent.Object(Slot).Equipped = 1 And UserList(UserIndex).Invent.Object(Slot).Amount = 1 Then Call Desequipar(UserIndex, Slot)
+    
+    UserList(UserIndex).Invent.Object(Slot).Amount = UserList(UserIndex).Invent.Object(Slot).Amount - 1
+    
+    If UserList(UserIndex).Invent.Object(Slot).Amount <= 0 Then
+        UserList(UserIndex).Invent.NroItems = UserList(UserIndex).Invent.NroItems - 1
+        UserList(UserIndex).Invent.Object(Slot).OBJIndex = 0
+        UserList(UserIndex).Invent.Object(Slot).Amount = 0
+        Call SendData(ToIndex, UserIndex, 0, "3I" & Slot)
+    Else
+        Call SendData(ToIndex, UserIndex, 0, "2I" & Slot)
+    End If
 
 End Sub
 Sub QuitarBebida(UserIndex As Integer, ByVal Slot As Byte)
@@ -1304,8 +1304,6 @@ Select Case Obj.ObjType
             Call SendData(ToIndex, UserIndex, 0, "MU")
             Exit Sub
         End If
-                
-       
 
         Select Case Obj.TipoPocion
         
@@ -1540,9 +1538,26 @@ Select Case Obj.ObjType
                 Exit Sub
             End If
             Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "TW" & Obj.Snd1)
-       
-       Case OBJTYPE_BARCOS
-               If UserList(UserIndex).flags.Montado = 1 Then Exit Sub
+            
+        Case OBJTYPE_GEMA
+            If UserList(UserIndex).flags.Muerto Then
+                Call SendData(ToIndex, UserIndex, 0, "MU")
+                Exit Sub
+            End If
+            
+            If OBJIndex = GemaFundarClan Then
+                Call SendData(ToIndex, UserIndex, 0, "||Debes buscar a la Oficial Enlistadora de Clanes para poder utilizar esta gema y fundar un clan." & FONTTYPE_INFO)
+                Exit Sub
+            End If
+            
+            If OBJIndex = GemaMapaFundarClan Then
+                Call WarpUserChar(UserIndex, 52, 22, 80, True)
+                Call QuitarUserInvItem(UserIndex, Slot, 1)
+                Call UpdateUserInv(False, UserIndex, Slot)
+            End If
+            
+        Case OBJTYPE_BARCOS
+            If UserList(UserIndex).flags.Montado = 1 Then Exit Sub
 
         If ((LegalPos(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X - 1, UserList(UserIndex).POS.Y, True) Or _
             LegalPos(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1, True) Or _
