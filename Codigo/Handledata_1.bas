@@ -368,7 +368,8 @@ Select Case UCase$(Left$(rdata, 2))
             Exit Sub
         End If
         rdata = Right$(rdata, Len(rdata) - 2)
-        UserList(UserIndex).flags.Hechizo = val(rdata)
+        UserList(UserIndex).flags.Hechizo = val(ReadField(1, rdata, 44))
+        UserList(UserIndex).flags.PortalDestino = val(ReadField(2, rdata, 44))
         Exit Sub
     Case "WH"
         rdata = Right$(rdata, Len(rdata) - 2)

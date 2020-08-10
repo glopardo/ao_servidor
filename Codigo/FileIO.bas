@@ -281,6 +281,8 @@ For Hechizo = 1 To NumeroHechizos
     
     Hechizos(Hechizo).Target = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "Target"))
     frmCargando.cargar.Value = frmCargando.cargar.Value + 1
+    
+    Hechizos(Hechizo).Portal = val(GetVar(DatPath & "Hechizos.dat", "Hechizo" & Hechizo, "Portal"))
 Next
 
 Exit Sub

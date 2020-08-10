@@ -305,30 +305,81 @@ B = True
 
 End Sub
 Sub HechizoTerrenoEstado(UserIndex As Integer, B As Boolean)
-Dim PosCasteada As WorldPos
-Dim TU As Integer
-Dim H As Integer
-Dim i As Integer
+    Dim TU As Integer
+    Dim H As Integer
+    Dim i As Integer
+    
+    H = UserList(UserIndex).Stats.UserHechizos(UserList(UserIndex).flags.Hechizo)
+    
+    Dim PosCasteada As WorldPos
+        
+    PosCasteada.X = UserList(UserIndex).flags.TargetX
+    PosCasteada.Y = UserList(UserIndex).flags.TargetY
+    PosCasteada.Map = UserList(UserIndex).flags.TargetMap
+    
+    If Hechizos(H).Invisibilidad = 2 Then
+        For i = 1 To MapInfo(UserList(UserIndex).POS.Map).NumUsers
+            TU = MapInfo(UserList(UserIndex).POS.Map).UserIndex(i)
+            If EnPantalla(PosCasteada, UserList(TU).POS, -1) Then 'And UserList(TU).flags.Invisible = 1 And UserList(TU).flags.AdminInvisible = 0 Then
+                'Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(TU).Char.CharIndex & "," & Hechizos(H).FXgrh & "," & Hechizos(H).loops)
+                UserList(i).flags.Invisible = 0
+                Call SendData(ToMap, 0, UserList(i).POS.Map, ("V3" & UserList(i).Char.CharIndex & ",0"))
+            End If
+        Next
+        B = True
+    End If
 
-PosCasteada.X = UserList(UserIndex).flags.TargetX
-PosCasteada.Y = UserList(UserIndex).flags.TargetY
-PosCasteada.Map = UserList(UserIndex).flags.TargetMap
-
-H = UserList(UserIndex).Stats.UserHechizos(UserList(UserIndex).flags.Hechizo)
-
-If Hechizos(H).Invisibilidad = 2 Then
-    For i = 1 To MapInfo(UserList(UserIndex).POS.Map).NumUsers
-        TU = MapInfo(UserList(UserIndex).POS.Map).UserIndex(i)
-        If EnPantalla(PosCasteada, UserList(TU).POS, -1) Then 'And UserList(TU).flags.Invisible = 1 And UserList(TU).flags.AdminInvisible = 0 Then
-            'Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(TU).Char.CharIndex & "," & Hechizos(H).FXgrh & "," & Hechizos(H).loops)
-            UserList(i).flags.Invisible = 0
-            Call SendData(ToMap, 0, UserList(i).POS.Map, ("V3" & UserList(i).Char.CharIndex & ",0"))
+    If Hechizos(H).Portal = 1 Then
+        'Descomentar para castear solo en zonas seguras
+        'If MapInfo(PosCasteada.Map).Pk Then
+        '    Call SendData(ToIndex, UserIndex, 0, "||No podés lanzar Portal Mágico en zonas inseguras." & FONTTYPE_INFO)
+        '    Exit Sub
+        'End If
+        
+        If UserList(UserIndex).POS.Map = 191 Or UserList(UserIndex).POS.Map = 192 Or UserList(UserIndex).POS.Map = 66 Then
+            Call SendData(ToIndex, UserIndex, 0, "||No podés lanzar Portal Mágico en este mapa." & FONTTYPE_INFO)
+            Exit Sub
         End If
-    Next
-    B = True
-End If
+        
+        If UserList(UserIndex).flags.Invisible = 1 Then
+            Call SendData(ToIndex, UserIndex, 0, "||No podés lanzar Portal Mágico mientras estás invisible." & FONTTYPE_INFO)
+            Exit Sub
+        End If
+        
+        If UserList(UserIndex).flags.TiroPortal = 1 Then
+            Call SendData(ToIndex, UserIndex, 0, "||Ya tenés un portal invocado" & FONTTYPE_INFO)
+            Exit Sub
+        End If
+        
+        If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).OBJInfo.OBJIndex Then Exit Sub 'Hay algo en el mapa
+        
+        If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).TileExit.Map Then Exit Sub 'Es un tile de salida
+    
+        If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).Blocked Then Exit Sub 'Tile bloqueado
+        
+        If Not MapaValido(UserList(UserIndex).POS.Map) Or Not InMapBounds(UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY) Then Exit Sub
+        
+        UserList(UserIndex).flags.PortalMap = PosCasteada.Map
+        UserList(UserIndex).flags.PortalX = PosCasteada.X
+        UserList(UserIndex).flags.PortalY = PosCasteada.Y
+        
+        Dim PM As Obj
+        PM.Amount = 1
+        PM.OBJIndex = PortalMagico
+        
+        Dim Dm As Obj
+        Dm.Amount = 1
+        Dm.OBJIndex = 930 'Destello Mágico
+        
+        Call MakeObj(ToMap, 0, PosCasteada.Map, Dm, PosCasteada.Map, PosCasteada.X, PosCasteada.Y)
+        B = True
+        
+        UserList(UserIndex).Counters.TimerPortal = 0
+        UserList(UserIndex).Counters.CreoPortal = 1
+        UserList(UserIndex).flags.TiroPortal = 1
+    End If
 
-Call InfoHechizo(UserIndex)
+    Call InfoHechizo(UserIndex)
 
 End Sub
 Sub HandleHechizoTerreno(UserIndex As Integer, ByVal uh As Integer)
@@ -340,6 +391,12 @@ Select Case Hechizos(uh).Tipo
     Case uRadial
         Call HechizoTerrenoEstado(UserIndex, B)
 End Select
+
+If Hechizos(UserList(UserIndex).Stats.UserHechizos(UserList(UserIndex).flags.Hechizo)).Portal = 1 Then
+    MapData(UserList(UserIndex).flags.TargetMap, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).TileExit.Map = 0
+    MapData(UserList(UserIndex).flags.TargetMap, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).TileExit.X = 0
+    MapData(UserList(UserIndex).flags.TargetMap, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY).TileExit.Y = 0
+End If
 
 If B Then
     Call SubirSkill(UserIndex, Magia)

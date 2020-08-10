@@ -587,8 +587,56 @@ End If
 
 End Function
 Public Function ItemEsDeMapa(ByVal Map As Integer, X As Integer, Y As Integer) As Boolean
-
-ItemEsDeMapa = ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Agarrable Or MapData(Map, X, Y).Blocked
-
+    ItemEsDeMapa = ObjData(MapData(Map, X, Y).OBJInfo.OBJIndex).Agarrable Or MapData(Map, X, Y).Blocked
 End Function
-
+Sub PasarSegundo()
+    Dim Mapa As Integer
+    Dim X As Integer
+    Dim Y As Integer
+    Dim i As Integer
+     
+    For i = 1 To LastUser
+        Mapa = UserList(i).flags.PortalMap
+        X = UserList(i).flags.PortalX
+        Y = UserList(i).flags.PortalY
+        If UserList(i).Counters.CreoPortal = 1 Then
+            UserList(i).Counters.TimerPortal = UserList(i).Counters.TimerPortal + 1
+     
+            If UserList(i).Counters.TimerPortal = 3 Then
+                Call EraseObj(ToMap, 0, Mapa, MapData(Mapa, X, Y).OBJInfo.Amount, Mapa, X, Y)
+                Dim ET As Obj
+                ET.Amount = 1
+                ET.OBJIndex = PortalMagico
+                            
+                Call MakeObj(ToMap, 0, UserList(i).POS.Map, ET, Mapa, X, Y)
+                
+                Select Case UserList(i).flags.PortalDestino
+                    Case 0
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Map = 1
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.X = 50
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Y = 50
+                    Case 1
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Map = 112
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.X = 27
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Y = 75
+                    Case 2
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Map = 160
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.X = 50
+                        MapData(UserList(i).POS.Map, X, Y).TileExit.Y = 50
+                End Select
+                
+            ElseIf UserList(i).Counters.TimerPortal >= 5 Then
+                UserList(i).flags.TiroPortal = 0
+                UserList(i).Counters.TimerPortal = 0
+                UserList(i).Counters.CreoPortal = 0
+                Call EraseObj(ToMap, 0, Mapa, MapData(Mapa, X, Y).OBJInfo.Amount, Mapa, X, Y)
+                MapData(Mapa, X, Y).TileExit.Map = 0
+                MapData(Mapa, X, Y).TileExit.X = 0
+                MapData(Mapa, X, Y).TileExit.Y = 0
+                UserList(i).flags.PortalMap = 0
+                UserList(i).flags.PortalX = 0
+                UserList(i).flags.PortalY = 0
+            End If
+        End If
+    Next i
+End Sub

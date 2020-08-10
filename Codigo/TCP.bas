@@ -564,27 +564,33 @@ Call ConnectUser(UserIndex, Name, Password)
 
 End Sub
 Sub CloseSocket(ByVal UserIndex As Integer, Optional ByVal cerrarlo As Boolean = True)
-On Error GoTo errhandler
-Dim LoopC As Integer
-
-Call aDos.RestarConexion(UserList(UserIndex).ip)
-
-If UserList(UserIndex).flags.UserLogged Then
-    If NumUsers > 0 Then NumUsers = NumUsers - 1
-    If UserList(UserIndex).flags.Privilegios = 0 Then NumNoGMs = NumNoGMs - 1
-    Call EstadisticasWeb.Informar(CANTIDAD_ONLINE, NumUsers)
-    Call CloseUser(UserIndex)
-End If
-
-If UserList(UserIndex).ConnID <> -1 Then Call ApiCloseSocket(UserList(UserIndex).ConnID)
-
-UserList(UserIndex) = UserOffline
-
-Exit Sub
-
-errhandler:
+    On Error GoTo errhandler
+    Dim LoopC As Integer
+    
+    Call aDos.RestarConexion(UserList(UserIndex).ip)
+    
+    If UserList(UserIndex).flags.UserLogged Then
+        If NumUsers > 0 Then NumUsers = NumUsers - 1
+        If UserList(UserIndex).flags.Privilegios = 0 Then NumNoGMs = NumNoGMs - 1
+        Call EstadisticasWeb.Informar(CANTIDAD_ONLINE, NumUsers)
+        Call CloseUser(UserIndex)
+    End If
+    
+    Call ControlarPortalLum(UserIndex)
+    
+    UserList(UserIndex).flags.TiroPortal = 0
+    UserList(UserIndex).Counters.TimerPortal = 0
+    UserList(UserIndex).Counters.CreoPortal = 0
+    
+    If UserList(UserIndex).ConnID <> -1 Then Call ApiCloseSocket(UserList(UserIndex).ConnID)
+    
     UserList(UserIndex) = UserOffline
-    Call LogError("Error en CloseSocket " & Err.Description)
+    
+    Exit Sub
+    
+errhandler:
+        UserList(UserIndex) = UserOffline
+        Call LogError("Error en CloseSocket " & Err.Description)
 
 End Sub
 
@@ -615,8 +621,8 @@ Select Case sndRoute
 
     Case ToPCArea
     
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
         
@@ -660,8 +666,8 @@ Select Case sndRoute
         Exit Sub
       
     Case ToMapButIndex
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
             
@@ -673,54 +679,54 @@ Select Case sndRoute
         Exit Sub
         
     Case ToGMArea
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) And UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).flags.Privilegios Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) And UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).flags.Privilegios Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
 
     Case ToPCAreaVivos
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) Then
-                If Not UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).flags.Muerto Or UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).Clase = CLERIGO Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) Then
+                If Not UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).flags.Muerto Or UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).Clase = CLERIGO Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
             End If
         Next
         Exit Sub
         
     Case ToMuertos
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) Then
-                If UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).Clase = CLERIGO Or UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).flags.Muerto Or UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).flags.Privilegios Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) Then
+                If UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).Clase = CLERIGO Or UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).flags.Muerto Or UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).flags.Privilegios Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
             End If
         Next
         Exit Sub
 
     Case ToPCAreaButIndex
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) And MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) And MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
         
     Case ToPCAreaButIndexG
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 3) And MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 3) And MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC) <> sndIndex Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
         
     Case ToNPCArea
-        For LoopC = 1 To MapInfo(Npclist(sndIndex).POS.Map).NumUsers
-            If EnPantalla(Npclist(sndIndex).POS, UserList(MapInfo(Npclist(sndIndex).POS.Map).UserIndex(LoopC)).POS, 1) Then Call WsApiEnviar(MapInfo(Npclist(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(Npclist(sndIndex).POS.map).NumUsers
+            If EnPantalla(Npclist(sndIndex).POS, UserList(MapInfo(Npclist(sndIndex).POS.map).UserIndex(LoopC)).POS, 1) Then Call WsApiEnviar(MapInfo(Npclist(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
 
     Case ToNPCAreaG
-        For LoopC = 1 To MapInfo(Npclist(sndIndex).POS.Map).NumUsers
-            If EnPantalla(Npclist(sndIndex).POS, UserList(MapInfo(Npclist(sndIndex).POS.Map).UserIndex(LoopC)).POS, 3) Then Call WsApiEnviar(MapInfo(Npclist(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(Npclist(sndIndex).POS.map).NumUsers
+            If EnPantalla(Npclist(sndIndex).POS, UserList(MapInfo(Npclist(sndIndex).POS.map).UserIndex(LoopC)).POS, 3) Then Call WsApiEnviar(MapInfo(Npclist(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
         
     Case ToPCAreaG
-        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.Map).NumUsers
-            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC)).POS, 3) Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.Map).UserIndex(LoopC), sndData)
+        For LoopC = 1 To MapInfo(UserList(sndIndex).POS.map).NumUsers
+            If EnPantalla(UserList(sndIndex).POS, UserList(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC)).POS, 3) Then Call WsApiEnviar(MapInfo(UserList(sndIndex).POS.map).UserIndex(LoopC), sndData)
         Next
         Exit Sub
         
@@ -746,8 +752,8 @@ End Sub
 Function HayPCarea(POS As WorldPos) As Boolean
 Dim i As Integer
 
-For i = 1 To MapInfo(POS.Map).NumUsers
-    If EnPantalla(POS, UserList(MapInfo(POS.Map).UserIndex(i)).POS, 1) Then
+For i = 1 To MapInfo(POS.map).NumUsers
+    If EnPantalla(POS, UserList(MapInfo(POS.map).UserIndex(i)).POS, 1) Then
         HayPCarea = True
         Exit Function
     End If
@@ -759,7 +765,7 @@ Dim X As Integer, Y As Integer
 
 For Y = POS.Y - MinYBorder + 1 To POS.Y + MinYBorder - 1
     For X = POS.X - MinXBorder + 1 To POS.X + MinXBorder - 1
-        If MapData(POS.Map, X, Y).OBJInfo.OBJIndex = OBJIndex Then
+        If MapData(POS.map, X, Y).OBJInfo.OBJIndex = OBJIndex Then
             HayOBJarea = True
             Exit Function
         End If
@@ -930,7 +936,7 @@ If UserList(UserIndex).flags.Privilegios > 1 Then
         UserList(UserIndex).flags.AdminInvisible = 1
         UserList(UserIndex).flags.Invisible = 1
     Else
-        UserList(UserIndex).POS.Map = 86
+        UserList(UserIndex).POS.map = 86
         UserList(UserIndex).POS.X = 50
         UserList(UserIndex).POS.Y = 50
     End If
@@ -947,7 +953,7 @@ End If
 
 Call SendData(ToIndex, UserIndex, 0, strAux)
 
-If UserList(UserIndex).POS.Map = 0 Or UserList(UserIndex).POS.Map > NumMaps Then
+If UserList(UserIndex).POS.map = 0 Or UserList(UserIndex).POS.map > NumMaps Then
     Select Case UserList(UserIndex).Hogar
         Case HOGAR_NIX
             UserList(UserIndex).POS = NIX
@@ -960,12 +966,12 @@ If UserList(UserIndex).POS.Map = 0 Or UserList(UserIndex).POS.Map > NumMaps Then
         Case Else
             UserList(UserIndex).POS = ULLATHORPE
     End Select
-    If UserList(UserIndex).POS.Map > NumMaps Then UserList(UserIndex).POS = ULLATHORPE
+    If UserList(UserIndex).POS.map > NumMaps Then UserList(UserIndex).POS = ULLATHORPE
 End If
 
-If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).UserIndex Then
+If MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).UserIndex Then
     Dim tIndex As Integer
-    tIndex = MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).UserIndex
+    tIndex = MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).UserIndex
     Call SendData(ToIndex, tIndex, 0, "!!Un personaje se ha conectado en tu misma posición, reconectate.")
     Call SendData(ToIndex, tIndex, 0, "FINOK")
     Call CloseSocket(tIndex)
@@ -980,8 +986,8 @@ UserList(UserIndex).Name = Name
 If UserList(UserIndex).flags.Privilegios > 0 Then Call SendData(ToMoreAdmins, UserIndex, 0, "||" & UserList(UserIndex).Name & " se conectó." & FONTTYPE_FENIX)
 
 Call SendData(ToIndex, UserIndex, 0, "IU" & UserIndex)
-Call SendData(ToIndex, UserIndex, 0, "CM" & UserList(UserIndex).POS.Map & "," & MapInfo(UserList(UserIndex).POS.Map).MapVersion & "," & MapInfo(UserList(UserIndex).POS.Map).Name & "," & MapInfo(UserList(UserIndex).POS.Map).TopPunto & "," & MapInfo(UserList(UserIndex).POS.Map).LeftPunto)
-Call SendData(ToIndex, UserIndex, 0, "TM" & MapInfo(UserList(UserIndex).POS.Map).Music)
+Call SendData(ToIndex, UserIndex, 0, "CM" & UserList(UserIndex).POS.map & "," & MapInfo(UserList(UserIndex).POS.map).MapVersion & "," & MapInfo(UserList(UserIndex).POS.map).Name & "," & MapInfo(UserList(UserIndex).POS.map).TopPunto & "," & MapInfo(UserList(UserIndex).POS.map).LeftPunto)
+Call SendData(ToIndex, UserIndex, 0, "TM" & MapInfo(UserList(UserIndex).POS.map).Music)
 
 Call SendUserStatsBox(UserIndex)
 Call EnviarHambreYsed(UserIndex)
@@ -1026,11 +1032,11 @@ Set UserList(UserIndex).GuildRef = FetchGuild(UserList(UserIndex).GuildInfo.Guil
 
 UserList(UserIndex).flags.Seguro = True
 
-Call MakeUserChar(ToMap, 0, UserList(UserIndex).POS.Map, UserIndex, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y)
+Call MakeUserChar(ToMap, 0, UserList(UserIndex).POS.map, UserIndex, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y)
 Call SendData(ToIndex, UserIndex, 0, "IP" & UserList(UserIndex).Char.CharIndex)
 If UserList(UserIndex).flags.Navegando = 1 Then Call SendData(ToIndex, UserIndex, 0, "NAVEG")
 
-If UserList(UserIndex).flags.AdminInvisible = 0 Then Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXWARP & "," & 0)
+If UserList(UserIndex).flags.AdminInvisible = 0 Then Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXWARP & "," & 0)
 Call SendData(ToIndex, UserIndex, 0, "LOGGED")
 UserList(UserIndex).Counters.Sincroniza = Timer
 
@@ -1106,7 +1112,7 @@ Sub CloseUser(ByVal UserIndex As Integer)
     
     If UserList(UserIndex).Reto.EstaDueleando = True Then Call DesconectarDuelo(UserList(UserIndex).Reto.Contrincante, UserIndex)
     
-    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & ",0,0")
+    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.map, "CFX" & UserList(UserIndex).Char.CharIndex & ",0,0")
     
     If UserList(UserIndex).Caballos.Num And UserList(UserIndex).flags.Montado = 1 Then Call Desmontar(UserIndex)
     
@@ -1115,8 +1121,8 @@ Sub CloseUser(ByVal UserIndex As Integer)
     
     Call SaveUserSQL(UserIndex)
     
-    If MapInfo(UserList(UserIndex).POS.Map).NumUsers Then Call SendData(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, "QDL" & UserList(UserIndex).Char.CharIndex)
-    If UserList(UserIndex).Char.CharIndex Then Call EraseUserChar(ToMapButIndex, UserIndex, UserList(UserIndex).POS.Map, UserIndex)
+    If MapInfo(UserList(UserIndex).POS.map).NumUsers Then Call SendData(ToMapButIndex, UserIndex, UserList(UserIndex).POS.map, "QDL" & UserList(UserIndex).Char.CharIndex)
+    If UserList(UserIndex).Char.CharIndex Then Call EraseUserChar(ToMapButIndex, UserIndex, UserList(UserIndex).POS.map, UserIndex)
     If UserList(UserIndex).Caballos.Num Then Call QuitarCaballos(UserIndex)
     
     For i = 1 To MAXMASCOTAS - 17 * Buleano(Not UserList(UserIndex).flags.Quest)
@@ -1137,7 +1143,7 @@ Sub CloseUser(ByVal UserIndex As Integer)
     
     Call QuitarDeUsersPorMapa(UserIndex)
     
-    If MapInfo(UserList(UserIndex).POS.Map).NumUsers < 0 Then MapInfo(UserList(UserIndex).POS.Map).NumUsers = 0
+    If MapInfo(UserList(UserIndex).POS.map).NumUsers < 0 Then MapInfo(UserList(UserIndex).POS.map).NumUsers = 0
     
     Exit Sub
     
@@ -1159,19 +1165,19 @@ End Function
 Sub ActivarTrampa(UserIndex As Integer)
 Dim i As Integer, TU As Integer
 
-For i = 1 To MapInfo(UserList(UserIndex).POS.Map).NumUsers
-    TU = MapInfo(UserList(UserIndex).POS.Map).UserIndex(i)
+For i = 1 To MapInfo(UserList(UserIndex).POS.map).NumUsers
+    TU = MapInfo(UserList(UserIndex).POS.map).UserIndex(i)
     If UserList(TU).flags.Paralizado = 0 And Abs(UserList(UserIndex).POS.X - UserList(TU).POS.X) <= 3 And Abs(UserList(UserIndex).POS.Y - UserList(TU).POS.Y) <= 3 And TU <> UserIndex And PuedeAtacar(UserIndex, TU) Then
        UserList(TU).flags.QuienParalizo = UserIndex
        UserList(TU).flags.Paralizado = 1
        UserList(TU).Counters.Paralisis = Timer - 15 * Buleano(UserList(TU).Clase = GUERRERO And UserList(TU).Recompensas(3) = 2)
        Call SendData(ToIndex, TU, 0, "PU" & UserList(TU).POS.X & "," & UserList(TU).POS.Y)
        Call SendData(ToIndex, TU, 0, ("P9"))
-       Call SendData(ToPCArea, TU, UserList(TU).POS.Map, "CFX" & UserList(TU).Char.CharIndex & ",12,1")
+       Call SendData(ToPCArea, TU, UserList(TU).POS.map, "CFX" & UserList(TU).Char.CharIndex & ",12,1")
     End If
 Next
 
-Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "TW112")
+Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.map, "TW112")
 
 End Sub
 Sub DesactivarMercenarios()
@@ -1418,7 +1424,7 @@ If UCase$(Left$(rdata, 12)) = "/ACEPTCONSE " Then
             If UserList(tIndex).Faccion.Bando = Real Then
                 Call SendData(ToAll, 0, 0, "||" & rdata & " fue aceptado en el honorable Consejo de Banderbill." & FONTTYPE_CONSEJO)
                 UserList(tIndex).flags.EsConseReal = 1
-                Call WarpUserChar(tIndex, UserList(tIndex).POS.Map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
+                Call WarpUserChar(tIndex, UserList(tIndex).POS.map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
             Else
                 Call SendData(ToIndex, UserIndex, 0, "||El usuario no es del bando Real" & FONTTYPE_INFO)
             End If
@@ -1438,7 +1444,7 @@ If UCase$(Left$(rdata, 16)) = "/ACEPTCONSECAOS " Then
             If UserList(tIndex).Faccion.Bando = Caos Then
                 Call SendData(ToAll, 0, 0, "||" & rdata & " fue aceptado en el siniestro Concilio de Arghal." & FONTTYPE_CONSEJOCAOS)
                 UserList(tIndex).flags.EsConseCaos = 1
-                Call WarpUserChar(tIndex, UserList(tIndex).POS.Map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
+                Call WarpUserChar(tIndex, UserList(tIndex).POS.map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
             Else
                 Call SendData(ToIndex, UserIndex, 0, "||El usuario no es del bando Caos" & FONTTYPE_INFO)
             End If
@@ -1473,7 +1479,7 @@ If UCase$(Left$(rdata, 11)) = "/KICKCONSE " Then
             If UserList(tIndex).flags.EsConseReal = 1 Then
                 Call SendData(ToAll, 0, 0, "||" & rdata & " fue echado del honorable Consejo De Banderbill." & FONTTYPE_CONSEJO)
                 UserList(tIndex).flags.EsConseReal = 0
-                Call WarpUserChar(tIndex, UserList(tIndex).POS.Map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
+                Call WarpUserChar(tIndex, UserList(tIndex).POS.map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
                 Exit Sub
             End If
             If UserList(tIndex).flags.EsConseReal = 0 Then
@@ -1494,7 +1500,7 @@ If UserList(UserIndex).flags.EsConseCaos Or UserList(UserIndex).flags.Privilegio
             If UserList(tIndex).flags.EsConseCaos = 1 Then
                 Call SendData(ToAll, 0, 0, "||" & rdata & " fue echado del Concilio de Arghal." & FONTTYPE_CONSEJOCAOS)
                 UserList(tIndex).flags.EsConseCaos = 0
-                Call WarpUserChar(tIndex, UserList(tIndex).POS.Map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
+                Call WarpUserChar(tIndex, UserList(tIndex).POS.map, UserList(tIndex).POS.X, UserList(tIndex).POS.Y, False)
                 Exit Sub
             End If
         If UserList(tIndex).flags.EsConseCaos = 0 Then
@@ -1522,8 +1528,8 @@ End If
 If UCase$(rdata) = "/HOGAR" Then
     If Not ModoQuest Then Exit Sub
     If UserList(UserIndex).flags.Muerto = 0 Then Exit Sub
-    If UserList(UserIndex).POS.Map = ULLATHORPE.Map Then Exit Sub
-    Call WarpUserChar(UserIndex, ULLATHORPE.Map, ULLATHORPE.X, ULLATHORPE.Y, True)
+    If UserList(UserIndex).POS.map = ULLATHORPE.map Then Exit Sub
+    Call WarpUserChar(UserIndex, ULLATHORPE.map, ULLATHORPE.X, ULLATHORPE.Y, True)
     Exit Sub
 End If
 
@@ -1673,12 +1679,12 @@ If UCase$(Left$(rdata, 5)) = "/SUM " Then
         Exit Sub
     End If
     
-    If UserList(UserIndex).flags.Privilegios = 1 And UserList(tIndex).POS.Map <> UserList(UserIndex).POS.Map Then Exit Sub
+    If UserList(UserIndex).flags.Privilegios = 1 And UserList(tIndex).POS.map <> UserList(UserIndex).POS.map Then Exit Sub
     
     Call SendData(ToIndex, UserIndex, 0, "%Z" & UserList(tIndex).Name)
-    Call WarpUserChar(tIndex, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y + 1, True)
+    Call WarpUserChar(tIndex, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y + 1, True)
     
-    Call LogGM(UserList(UserIndex).Name, "/SUM " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.Map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
+    Call LogGM(UserList(UserIndex).Name, "/SUM " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
     Exit Sub
 End If
 
@@ -1698,9 +1704,9 @@ If UCase$(Left$(rdata, 5)) = "/IRA " Then
 
     If UserList(tIndex).flags.AdminInvisible And Not UserList(UserIndex).flags.AdminInvisible Then Call DoAdminInvisible(UserIndex)
 
-    Call WarpUserChar(UserIndex, UserList(tIndex).POS.Map, UserList(tIndex).POS.X + 1, UserList(tIndex).POS.Y + 1, True)
+    Call WarpUserChar(UserIndex, UserList(tIndex).POS.map, UserList(tIndex).POS.X + 1, UserList(tIndex).POS.Y + 1, True)
     
-    Call LogGM(UserList(UserIndex).Name, "/IRA " & UserList(tIndex).Name & " Mapa:" & UserList(tIndex).POS.Map & " X:" & UserList(tIndex).POS.X & " Y:" & UserList(tIndex).POS.Y, (UserList(UserIndex).flags.Privilegios = 1))
+    Call LogGM(UserList(UserIndex).Name, "/IRA " & UserList(tIndex).Name & " Mapa:" & UserList(tIndex).POS.map & " X:" & UserList(tIndex).POS.X & " Y:" & UserList(tIndex).POS.Y, (UserList(UserIndex).flags.Privilegios = 1))
     Exit Sub
 End If
 
@@ -1807,7 +1813,7 @@ If UCase$(Left$(rdata, 7)) = "/DONDE " Then
         Exit Sub
     End If
     
-    Call SendData(ToIndex, UserIndex, 0, "||Ubicacion de " & UserList(tIndex).Name & ": " & UserList(tIndex).POS.Map & ", " & UserList(tIndex).POS.X & ", " & UserList(tIndex).POS.Y & "." & FONTTYPE_INFO)
+    Call SendData(ToIndex, UserIndex, 0, "||Ubicacion de " & UserList(tIndex).Name & ": " & UserList(tIndex).POS.map & ", " & UserList(tIndex).POS.X & ", " & UserList(tIndex).POS.Y & "." & FONTTYPE_INFO)
     Call LogGM(UserList(UserIndex).Name, "/Donde", (UserList(UserIndex).flags.Privilegios = 1))
     Exit Sub
 End If
@@ -1828,7 +1834,7 @@ End If
 
 If UCase$(rdata) = "/TELEPLOC" Then
     Call WarpUserChar(UserIndex, UserList(UserIndex).flags.TargetMap, UserList(UserIndex).flags.TargetX, UserList(UserIndex).flags.TargetY, True)
-    Call LogGM(UserList(UserIndex).Name, "/TELEPLOC a x:" & UserList(UserIndex).flags.TargetX & " Y:" & UserList(UserIndex).flags.TargetY & " Map:" & UserList(UserIndex).POS.Map, (UserList(UserIndex).flags.Privilegios = 1))
+    Call LogGM(UserList(UserIndex).Name, "/TELEPLOC a x:" & UserList(UserIndex).flags.TargetX & " Y:" & UserList(UserIndex).flags.TargetY & " Map:" & UserList(UserIndex).POS.map, (UserList(UserIndex).flags.Privilegios = 1))
     Exit Sub
 End If
 
@@ -1934,9 +1940,9 @@ If UCase$(Left$(rdata, 4)) = "/GO " Then
 End If
 
 If UCase$(rdata) = "/OMAP" Then
-    For LoopC = 1 To MapInfo(UserList(UserIndex).POS.Map).NumUsers
-        If UserList(MapInfo(UserList(UserIndex).POS.Map).UserIndex(LoopC)).flags.Privilegios <= UserList(UserIndex).flags.Privilegios Then
-            tStr = tStr & UserList(MapInfo(UserList(UserIndex).POS.Map).UserIndex(LoopC)).Name & ","
+    For LoopC = 1 To MapInfo(UserList(UserIndex).POS.map).NumUsers
+        If UserList(MapInfo(UserList(UserIndex).POS.map).UserIndex(LoopC)).flags.Privilegios <= UserList(UserIndex).flags.Privilegios Then
+            tStr = tStr & UserList(MapInfo(UserList(UserIndex).POS.map).UserIndex(LoopC)).Name & ","
         End If
     Next
     If Len(tStr) > 0 Then
@@ -1954,8 +1960,8 @@ If UCase$(rdata) = "/PANELGM" Then
 End If
 
 If UCase$(rdata) = "/CMAP" Then
-    If MapInfo(UserList(UserIndex).POS.Map).NumUsers Then
-        Call SendData(ToIndex, UserIndex, 0, "||Hay " & MapInfo(UserList(UserIndex).POS.Map).NumUsers & " usuarios en este mapa." & FONTTYPE_INFO)
+    If MapInfo(UserList(UserIndex).POS.map).NumUsers Then
+        Call SendData(ToIndex, UserIndex, 0, "||Hay " & MapInfo(UserList(UserIndex).POS.map).NumUsers & " usuarios en este mapa." & FONTTYPE_INFO)
     Else
         Call SendData(ToIndex, UserIndex, 0, "%R")
     End If
@@ -2159,7 +2165,7 @@ If UCase$(Left$(rdata, 6)) = "/BANT " Then
         Call SendData(ToAdmins, 0, 0, "%X" & UserList(UserIndex).Name & "," & UserList(tIndex).Name)
         
         UserList(tIndex).flags.Ban = 1
-        Call WarpUserChar(tIndex, ULLATHORPE.Map, ULLATHORPE.X, ULLATHORPE.Y)
+        Call WarpUserChar(tIndex, ULLATHORPE.map, ULLATHORPE.X, ULLATHORPE.Y)
         
         Call CloseSocket(tIndex)
     Else
@@ -2375,7 +2381,7 @@ End If
 If UCase$(Left$(rdata, 8)) = "/CUENTA " Then
     rdata = Right$(rdata, Len(rdata) - 8)
     CuentaRegresiva = val(ReadField(1, rdata, 32)) + 1
-    GMCuenta = UserList(UserIndex).POS.Map
+    GMCuenta = UserList(UserIndex).POS.map
     Exit Sub
 End If
 
@@ -2457,7 +2463,7 @@ End If
 If UCase$(Left$(rdata, 5)) = "/DEST" Then
     Call LogGM(UserList(UserIndex).Name, "/DEST", False)
     rdata = Right$(rdata, Len(rdata) - 5)
-    Call EraseObj(ToMap, UserIndex, UserList(UserIndex).POS.Map, 10000, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y)
+    Call EraseObj(ToMap, UserIndex, UserList(UserIndex).POS.map, 10000, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y)
     Exit Sub
 End If
 
@@ -2465,7 +2471,7 @@ If UCase$(rdata) = "/MASSDEST" Then
     For Y = UserList(UserIndex).POS.Y - MinYBorder + 1 To UserList(UserIndex).POS.Y + MinYBorder - 1
         For X = UserList(UserIndex).POS.X - MinXBorder + 1 To UserList(UserIndex).POS.X + MinXBorder - 1
             If InMapBounds(X, Y) Then _
-            If MapData(UserList(UserIndex).POS.Map, X, Y).OBJInfo.OBJIndex > 0 And Not ItemEsDeMapa(UserList(UserIndex).POS.Map, X, Y) Then Call EraseObj(ToMap, UserIndex, UserList(UserIndex).POS.Map, 10000, UserList(UserIndex).POS.Map, X, Y)
+            If MapData(UserList(UserIndex).POS.map, X, Y).OBJInfo.OBJIndex > 0 And Not ItemEsDeMapa(UserList(UserIndex).POS.map, X, Y) Then Call EraseObj(ToMap, UserIndex, UserList(UserIndex).POS.map, 10000, UserList(UserIndex).POS.map, X, Y)
         Next
     Next
     Call LogGM(UserList(UserIndex).Name, "/MASSDEST", (UserList(UserIndex).flags.Privilegios = 1))
@@ -2493,7 +2499,7 @@ If UCase$(Left$(rdata, 11)) = "/GANOTORNEO" Then
     Call SendData(ToAll, 0, 0, "||" & UserList(UserList(UserIndex).flags.TargetUser).Name & " ganó un torneo." & FONTTYPE_INFO)
     UserList(UserList(UserIndex).flags.TargetUser).Faccion.Torneos = UserList(UserList(UserIndex).flags.TargetUser).Faccion.Torneos + 1
     
-    Call LogGM(UserList(UserIndex).Name, "Gano torneo: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.Map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
+    Call LogGM(UserList(UserIndex).Name, "Gano torneo: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
     Exit Sub
 End If
 
@@ -2508,7 +2514,7 @@ If UCase$(Left$(rdata, 10)) = "/GANOQUEST" Then
     
     Call SendData(ToAll, 0, 0, "||" & UserList(UserList(UserIndex).flags.TargetUser).Name & " ganó una quest." & FONTTYPE_INFO)
     UserList(UserList(UserIndex).flags.TargetUser).Faccion.Quests = UserList(UserList(UserIndex).flags.TargetUser).Faccion.Quests + 1
-    Call LogGM(UserList(UserIndex).Name, "Ganó quest: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.Map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
+    Call LogGM(UserList(UserIndex).Name, "Ganó quest: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
     Exit Sub
 End If
 
@@ -2523,7 +2529,7 @@ If UCase$(Left$(rdata, 13)) = "/PERDIOTORNEO" Then
     
     UserList(UserList(UserIndex).flags.TargetUser).Faccion.Torneos = UserList(UserList(UserIndex).flags.TargetUser).Faccion.Torneos - 1
     
-    Call LogGM(UserList(UserIndex).Name, "Restó torneo: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.Map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
+    Call LogGM(UserList(UserIndex).Name, "Restó torneo: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
     Exit Sub
 End If
 
@@ -2537,7 +2543,7 @@ If UCase$(Left$(rdata, 12)) = "/PERDIOQUEST" Then
     End If
     
     UserList(UserList(UserIndex).flags.TargetUser).Faccion.Quests = UserList(UserList(UserIndex).flags.TargetUser).Faccion.Quests - 1
-    Call LogGM(UserList(UserIndex).Name, "Restó quest: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.Map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
+    Call LogGM(UserList(UserIndex).Name, "Restó quest: " & UserList(tIndex).Name & " Map:" & UserList(UserIndex).POS.map & " X:" & UserList(UserIndex).POS.X & " Y:" & UserList(UserIndex).POS.Y, False)
     Exit Sub
 End If
 
@@ -2725,10 +2731,10 @@ If UCase$(Left$(rdata, 3)) = "/CT" Then
     X = ReadField(2, rdata, 32)
     Y = ReadField(3, rdata, 32)
     
-    If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).OBJInfo.OBJIndex Then
+    If MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).OBJInfo.OBJIndex Then
         Exit Sub
     End If
-    If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.Map Then
+    If MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.map Then
         Exit Sub
     End If
     If Not MapaValido(Mapa) Or Not InMapBounds(X, Y) Then Exit Sub
@@ -2737,10 +2743,10 @@ If UCase$(Left$(rdata, 3)) = "/CT" Then
     ET.Amount = 1
     ET.OBJIndex = Teleport
     
-    Call MakeObj(ToMap, 0, UserList(UserIndex).POS.Map, ET, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1)
-    MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.Map = Mapa
-    MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.X = X
-    MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.Y = Y
+    Call MakeObj(ToMap, 0, UserList(UserIndex).POS.map, ET, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1)
+    MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.map = Mapa
+    MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.X = X
+    MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y - 1).TileExit.Y = Y
     
     Exit Sub
 End If
@@ -2755,10 +2761,9 @@ If UCase$(Left$(rdata, 3)) = "/DT" Then
     X = UserList(UserIndex).flags.TargetX
     Y = UserList(UserIndex).flags.TargetY
     
-    If ObjData(MapData(Mapa, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT And _
-        MapData(Mapa, X, Y).TileExit.Map Then
+    If ObjData(MapData(Mapa, X, Y).OBJInfo.OBJIndex).ObjType = OBJTYPE_TELEPORT And MapData(Mapa, X, Y).TileExit.map Then
         Call EraseObj(ToMap, 0, Mapa, MapData(Mapa, X, Y).OBJInfo.Amount, Mapa, X, Y)
-        MapData(Mapa, X, Y).TileExit.Map = 0
+        MapData(Mapa, X, Y).TileExit.map = 0
         MapData(Mapa, X, Y).TileExit.X = 0
         MapData(Mapa, X, Y).TileExit.Y = 0
     End If
@@ -2770,12 +2775,12 @@ End If
 If UCase$(Left$(rdata, 5)) = "/BLOQ" Then
     Call LogGM(UserList(UserIndex).Name, "/BLOQ", False)
     rdata = Right$(rdata, Len(rdata) - 5)
-    If MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 0 Then
-        MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 1
-        Call Bloquear(ToMap, UserIndex, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y, 1)
+    If MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 0 Then
+        MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 1
+        Call Bloquear(ToMap, UserIndex, UserList(UserIndex).POS.map, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y, 1)
     Else
-        MapData(UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 0
-        Call Bloquear(ToMap, UserIndex, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.Map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y, 0)
+        MapData(UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y).Blocked = 0
+        Call Bloquear(ToMap, UserIndex, UserList(UserIndex).POS.map, UserList(UserIndex).POS.map, UserList(UserIndex).POS.X, UserList(UserIndex).POS.Y, 0)
     End If
     Exit Sub
 End If
@@ -2785,7 +2790,7 @@ If UCase$(rdata) = "/MASSKILL" Then
     For Y = UserList(UserIndex).POS.Y - MinYBorder + 1 To UserList(UserIndex).POS.Y + MinYBorder - 1
             For X = UserList(UserIndex).POS.X - MinXBorder + 1 To UserList(UserIndex).POS.X + MinXBorder - 1
                 If X > 0 And Y > 0 And X < 101 And Y < 101 Then _
-                    If MapData(UserList(UserIndex).POS.Map, X, Y).NpcIndex Then Call QuitarNPC(MapData(UserList(UserIndex).POS.Map, X, Y).NpcIndex)
+                    If MapData(UserList(UserIndex).POS.map, X, Y).NpcIndex Then Call QuitarNPC(MapData(UserList(UserIndex).POS.map, X, Y).NpcIndex)
             Next
     Next
     Call LogGM(UserList(UserIndex).Name, "/MASSKILL", False)
@@ -2999,7 +3004,7 @@ If UCase$(Left$(rdata, 5)) = "/MOD " Then
             If val(Arg2) < 6 Then
                 UserList(tIndex).Raza = val(Arg2)
                 Call DarCuerpoDesnudo(tIndex)
-                Call ChangeUserChar(ToMap, 0, UserList(UserIndex).POS.Map, UserIndex, UserList(UserIndex).Char.Body, UserList(UserIndex).Char.Head, UserList(UserIndex).Char.Heading, UserList(UserIndex).Char.WeaponAnim, UserList(UserIndex).Char.ShieldAnim, UserList(UserIndex).Char.CascoAnim)
+                Call ChangeUserChar(ToMap, 0, UserList(UserIndex).POS.map, UserIndex, UserList(UserIndex).Char.Body, UserList(UserIndex).Char.Head, UserList(UserIndex).Char.Heading, UserList(UserIndex).Char.WeaponAnim, UserList(UserIndex).Char.ShieldAnim, UserList(UserIndex).Char.CascoAnim)
             End If
         Case "JER"
             UserList(UserIndex).Faccion.Jerarquia = 0
@@ -3050,13 +3055,13 @@ If UCase$(Left$(rdata, 5)) = "/MOD " Then
             Call CheckUserLevel(tIndex)
             Call SendUserEXP(tIndex)
         Case "BODY"
-            Call ChangeUserBody(ToMap, 0, UserList(tIndex).POS.Map, tIndex, val(Arg2))
+            Call ChangeUserBody(ToMap, 0, UserList(tIndex).POS.map, tIndex, val(Arg2))
         Case "HEAD"
-            Call ChangeUserHead(ToMap, 0, UserList(tIndex).POS.Map, tIndex, val(Arg2))
+            Call ChangeUserHead(ToMap, 0, UserList(tIndex).POS.map, tIndex, val(Arg2))
             UserList(tIndex).OrigChar.Head = val(Arg2)
         Case "PHEAD"
             UserList(tIndex).OrigChar.Head = val(Arg2)
-            Call ChangeUserHead(ToMap, 0, UserList(tIndex).POS.Map, tIndex, val(Arg2))
+            Call ChangeUserHead(ToMap, 0, UserList(tIndex).POS.map, tIndex, val(Arg2))
         Case "TOR"
             UserList(tIndex).Faccion.Torneos = val(Arg2)
         Case "QUE"
@@ -3154,7 +3159,7 @@ If UCase$(Left$(rdata, 9)) = "/PAUSA" Then
         Call SendData(ToAll, 0, 0, "TL")
         Call SendData(ToAll, 0, 0, "||Servidor> Juego reanudado." & FONTTYPE_INFO)
         Call SendData(ToAll, 0, 0, "BKW")
-        Call SendData(ToIndex, UserIndex, 0, "TM" & MapInfo(UserList(UserIndex).POS.Map).Music)
+        Call SendData(ToIndex, UserIndex, 0, "TM" & MapInfo(UserList(UserIndex).POS.map).Music)
     End If
 Exit Sub
 End If

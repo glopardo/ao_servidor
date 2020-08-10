@@ -686,72 +686,73 @@ Public Sub Tlimpiar_Timer()
     End If
     
 End Sub
-
 Private Sub UserTimer_Timer()
-On Error GoTo Error
-Static Andaban As Boolean, Contador As Single
-Dim Andan As Boolean, UI As Integer, i As Integer
-
-If CuentaRegresiva Then
-    CuentaRegresiva = CuentaRegresiva - 1
+    On Error GoTo Error
+    Static Andaban As Boolean, Contador As Single
+    Dim Andan As Boolean, UI As Integer, i As Integer
     
-    If CuentaRegresiva = 0 Then
-        Call SendData(ToMap, 0, GMCuenta, "||YA!!!" & FONTTYPE_FIGHT)
-        Me.Enabled = False
-    Else
-        Call SendData(ToMap, 0, GMCuenta, "||" & CuentaRegresiva & "..." & FONTTYPE_INFO)
-    End If
-End If
-
-For i = 1 To LastUser
-    If UserList(i).ConnID <> -1 Then DayStats.Segundos = DayStats.Segundos + 1
-Next
-
-If TiempoTranscurrido(Contador) >= 10 Then
-    Contador = Timer
-    Andan = EstadisticasWeb.EstadisticasAndando()
-    If Not Andaban And Andan Then Call InicializaEstadisticas
-    Andaban = Andan
-End If
-
-For UI = 1 To LastUser
-    If UserList(UI).flags.UserLogged And UserList(UI).ConnID <> -1 Then
-        Call TimerPiquete(UI)
-        If UserList(UI).flags.Protegido > 1 Then Call TimerProtEntro(UI)
-        If Not UserList(UI).flags.PuedeLanzarProteccionDivina Then Call TimerLanzarProteccionDivina(UI)
-        If UserList(UI).flags.Encarcelado Then Call TimerCarcel(UI)
-        If UserList(UI).flags.Muerto = 0 Then
-            If UserList(UI).flags.Paralizado Then Call TimerParalisis(UI)
-            If UserList(UI).flags.BonusFlecha Then Call TimerFlecha(UI)
-            If UserList(UI).flags.Ceguera = 1 Then Call TimerCeguera(UI)
-            If UserList(UI).flags.Envenenado = 1 Then Call TimerVeneno(UI)
-            If UserList(UI).flags.Envenenado = 2 Then Call TimerVenenoDoble(UI)
-            If UserList(UI).flags.Estupidez = 1 Then Call TimerEstupidez(UI)
-            If UserList(UI).flags.AdminInvisible = 0 And UserList(UI).flags.Invisible = 1 And UserList(UI).flags.Oculto = 0 Then Call TimerInvisibilidad(UI)
-            If UserList(UI).flags.Desnudo = 1 Then Call TimerFrio(UI)
-            If UserList(UI).flags.TomoPocion Then Call TimerPocion(UI)
-            If UserList(UI).flags.Transformado Then Call TimerTransformado(UI)
-            If UserList(UI).NroMascotas Then Call TimerInvocacion(UI)
-            If UserList(UI).flags.Oculto Then Call TimerOculto(UI)
-            If UserList(UI).flags.Sacrificando Then Call TimerSacrificando(UI)
-            
-            Call TimerHyS(UI)
-            Call TimerSanar(UI)
-            Call TimerStamina(UI)
+    Call PasarSegundo
+    
+    If CuentaRegresiva Then
+        CuentaRegresiva = CuentaRegresiva - 1
+        
+        If CuentaRegresiva = 0 Then
+            Call SendData(ToMap, 0, GMCuenta, "||YA!!!" & FONTTYPE_FIGHT)
+            Me.Enabled = False
+        Else
+            Call SendData(ToMap, 0, GMCuenta, "||" & CuentaRegresiva & "..." & FONTTYPE_INFO)
         End If
-        If EnviarEstats Then
-            Call SendUserStatsBox(UI)
-            EnviarEstats = False
-        End If
-        Call TimerIdleCount(UI)
-        If UserList(UI).Counters.Saliendo Then Call TimerSalir(UI)
     End If
-Next
-
-Exit Sub
-
+    
+    For i = 1 To LastUser
+        If UserList(i).ConnID <> -1 Then DayStats.Segundos = DayStats.Segundos + 1
+    Next
+    
+    If TiempoTranscurrido(Contador) >= 10 Then
+        Contador = Timer
+        Andan = EstadisticasWeb.EstadisticasAndando()
+        If Not Andaban And Andan Then Call InicializaEstadisticas
+        Andaban = Andan
+    End If
+    
+    For UI = 1 To LastUser
+        If UserList(UI).flags.UserLogged And UserList(UI).ConnID <> -1 Then
+            Call TimerPiquete(UI)
+            If UserList(UI).flags.Protegido > 1 Then Call TimerProtEntro(UI)
+            If Not UserList(UI).flags.PuedeLanzarProteccionDivina Then Call TimerLanzarProteccionDivina(UI)
+            If UserList(UI).flags.Encarcelado Then Call TimerCarcel(UI)
+            If UserList(UI).flags.Muerto = 0 Then
+                If UserList(UI).flags.Paralizado Then Call TimerParalisis(UI)
+                If UserList(UI).flags.BonusFlecha Then Call TimerFlecha(UI)
+                If UserList(UI).flags.Ceguera = 1 Then Call TimerCeguera(UI)
+                If UserList(UI).flags.Envenenado = 1 Then Call TimerVeneno(UI)
+                If UserList(UI).flags.Envenenado = 2 Then Call TimerVenenoDoble(UI)
+                If UserList(UI).flags.Estupidez = 1 Then Call TimerEstupidez(UI)
+                If UserList(UI).flags.AdminInvisible = 0 And UserList(UI).flags.Invisible = 1 And UserList(UI).flags.Oculto = 0 Then Call TimerInvisibilidad(UI)
+                If UserList(UI).flags.Desnudo = 1 Then Call TimerFrio(UI)
+                If UserList(UI).flags.TomoPocion Then Call TimerPocion(UI)
+                If UserList(UI).flags.Transformado Then Call TimerTransformado(UI)
+                If UserList(UI).NroMascotas Then Call TimerInvocacion(UI)
+                If UserList(UI).flags.Oculto Then Call TimerOculto(UI)
+                If UserList(UI).flags.Sacrificando Then Call TimerSacrificando(UI)
+                
+                Call TimerHyS(UI)
+                Call TimerSanar(UI)
+                Call TimerStamina(UI)
+            End If
+            If EnviarEstats Then
+                Call SendUserStatsBox(UI)
+                EnviarEstats = False
+            End If
+            Call TimerIdleCount(UI)
+            If UserList(UI).Counters.Saliendo Then Call TimerSalir(UI)
+        End If
+    Next
+    
+    Exit Sub
+    
 Error:
-    Call LogError("Error en UserTimer:" & Err.Description & " " & UI)
+        Call LogError("Error en UserTimer:" & Err.Description & " " & UI)
     
 End Sub
 Public Sub TimerOculto(UserIndex As Integer)

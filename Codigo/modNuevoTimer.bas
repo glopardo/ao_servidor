@@ -71,8 +71,8 @@ If Not haciendoBK Then
     For NpcIndex = 1 To LastNPC
         If Npclist(NpcIndex).flags.NPCActive Then
            If Npclist(NpcIndex).flags.Paralizado = 0 Then
-                If Npclist(NpcIndex).POS.Map Then
-                     If MapInfo(Npclist(NpcIndex).POS.Map).NumUsers And Npclist(NpcIndex).Movement <> ESTATICO Then Call NPCMovementAI(NpcIndex)
+                If Npclist(NpcIndex).POS.map Then
+                     If MapInfo(Npclist(NpcIndex).POS.map).NumUsers And Npclist(NpcIndex).Movement <> ESTATICO Then Call NPCMovementAI(NpcIndex)
                 End If
            ElseIf Npclist(NpcIndex).flags.Paralizado = 2 Then Call NPCAtacaAlFrente(NpcIndex)
            End If
@@ -83,7 +83,7 @@ End If
 Exit Sub
 
 ErrorHandler:
- Call LogError("Error en TIMER_AI_Timer " & Npclist(NpcIndex).Name & " mapa:" & Npclist(NpcIndex).POS.Map)
+ Call LogError("Error en TIMER_AI_Timer " & Npclist(NpcIndex).Name & " mapa:" & Npclist(NpcIndex).POS.map)
  Call MuereNpc(NpcIndex, 0)
 
 End Sub
@@ -109,7 +109,7 @@ Dim Npc As Integer
 On Error GoTo Error
     
 For Npc = 1 To LastNPC
-    If Npclist(Npc).flags.NPCActive And Npclist(Npc).POS.Map Then
+    If Npclist(Npc).flags.NPCActive And Npclist(Npc).POS.map Then
         If Npclist(Npc).Numero <> 89 Then Npclist(Npc).CanAttack = 1
         If Npclist(Npc).flags.Paralizado Then Call EfectoParalisisNpc(Npc)
     End If
@@ -335,12 +335,23 @@ errhandler:
 
 End Sub
 Public Sub ComprobarCerrar()
-
-If val(GetVar(App.Path & "\Executor.ini", "EXECUTOR", "Cerrar")) = 1 Then
-    Call LogMain(" Server apagado por el Executor.")
-    Call WriteVar(App.Path & "\Executor.ini", "EXECUTOR", "Cerrar", 0)
-    Call DoBackUp(True)
-    End
-End If
-
+    If val(GetVar(App.Path & "\Executor.ini", "EXECUTOR", "Cerrar")) = 1 Then
+        Call LogMain(" Server apagado por el Executor.")
+        Call WriteVar(App.Path & "\Executor.ini", "EXECUTOR", "Cerrar", 0)
+        Call DoBackUp(True)
+        End
+    End If
+End Sub
+Sub ControlarPortalLum(ByVal UserIndex As Integer)
+    If UserList(UserIndex).Counters.CreoPortal = 1 Then
+        Call EraseObj(ToMap, 0, UserList(UserIndex).flags.PortalMap, MapData(UserList(UserIndex).flags.PortalMap, UserList(UserIndex).flags.PortalX, UserList(UserIndex).flags.PortalY).OBJInfo.Amount, UserList(UserIndex).flags.PortalMap, UserList(UserIndex).flags.PortalX, UserList(UserIndex).flags.PortalY)
+        
+        MapData(UserList(UserIndex).flags.PortalMap, UserList(UserIndex).flags.PortalX, UserList(UserIndex).flags.PortalY).TileExit.map = 0
+        MapData(UserList(UserIndex).flags.PortalMap, UserList(UserIndex).flags.PortalX, UserList(UserIndex).flags.PortalY).TileExit.X = 0
+        MapData(UserList(UserIndex).flags.PortalMap, UserList(UserIndex).flags.PortalX, UserList(UserIndex).flags.PortalY).TileExit.Y = 0
+        
+        UserList(UserIndex).flags.PortalMap = ""
+        UserList(UserIndex).flags.PortalX = ""
+        UserList(UserIndex).flags.PortalY = ""
+    End If
 End Sub

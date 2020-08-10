@@ -273,6 +273,7 @@ Public Const iCabezaMuerto = 500
 Public Const iORO = 12
 
 Public Const Teleport = 378
+Public Const PortalMagico = 805
 Public Const Flecha = 480
 
 Public Const Pescado = 139
@@ -536,6 +537,7 @@ Type tHechizo
     Flecha As Byte
     Morph As Byte
     Proteger As Byte
+    Portal As Byte
     
     Invoca As Byte
     NumNPC As Integer
@@ -937,8 +939,16 @@ Type UserFlags
     EsConseCaos As Integer
     EsConseReal As Integer
     
+    'Soporte
     SoporteRespondido As Integer
     SoporteRespuesta As String
+    
+    'Portal mágico
+    PortalMap As Integer
+    PortalX As Integer
+    PortalY As Integer
+    TiroPortal As Integer
+    PortalDestino As Integer
 End Type
 
 Type UserCounters
@@ -986,6 +996,9 @@ Type UserCounters
     LastRobo As Single
     LastFlecha As Single
     LastOculto As Single
+    
+    CreoPortal As Single
+    TimerPortal As Single
 End Type
 
 Public Const Neutral = 0
