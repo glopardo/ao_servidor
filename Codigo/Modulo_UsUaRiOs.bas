@@ -386,9 +386,12 @@ If UserList(UserIndex).flags.Meditando Then
     ElseIf UserList(UserIndex).Stats.ELV < 42 Then
         Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARGRANDE & "," & LoopAdEternum)
         UserList(UserIndex).Char.FX = FXMEDITARGRANDE
-    Else
+    ElseIf UserList(UserIndex).Stats.ELV < 50 Then
         Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARGIGANTE & "," & LoopAdEternum)
         UserList(UserIndex).Char.FX = FXMEDITARGIGANTE
+    Else
+        Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "CFX" & UserList(UserIndex).Char.CharIndex & "," & FXMEDITARSUPREMO & "," & LoopAdEternum)
+        UserList(UserIndex).Char.FX = FXMEDITARSUPREMO
     End If
 End If
 
@@ -410,7 +413,13 @@ Dim AumentoMANA As Integer
 Dim WasNewbie As Boolean
 
 Do Until UserList(UserIndex).Stats.Exp < UserList(UserIndex).Stats.ELU
-If UserList(UserIndex).Stats.ELV >= STAT_MAXELV Then
+'If UserList(UserIndex).Stats.ELV >= STAT_MAXELV Then
+'    UserList(UserIndex).Stats.Exp = 0
+'    UserList(UserIndex).Stats.ELU = 0
+'    Exit Sub
+'End If
+
+If UserList(UserIndex).Stats.ELV >= STAT_MAXELVFINAL Then
     UserList(UserIndex).Stats.Exp = 0
     UserList(UserIndex).Stats.ELU = 0
     Exit Sub
@@ -443,6 +452,15 @@ If UserList(UserIndex).Stats.Exp >= UserList(UserIndex).Stats.ELU Then
     UserList(UserIndex).Stats.ELV = UserList(UserIndex).Stats.ELV + 1
     UserList(UserIndex).Stats.Exp = UserList(UserIndex).Stats.Exp - UserList(UserIndex).Stats.ELU
     UserList(UserIndex).Stats.ELU = ELUs(UserList(UserIndex).Stats.ELV)
+    
+    If UserList(UserIndex).Stats.ELV >= STAT_MAXELV Then
+        'UserList(UserIndex).Stats.Exp = 0
+        'UserList(UserIndex).Stats.ELU = 0
+        Call EnviarSkills(UserIndex)
+        Call EnviarSubirNivel(UserIndex, Pts)
+        Call SendUserStatsBox(UserIndex)
+        Exit Sub
+    End If
     
     Dim AumentoHP As Integer
     Dim SubePromedio As Single

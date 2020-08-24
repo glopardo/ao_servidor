@@ -436,82 +436,73 @@ End If
 
 End Sub
 Public Sub UsuarioAtaca(UserIndex As Integer)
-
-If UserList(UserIndex).flags.Protegido = 1 Then
-    Call SendData(ToIndex, UserIndex, 0, "||No podés atacar mientras estás siendo protegido por un GM." & FONTTYPE_INFO)
-    Exit Sub
-ElseIf UserList(UserIndex).flags.Protegido = 2 Then
-    Call SendData(ToIndex, UserIndex, 0, "||No podés atacar tan pronto al conectarte." & FONTTYPE_INFO)
-    Exit Sub
-End If
-
-If TiempoTranscurrido(UserList(UserIndex).Counters.LastGolpe) < IntervaloUserPuedeAtacar Then Exit Sub
-If TiempoTranscurrido(UserList(UserIndex).Counters.LastHechizo) < IntervaloUserPuedeHechiGolpe Then Exit Sub
-If TiempoTranscurrido(UserList(UserIndex).Counters.LastFlecha) < IntervaloUserFlechas Then Exit Sub
-
-UserList(UserIndex).Counters.LastGolpe = Timer
-Call SendData(ToIndex, UserIndex, 0, "LG")
-
-If UserList(UserIndex).flags.Oculto Then
-    If Not ((UserList(UserIndex).Clase = CAZADOR Or UserList(UserIndex).Clase = ARQUERO) And UserList(UserIndex).Invent.ArmourEqpObjIndex = 360) Then
-        UserList(UserIndex).flags.Oculto = 0
-        UserList(UserIndex).flags.Invisible = 0
-        Call SendData(ToMap, 0, UserList(UserIndex).POS.Map, ("V3" & UserList(UserIndex).Char.CharIndex & ",0"))
-        Call SendData(ToIndex, UserIndex, 0, "V5")
+    If UserList(UserIndex).flags.Protegido = 1 Then
+        Call SendData(ToIndex, UserIndex, 0, "||No podés atacar mientras estás siendo protegido por un GM." & FONTTYPE_INFO)
+        Exit Sub
+    ElseIf UserList(UserIndex).flags.Protegido = 2 Then
+        Call SendData(ToIndex, UserIndex, 0, "||No podés atacar tan pronto al conectarte." & FONTTYPE_INFO)
+        Exit Sub
     End If
-End If
-
-If UserList(UserIndex).Stats.MinSta >= 10 Then
-    Call QuitarSta(UserIndex, RandomNumber(1, 10))
-Else: Call SendData(ToIndex, UserIndex, 0, "9E")
-    Exit Sub
-End If
-
-Dim AttackPos As WorldPos
-AttackPos = UserList(UserIndex).POS
-Call HeadtoPos(UserList(UserIndex).Char.Heading, AttackPos)
-
-If AttackPos.X < XMinMapSize Or AttackPos.X > XMaxMapSize Or AttackPos.Y <= YMinMapSize Or AttackPos.Y > YMaxMapSize Then
-    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "-" & UserList(UserIndex).Char.CharIndex)
-    Exit Sub
-End If
-
-Dim Index As Integer
-Index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
-
-If Index Then
-    Call UsuarioAtacaUsuario(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
-    Call SendUserSTA(UserIndex)
-    Call SendUserHP(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
-    Exit Sub
-End If
-
-If MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex Then
-
-    If Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).Attackable Then
-        
-        If (Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).MaestroUser > 0 And _
-           MapInfo(Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).POS.Map).Pk = False) And (UserList(UserIndex).POS.Map <> 190) Then
-            Call SendData(ToIndex, UserIndex, 0, "0Z")
-            Exit Sub
+    
+    If TiempoTranscurrido(UserList(UserIndex).Counters.LastGolpe) < IntervaloUserPuedeAtacar Then Exit Sub
+    If TiempoTranscurrido(UserList(UserIndex).Counters.LastHechizo) < IntervaloUserPuedeHechiGolpe Then Exit Sub
+    If TiempoTranscurrido(UserList(UserIndex).Counters.LastFlecha) < IntervaloUserFlechas Then Exit Sub
+    
+    UserList(UserIndex).Counters.LastGolpe = Timer
+    Call SendData(ToIndex, UserIndex, 0, "LG")
+    
+    If UserList(UserIndex).flags.Oculto Then
+        If Not ((UserList(UserIndex).Clase = CAZADOR Or UserList(UserIndex).Clase = ARQUERO) And UserList(UserIndex).Invent.ArmourEqpObjIndex = 360) Then
+            UserList(UserIndex).flags.Oculto = 0
+            UserList(UserIndex).flags.Invisible = 0
+            Call SendData(ToMap, 0, UserList(UserIndex).POS.Map, ("V3" & UserList(UserIndex).Char.CharIndex & ",0"))
+            Call SendData(ToIndex, UserIndex, 0, "V5")
         End If
-           
-        Call UsuarioAtacaNpc(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex)
-
-    Else
-        Call SendData(ToIndex, UserIndex, 0, "NO")
     End If
     
-    Call SendUserSTA(UserIndex)
+    If UserList(UserIndex).Stats.MinSta >= 10 Then
+        Call QuitarSta(UserIndex, RandomNumber(1, 10))
+    Else: Call SendData(ToIndex, UserIndex, 0, "9E")
+        Exit Sub
+    End If
     
-    Exit Sub
-
-
-End If
-
-Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "-" & UserList(UserIndex).Char.CharIndex)
-Call SendUserSTA(UserIndex)
-
+    Dim AttackPos As WorldPos
+    AttackPos = UserList(UserIndex).POS
+    Call HeadtoPos(UserList(UserIndex).Char.Heading, AttackPos)
+    
+    If AttackPos.X < XMinMapSize Or AttackPos.X > XMaxMapSize Or AttackPos.Y <= YMinMapSize Or AttackPos.Y > YMaxMapSize Then
+        Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "-" & UserList(UserIndex).Char.CharIndex)
+        Exit Sub
+    End If
+    
+    Dim Index As Integer
+    Index = MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex
+    
+    If Index Then
+        Call UsuarioAtacaUsuario(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
+        Call SendUserSTA(UserIndex)
+        Call SendUserHP(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).UserIndex)
+        Exit Sub
+    End If
+    
+    If MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex Then
+        If Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).Attackable Then
+            If (Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).MaestroUser > 0 And _
+               MapInfo(Npclist(MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex).POS.Map).Pk = False) And (UserList(UserIndex).POS.Map <> 190) Then
+                Call SendData(ToIndex, UserIndex, 0, "0Z")
+                Exit Sub
+            End If
+            Call UsuarioAtacaNpc(UserIndex, MapData(AttackPos.Map, AttackPos.X, AttackPos.Y).NpcIndex)
+        Else
+            Call SendData(ToIndex, UserIndex, 0, "NO")
+        End If
+        
+        Call SendUserSTA(UserIndex)
+        Exit Sub
+    End If
+    
+    Call SendData(ToPCArea, UserIndex, UserList(UserIndex).POS.Map, "-" & UserList(UserIndex).Char.CharIndex)
+    Call SendUserSTA(UserIndex)
 End Sub
 Public Sub UsuarioAtacaNpc(UserIndex As Integer, ByVal NpcIndex As Integer)
 

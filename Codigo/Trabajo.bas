@@ -87,6 +87,17 @@ If UserList(UserIndex).Stats.ELV < 18 Then
     Exit Sub
 End If
 
+If Barco.Neutral And UserList(UserIndex).Faccion.Bando <> Neutral Then
+    Call SendData(ToIndex, UserIndex, 0, "||No debes pertenecer a ninguna facción para poder navegar en esta embarcación." & FONTTYPE_INFO)
+    Exit Sub
+ElseIf Barco.Real And UserList(UserIndex).Faccion.Bando <> Real Then
+    Call SendData(ToIndex, UserIndex, 0, "||Debes pertenecer a la facción real para poder navegar en esta embarcación." & FONTTYPE_INFO)
+    Exit Sub
+ElseIf Barco.Caos And UserList(UserIndex).Faccion.Bando <> Caos Then
+    Call SendData(ToIndex, UserIndex, 0, "||Debes pertenecer a la facción criminal para poder navegar en esta embarcación." & FONTTYPE_INFO)
+    Exit Sub
+End If
+
 UserList(UserIndex).Invent.BarcoObjIndex = UserList(UserIndex).Invent.Object(Slot).OBJIndex
 UserList(UserIndex).Invent.BarcoSlot = Slot
            

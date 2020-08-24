@@ -636,6 +636,10 @@ For Object = 1 To NumObjDatas
         ObjData(Object).Ropaje = INIDarClaveInt(A, S, "NumRopaje")
         ObjData(Object).HechizoIndex = INIDarClaveInt(A, S, "HechizoIndex")
         
+        ObjData(Object).Real = INIDarClaveInt(A, S, "Real")
+        ObjData(Object).Caos = INIDarClaveInt(A, S, "Caos")
+        ObjData(Object).Neutral = INIDarClaveInt(A, S, "Neutral")
+        
         If ObjData(Object).ObjType = OBJTYPE_WEAPON Then
                 ObjData(Object).Baculo = INIDarClaveInt(A, S, "Baculo")
                 ObjData(Object).WeaponAnim = INIDarClaveInt(A, S, "Anim")
@@ -647,8 +651,6 @@ For Object = 1 To NumObjDatas
                 ObjData(Object).LingP = INIDarClaveInt(A, S, "LingP")
                 ObjData(Object).LingO = INIDarClaveInt(A, S, "LingO")
                 ObjData(Object).SkHerreria = INIDarClaveInt(A, S, "SkHerreria")
-                ObjData(Object).Real = INIDarClaveInt(A, S, "Real")
-                ObjData(Object).Caos = INIDarClaveInt(A, S, "Caos")
                 ObjData(Object).proyectil = INIDarClaveInt(A, S, "Proyectil")
                 ObjData(Object).Municion = INIDarClaveInt(A, S, "Municiones")
     
@@ -659,8 +661,6 @@ For Object = 1 To NumObjDatas
                 ObjData(Object).LingP = INIDarClaveInt(A, S, "LingP")
                 ObjData(Object).LingO = INIDarClaveInt(A, S, "LingO")
                 ObjData(Object).SkHerreria = INIDarClaveInt(A, S, "SkHerreria")
-                ObjData(Object).Real = INIDarClaveInt(A, S, "Real")
-                ObjData(Object).Caos = INIDarClaveInt(A, S, "Caos")
                 ObjData(Object).Jerarquia = INIDarClaveInt(A, S, "Jerarquia")
         
         End If

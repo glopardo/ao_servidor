@@ -1102,6 +1102,18 @@ Select Case Obj.ObjType
                     End If
                 End If
                 
+                'Ropa de rey neutral
+                If ObjData(OBJIndex).Neutral = 1 And UserList(UserIndex).Faccion.Bando <> Neutral Then
+                    Call SendData(ToIndex, UserIndex, 0, "||No tenés que pertenecer a ninguna facción para usar este objeto." & FONTTYPE_INFO)
+                    Exit Sub
+                ElseIf ObjData(OBJIndex).Caos = 1 And UserList(UserIndex).Faccion.Bando <> Caos Then
+                    Call SendData(ToIndex, UserIndex, 0, "||Tenés que pertenecer a la facción criminal para usar este objeto." & FONTTYPE_INFO)
+                    Exit Sub
+                ElseIf ObjData(OBJIndex).Real = 1 And UserList(UserIndex).Faccion.Bando <> Real Then
+                    Call SendData(ToIndex, UserIndex, 0, "||Tenés que pertenecer a la facción ciudadana para usar este objeto." & FONTTYPE_INFO)
+                    Exit Sub
+                End If
+                
                 If Not SkillPuedeUsarItem(UserIndex, OBJIndex) Then
                     Call SendData(ToIndex, UserIndex, 0, "7W")
                     Exit Sub

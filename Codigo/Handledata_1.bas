@@ -248,11 +248,10 @@ Select Case UCase$(Left$(rdata, 1))
         Case 7
             If UserList(UserIndex).flags.Privilegios = 0 Then Exit Sub
             
-            Call LogGM(UserList(UserIndex).Name, "Mensaje a Gms:" & rdata, (UserList(UserIndex).flags.Privilegios = 1))
+            Call LogGM(UserList(UserIndex).Name, "Mensaje Broadcast:" & rdata, False)
             If Len(rdata) > 0 Then
-                Call SendData(ToAdmins, 0, 0, "||" & UserList(UserIndex).Name & "> " & rdata & "~255~255~255~0~1")
+                Call SendData(ToAll, 0, 0, "|$" & UserList(UserIndex).Name & "> " & rdata & ENDC)
             End If
-            
             Exit Sub
     
         End Select

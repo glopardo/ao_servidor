@@ -36,9 +36,7 @@ Attribute VB_Name = "Extra"
 
 Option Explicit
 Public Function EsNewbie(UserIndex As Integer) As Boolean
-
-EsNewbie = (UserList(UserIndex).Stats.ELV <= LimiteNewbie)
-
+    EsNewbie = (UserList(UserIndex).Stats.ELV <= LimiteNewbie)
 End Function
 Public Sub DoTileEvents(UserIndex As Integer)
 On Error GoTo errhandler

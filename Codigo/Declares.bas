@@ -135,8 +135,9 @@ Public Const FXCURAR = 2
 
 Public Const FXMEDITARCHICO = 4
 Public Const FXMEDITARMEDIANO = 5
-Public Const FXMEDITARGRANDE = 6
-Public Const FXMEDITARGIGANTE = 50
+Public Const FXMEDITARGRANDE = 56
+Public Const FXMEDITARGIGANTE = 54
+Public Const FXMEDITARSUPREMO = 58
 Public Const FXMEDITARGRANDECAOS = 18
 Public Const FXMEDITARGRANDEREAL = 19
 
@@ -456,6 +457,7 @@ Public Const FONTTYPE_CONSEJO = "~90~90~255~1~0"
 Public Const FONTTYPE_CONSEJOCAOS = "~255~90~90~1~0"
 
 Public Const STAT_MAXELV = 45
+Public Const STAT_MAXELVFINAL = 50
 Public Const STAT_MAXHP = 999
 Public Const STAT_MAXSTA = 999
 Public Const STAT_MAXDEF = 99
@@ -749,6 +751,7 @@ Public Type ObjData
     
     Real As Integer
     Caos As Integer
+    Neutral As Integer
     
 End Type
 

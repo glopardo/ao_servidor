@@ -511,7 +511,7 @@ For i = 11 To 24
     ELUs(i) = ELUs(i - 1) * 1.3
 Next
 
-For i = 25 To STAT_MAXELV - 1
+For i = 25 To STAT_MAXELVFINAL - 1
     ELUs(i) = ELUs(i - 1) * 1.2
 Next
 
